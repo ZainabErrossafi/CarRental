@@ -1,0 +1,16 @@
+Rently — Car Rental: Study and Presentation Guide
+This README explains what the project contains, how it works, and which files to study so you can present it confidently. It reflects the source code, documentation, and Git history available on October 30, 2026, including local changes that have not been committed yet. Earlier conversations outside this session are unavailable. This guide does not attribute all team changes to one person or reproduce the chat history.
+
+1. What is the project?
+Rently is a car rental agency management application. Customers can browse vehicles, choose rental dates and extras, and make reservations. Administrators manage vehicles, reservations, users, locations, the catalog, FAQs, notifications, and reports.
+
+Technology	Purpose	Where to look
+React 18 + React Router	Pages, components, and navigation	frontend/src/App.jsx
+Vite + Tailwind CSS + MUI	Build tooling, styling, and UI elements	frontend/package.json
+Axios	API requests, errors, and token handling	frontend/src/services/api.js
+Django 4.2 + Django REST Framework	Business rules and REST API	backend/config/ and backend/apps/
+SimpleJWT	Access, refresh, and pending OTP tokens	backend/apps/users/two_factor.py
+django-allauth + dj-rest-auth	Authentication integration and Google OAuth	backend/config/settings.py
+PostgreSQL 16	Data storage, relationships, and transactions	docker-compose.yml
+Docker Compose + Gunicorn + Nginx	Services, HTTPS, and request routing	docker-compose.yml and nginx/
+Django email + SMTP	Verification, account, and reservation emails	backend/apps/users/templates/
