@@ -1,0 +1,12 @@
+services:
+  backend:
+    build:
+    context: ./backend
+    dockerfile: Dockerfile
+    container_name: car_rental_backend
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
