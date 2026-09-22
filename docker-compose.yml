@@ -34,6 +34,9 @@ services:
         condition: service_healthy
     ports:
       - "8000:8000"
+#So anything Django creates in /app will appear in your actual project folder.
+    volumes:
+     - ./backend:/app
     networks:
       - backend_net
       - frontend_net
