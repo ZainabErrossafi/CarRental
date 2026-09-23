@@ -73,3 +73,14 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year})"
+
+    def is_available(self, start, end, exclude_reservation_id=None):
+        """
+        Return True if this vehicle can be booked from start to end.
+
+        TODO: temporary stub, always returns True.
+        Real logic: False if start >= end, if status != AVAILABLE, or if a
+        pending/confirmed reservation overlaps [start, end)
+        (pickup_date < end and return_date > start).
+        """
+        return True
