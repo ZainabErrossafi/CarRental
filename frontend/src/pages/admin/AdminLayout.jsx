@@ -58,7 +58,7 @@ export default function AdminLayout() {
       <aside className="admin-sidebar">
         <div className="sidebar-brand">
           <span className="logo-dot" />
-            
+          Rently Admin
         </div>
 
         <div className="sidebar-search">

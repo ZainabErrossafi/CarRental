@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pencil, Trash2, Archive } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 
 import {
   getVehicles,
@@ -8,6 +10,7 @@ import {
 } from "../../services/adminApi";
 
 export default function AdminVehicles() {
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
 
   useEffect(() => {
@@ -22,7 +25,7 @@ export default function AdminVehicles() {
   };
 
   const handleEdit = (id) => {
-    console.log("Edit vehicle:", id);
+    navigate(`/admin/vehicles/${id}/edit`);
   };
 
   const handleArchive = (id) => {
@@ -70,71 +73,36 @@ export default function AdminVehicles() {
 
               <td>
                 <select
+                  className="status-select"
+                  data-status={v.status}
                   value={v.status}
                   onChange={(e) => handleStatusChange(v.id, e.target.value)}
                 >
-                  <option value="available" style={{ color: '#16a34a' }}>● Available</option>
-                  <option value="maintenance" style={{ color: '#d97706' }}>● Maintenance</option>
-                  <option value="hidden" style={{ color: '#6b7280' }}>● Hidden</option>
+                  <option value="available">Available</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="hidden">Hidden</option>
                 </select>
               </td>
+
               <td>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    alignItems: "center",
-                  }}
-                >
+                <div className="row-actions">
                   {/* EDIT */}
-                  <button
-                    onClick={() => handleEdit(v.id)}
-                    title="Edit Vehicle"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      color: "#1976d2",
-                    }}
-                  >
-                    <Pencil size={18} strokeWidth={2} />
+                  <button onClick={() => handleEdit(v.id)} title="Edit Vehicle">
+                    <Pencil size={15} />
+                  </button>
+
+                  {/* ARCHIVE */}
+                  <button onClick={() => handleArchive(v.id)} title="Archive Vehicle">
+                    <Archive size={15} />
                   </button>
 
                   {/* DELETE */}
                   <button
                     onClick={() => handleDelete(v.id)}
                     title="Delete Vehicle"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      color: "#d32f2f",
-                    }}
+                    className="danger"
                   >
-                    <Trash2 size={18} strokeWidth={2} />
-                  </button>
-
-                  {/* ARCHIVE */}
-                  <button
-                    onClick={() => handleArchive(v.id)}
-                    title="Archive Vehicle"
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      color: "#a77917",
-                    }}
-                  >
-                    <Archive size={18} strokeWidth={2} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </td>

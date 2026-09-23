@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminVehicles from "./pages/admin/AdminVehicles.jsx";
+import AdminLocations from "./pages/admin/AdminLocations.jsx";
 
 function ComingSoon({ label }) {
   return (
@@ -21,7 +22,7 @@ export default function App() {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="vehicles" element={<AdminVehicles />} />
-        <Route path="locations" element={<ComingSoon label="Locations" />} />
+        <Route path="locations" element={<AdminLocations label="Locations" />} />
         <Route path="catalog" element={<ComingSoon label="Catalog" />} />
         <Route path="reservations" element={<ComingSoon label="Reservations" />} />
         <Route path="reviews" element={<ComingSoon label="Reviews" />} />
