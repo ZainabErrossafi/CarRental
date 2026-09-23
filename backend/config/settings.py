@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'apps.reservations',
     'apps.reviews',
     'apps.notifications',
+    'apps.brands',
     'apps.vehicles',
     'apps.locations',
     'apps.extras',
