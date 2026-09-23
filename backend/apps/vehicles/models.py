@@ -60,7 +60,7 @@ class Vehicle(models.Model):
     min_license_years = models.PositiveSmallIntegerField(default=1)
 
     # Media & descriptions
-    main_image = models.ImageField(upload_to="vehicles/", blank=True)
+    # main_image = models.ImageField(upload_to="vehicles/", blank=True)
     description_en = models.TextField(blank=True)
     description_fr = models.TextField(blank=True)
     description_ar = models.TextField(blank=True)
