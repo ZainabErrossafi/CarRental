@@ -43,14 +43,16 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
+    'apps.brands',
+    'apps.categories',
+    'apps.features',
+    'apps.vehicles',
     'apps.users',
+    'apps.locations',
     'apps.reservations',
+    'apps.extras',
     'apps.reviews',
     'apps.notifications',
-    'apps.brands',
-    'apps.vehicles',
-    'apps.locations',
-    'apps.extras',
     'apps.content',
 ]
 
