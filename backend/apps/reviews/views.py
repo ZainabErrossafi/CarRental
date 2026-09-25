@@ -1,4 +1,6 @@
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from apps.users.permissions import IsAdminOrOwner
 from .models import Review
 from .serializers import ReviewSerializer
 
@@ -6,3 +8,14 @@ from .serializers import ReviewSerializer
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        elif self.action == 'create':
+            return [IsAuthenticated()]
+        else:
+            return [IsAdminOrOwner()]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
