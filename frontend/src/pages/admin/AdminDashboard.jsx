@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Download, RefreshCw, Search, Trash2, Pencil } from "lucide-react";
-import { getVehicles } from "../../services/adminApi";
+import { useNavigate } from "react-router-dom";
+import { getVehicles, deleteVehicle } from "../../services/adminApi";
 
 const TABLE_TABS = ["View all", "Available", "Maintenance", "Hidden"];
 
@@ -9,6 +10,7 @@ const SPARK_B = [9, 7, 10, 8, 12, 9, 13, 10, 15, 13];
 const SPARK_C = [3, 5, 4, 6, 5, 8, 6, 9, 8, 11];
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [filterTab, setFilterTab] = useState("All vehicles");
   const [tableTab, setTableTab] = useState("View all");
@@ -30,6 +32,17 @@ export default function AdminDashboard() {
   }, [vehicles, filterTab, tableTab, query]);
 
   const totalRate = vehicles.reduce((sum, v) => sum + v.dailyRate, 0) || 1;
+
+  const handleEdit = (id) => {
+    navigate(`/admin/vehicles/${id}/edit`);
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this vehicle?")) return;
+
+    await deleteVehicle(id);
+    setVehicles((prev) => prev.filter((v) => v.id !== id));
+  };
 
   return (
     <div>
@@ -110,8 +123,12 @@ export default function AdminDashboard() {
                   </td>
                   <td>
                     <div className="row-actions">
-                      <button title="Delete"><Trash2 size={15} /></button>
-                      <button title="Edit"><Pencil size={15} /></button>
+                      <button onClick={() => handleEdit(v.id)} title="Edit">
+                        <Pencil size={15} />
+                      </button>
+                      <button onClick={() => handleDelete(v.id)} title="Delete" className="danger">
+                        <Trash2 size={15} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -167,7 +184,7 @@ function Sparkline({ data }) {
       <polyline
         points={points}
         fill="none"
-        stroke="#FE832A"
+        stroke="#FF4F00"
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"

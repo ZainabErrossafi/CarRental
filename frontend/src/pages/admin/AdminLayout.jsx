@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Car,
@@ -12,7 +12,9 @@ import {
   Bell,
   BarChart2,
   Search,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const NAV_SECTIONS = [
   {
@@ -53,6 +55,14 @@ const NAV_SECTIONS = [
 ];
 
 export default function AdminLayout() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
@@ -86,10 +96,19 @@ export default function AdminLayout() {
 
         <div className="sidebar-footer">
           <span className="avatar" />
-          <div>
-            <div style={{ fontWeight: 600 }}>Admin User</div>
-            <div style={{ color: "#98a2b3", fontSize: "0.78rem" }}>admin@Rently.com</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 600 }}>{user?.name || "Admin User"}</div>
+            <div style={{ color: "#98a2b3", fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {user?.email}
+            </div>
           </div>
+          <button
+            onClick={handleLogout}
+            title="Log out"
+            style={{ background: "none", border: "none", cursor: "pointer", color: "#897973", display: "flex" }}
+          >
+            <LogOut size={16} />
+          </button>
         </div>
       </aside>
       <main className="admin-content">
