@@ -48,10 +48,6 @@ const NAV_SECTIONS = [
       { to: "/admin/notifications", label: "Notifications", icon: Bell },
     ],
   },
-  {
-    label: "Insights",
-    items: [{ to: "/admin/analytics", label: "Analytics", icon: BarChart2 }],
-  },
 ];
 
 export default function AdminLayout() {

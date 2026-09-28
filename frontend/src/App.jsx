@@ -9,10 +9,14 @@ import AdminReservations from "./pages/admin/AdminReservations.jsx";
 import AdminReservationAdd from "./pages/admin/Adminreservationadd.jsx";
 import AdminVehicleAdd from "./pages/admin/AdminVehicleAdd.jsx";
 import AdminAuth from "./pages/admin/AdminAuth.jsx";
+import AdminForgotPassword from "./pages/admin/AdminForgotPassword.jsx";
+import AdminVerifyEmail from "./pages/admin/ AdminVerifyEmail.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminReviews from "./pages/admin/AdminReviews.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
-
+import AdminSiteSettings from "./pages/admin/AdminSiteSettings.jsx";
+import AdminFaqs from "./pages/admin/AdminFAQs.jsx";
+import AdminNotifications from "./pages/admin/AdminNotifications.jsx";
 function ComingSoon({ label }) {
   return (
     <div>
@@ -29,6 +33,8 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<AdminAuth initialMode="login" />} />
       <Route path="/signup" element={<AdminAuth initialMode="signup" />} />
+      <Route path="/forgot-password" element={<AdminForgotPassword />} />
+      <Route path="/verify-email" element={<AdminVerifyEmail />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route
         path="/admin"
@@ -48,9 +54,9 @@ export default function App() {
         <Route path="reservations/new" element={<AdminReservationAdd />} />
         <Route path="reviews" element={<AdminReviews label="Reviews" />} />
         <Route path="users" element={<AdminUsers label="Users & Roles" />} />
-        <Route path="site-settings" element={<ComingSoon label="Site Settings" />} />
-        <Route path="faqs" element={<ComingSoon label="FAQs" />} />
-        <Route path="notifications" element={<ComingSoon label="Notifications" />} />
+        <Route path="site-settings" element={<AdminSiteSettings label="Site Settings" />} />
+        <Route path="faqs" element={<AdminFaqs label="FAQs" />} />
+        <Route path="notifications" element={<AdminNotifications label="Notifications" />} />
         <Route path="analytics" element={<ComingSoon label="Analytics" />} />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />

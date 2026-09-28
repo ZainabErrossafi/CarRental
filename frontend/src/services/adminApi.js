@@ -136,29 +136,75 @@ let mockLocations = [
 ];
 export const getLocations = () => delay(mockLocations);
 
-const mockBrands = [
-  { id: 1, name: "Toyota" },
-  { id: 2, name: "Renault" },
-  { id: 3, name: "Dacia" },
-  { id: 4, name: "Mercedes" },
-];
-const mockCategories = [
-  { id: 1, name: "Economy" },
-  { id: 2, name: "SUV" },
-  { id: 3, name: "Luxury" },
-];
-const mockFeatures = [
-  { id: 1, name: "Air Conditioning" },
-  { id: 2, name: "GPS Navigation" },
-  { id: 3, name: "Bluetooth" },
-];
-const mockExtras = [
-  { id: 1, name: "Child Seat", pricePerDay: 30 },
-  { id: 2, name: "GPS Device", pricePerDay: 20 },
-  { id: 3, name: "Additional Driver", pricePerDay: 50 },
-];
-export const getCatalog = () =>
-  delay({ brands: mockBrands, categories: mockCategories, features: mockFeatures, extras: mockExtras });
+// =========================
+// CATALOG
+// Mirrors the Brand, Category, Feature and Extra models.
+// =========================
+let catalogData = {
+  brands: [
+    { id: 1, name: "Toyota", slug: "toyota" },
+    { id: 2, name: "Renault", slug: "renault" },
+    { id: 3, name: "Dacia", slug: "dacia" },
+    { id: 4, name: "Mercedes", slug: "mercedes" },
+  ],
+  categories: [
+    { id: 1, icon: "car", name: "Economy", name_fr: "Économique", name_ar: "اقتصادية", order: 1, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+    { id: 2, icon: "truck", name: "SUV", name_fr: "SUV", name_ar: "دفع رباعي", order: 2, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+    { id: 3, icon: "gem", name: "Luxury", name_fr: "Luxe", name_ar: "فاخرة", order: 3, active: false, created_at: "2026-01-05", updated_at: "2026-03-10" },
+  ],
+  features: [
+    { id: 1, icon: "snowflake", name: "Air Conditioning", name_fr: "Climatisation", name_ar: "تكييف الهواء" },
+    { id: 2, icon: "navigation", name: "GPS Navigation", name_fr: "Navigation GPS", name_ar: "نظام تحديد المواقع" },
+    { id: 3, icon: "bluetooth", name: "Bluetooth", name_fr: "Bluetooth", name_ar: "بلوتوث" },
+  ],
+  extras: [
+    { id: 1, icon: "baby", name: "Child Seat", price_per_day: 30, flat_price: 0, max_qty: 2, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+    { id: 2, icon: "navigation", name: "GPS Device", price_per_day: 20, flat_price: 0, max_qty: 1, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+    { id: 3, icon: "userplus", name: "Additional Driver", price_per_day: 50, flat_price: 0, max_qty: 2, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+  ],
+};
+
+const catalogToday = () => new Date().toISOString().slice(0, 10);
+
+export const getCatalog = () => delay(catalogData);
+
+// kind: "brands" | "categories" | "features" | "extras"
+export const createCatalogItem = (kind, data) => {
+  const list = catalogData[kind];
+  const nextId = list.length ? Math.max(...list.map((i) => i.id)) + 1 : 1;
+  const item = { ...data, id: nextId };
+
+  if (kind === "categories") {
+    item.order = list.length ? Math.max(...list.map((i) => i.order)) + 1 : 1;
+  }
+  if (kind === "categories" || kind === "extras") {
+    item.created_at = catalogToday();
+    item.updated_at = catalogToday();
+  }
+
+  catalogData = { ...catalogData, [kind]: [...list, item] };
+  return delay(item);
+};
+
+export const updateCatalogItem = (kind, id, data) => {
+  const withStamp = kind === "categories" || kind === "extras"
+    ? { ...data, updated_at: catalogToday() }
+    : data;
+
+  catalogData = {
+    ...catalogData,
+    [kind]: catalogData[kind].map((i) => (i.id === id ? { ...i, ...withStamp } : i)),
+  };
+  return delay(catalogData[kind].find((i) => i.id === id));
+};
+
+export const deleteCatalogItem = (kind, id) => {
+  catalogData = {
+    ...catalogData,
+    [kind]: catalogData[kind].filter((i) => i.id !== id),
+  };
+  return delay(null);
+};
 
 let mockReviews = [
   { id: 1, vehicle: "Toyota Yaris", user: "amine@example.com", rating: 5, comment: "Clean car, smooth pickup." },
@@ -173,6 +219,7 @@ export const deleteReview = (id) => {
 let mockUsers = [
   { id: 1, email: "amine@example.com", role: "client", isActive: true },
   { id: 2, email: "sara@example.com", role: "client", isActive: true },
+  { id: 3, email: "staff1@Rently.com", role: "staff", isActive: true },
   { id: 4, email: "admin@Rently.com", role: "admin", isActive: true },
 ];
 export const getUsers = () => delay(mockUsers);
@@ -182,16 +229,215 @@ export const updateUserRole = (id, role) => {
 };
 
 let mockFaqs = [
-  { id: 1, question: "What documents do I need to rent a car?", order: 1, active: true },
-  { id: 2, question: "Can I extend my rental?", order: 2, active: true },
+  {
+    id: 1,
+    question: "What documents do I need to rent a car?",
+    answer:
+      "You need a valid driver's license (held for at least the minimum required years), a national ID or passport, and a credit or debit card for the security deposit.",
+    order: 1,
+    active: true,
+    created_at: "2026-01-05",
+    updated_at: "2026-08-12",
+  },
+  {
+    id: 2,
+    question: "Can I extend my rental?",
+    answer:
+      "Yes, as long as the vehicle isn't booked by another client. Contact us at least 24 hours before your return date to request an extension.",
+    order: 2,
+    active: true,
+    created_at: "2026-01-05",
+    updated_at: "2026-08-12",
+  },
+  {
+    id: 3,
+    question: "Is there a mileage limit?",
+    answer:
+      "Each vehicle has its own daily mileage limit, shown on its listing. Extra kilometers are charged at the rate stated in your rental agreement.",
+    order: 3,
+    active: false,
+    created_at: "2026-02-14",
+    updated_at: "2026-02-14",
+  },
 ];
-export const getFaqs = () => delay(mockFaqs);
 
-export const getSiteSettings = () =>
-  delay({
-    companyName: "Rently",
-    email: "contact@Rently.com",
-    phone: "+212 6 00 00 00 00",
-    city: "Rabat",
-    country: "Morocco",
+const today = () => new Date().toISOString().slice(0, 10);
+
+export const getFaqs = () =>
+  delay([...mockFaqs].sort((a, b) => a.order - b.order));
+
+export const createFaq = (data) => {
+  const newFaq = {
+    ...data,
+    id: mockFaqs.length ? Math.max(...mockFaqs.map((f) => f.id)) + 1 : 1,
+    order: mockFaqs.length ? Math.max(...mockFaqs.map((f) => f.order)) + 1 : 1,
+    created_at: today(),
+    updated_at: today(),
+  };
+  mockFaqs = [...mockFaqs, newFaq];
+  return delay(newFaq);
+};
+
+export const updateFaq = (id, data) => {
+  mockFaqs = mockFaqs.map((f) =>
+    f.id === id ? { ...f, ...data, updated_at: today() } : f
+  );
+  return delay(mockFaqs.find((f) => f.id === id));
+};
+
+export const deleteFaq = (id) => {
+  mockFaqs = mockFaqs.filter((f) => f.id !== id);
+  return delay(null);
+};
+
+// Swaps the `order` value of two FAQs so they trade places in the list.
+export const swapFaqOrder = (idA, idB) => {
+  const a = mockFaqs.find((f) => f.id === idA);
+  const b = mockFaqs.find((f) => f.id === idB);
+  if (!a || !b) return delay(mockFaqs);
+
+  mockFaqs = mockFaqs.map((f) => {
+    if (f.id === idA) return { ...f, order: b.order, updated_at: today() };
+    if (f.id === idB) return { ...f, order: a.order, updated_at: today() };
+    return f;
   });
+  return delay([...mockFaqs].sort((x, y) => x.order - y.order));
+};
+
+let mockSiteSettings = {
+  company_name: "Rently",
+  email: "contact@rently.com",
+  phone: "+212 6 00 00 00 00",
+  whatsapp: "+212 6 00 00 00 00",
+  address: "12 Avenue Mohammed V",
+  city: "Rabat",
+  country: "Morocco",
+  facebook: "",
+  instagram: "",
+  twitter: "",
+  linkedin: "",
+  hero_title_en: "Drive your way",
+  hero_title_fr: "Roulez à votre façon",
+  hero_title_ar: "قد بطريقتك",
+  hero_subtitle_en: "Rent the perfect car for every trip.",
+  hero_subtitle_fr: "Louez la voiture idéale pour chaque trajet.",
+  hero_subtitle_ar: "استأجر السيارة المثالية لكل رحلة.",
+  hero_image: "",
+  about_en: "",
+  about_fr: "",
+  about_ar: "",
+  created_at: "2026-01-05",
+  updated_at: "2026-09-20",
+};
+
+export const getSiteSettings = () => delay(mockSiteSettings);
+
+export const updateSiteSettings = (data) => {
+  mockSiteSettings = {
+    ...mockSiteSettings,
+    ...data,
+    updated_at: new Date().toISOString().slice(0, 10),
+  };
+  return delay(mockSiteSettings);
+};
+// =========================
+// NOTIFICATIONS
+// Mirrors the Notification model: type, title, message, related_id,
+// related_type, is_read, read_at, created_at.
+// =========================
+const minutesAgo = (m) => new Date(Date.now() - m * 60 * 1000).toISOString();
+
+let mockNotifications = [
+  {
+    id: 1,
+    type: "reservation_confirmed",
+    title: "Reservation confirmed",
+    message: "Reservation DG-0001 for Toyota Yaris was confirmed.",
+    related_id: 1,
+    related_type: "Reservation",
+    is_read: false,
+    read_at: null,
+    created_at: minutesAgo(12),
+  },
+  {
+    id: 2,
+    type: "pickup_reminder",
+    title: "Pickup tomorrow",
+    message: "Amine El Fassi picks up the Toyota Yaris tomorrow at 10:00.",
+    related_id: 1,
+    related_type: "Reservation",
+    is_read: false,
+    read_at: null,
+    created_at: minutesAgo(95),
+  },
+  {
+    id: 3,
+    type: "payment_received",
+    title: "Payment received",
+    message: "A payment of 350 MAD was received for reservation DG-0002.",
+    related_id: 2,
+    related_type: "Reservation",
+    is_read: false,
+    read_at: null,
+    created_at: minutesAgo(60 * 5),
+  },
+  {
+    id: 4,
+    type: "reservation_cancelled",
+    title: "Reservation cancelled",
+    message: "Reservation DG-0003 for Renault Clio was cancelled by the client.",
+    related_id: 3,
+    related_type: "Reservation",
+    is_read: true,
+    read_at: minutesAgo(60 * 20),
+    created_at: minutesAgo(60 * 26),
+  },
+  {
+    id: 5,
+    type: "return_reminder",
+    title: "Vehicle due back today",
+    message: "Dacia Duster is due back today by 18:00.",
+    related_id: 2,
+    related_type: "Reservation",
+    is_read: true,
+    read_at: minutesAgo(60 * 46),
+    created_at: minutesAgo(60 * 50),
+  },
+  {
+    id: 6,
+    type: "review_request",
+    title: "Review requested",
+    message: "A review request was sent to sara@example.com after her rental.",
+    related_id: 2,
+    related_type: "Reservation",
+    is_read: true,
+    read_at: minutesAgo(60 * 70),
+    created_at: minutesAgo(60 * 72),
+  },
+];
+
+export const getNotifications = () =>
+  delay([...mockNotifications].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+
+// Mirrors the Notification model's mark_as_read() method.
+export const markNotificationAsRead = (id) => {
+  mockNotifications = mockNotifications.map((n) =>
+    n.id === id && !n.is_read
+      ? { ...n, is_read: true, read_at: new Date().toISOString() }
+      : n
+  );
+  return delay(mockNotifications.find((n) => n.id === id));
+};
+
+export const markAllNotificationsAsRead = () => {
+  const now = new Date().toISOString();
+  mockNotifications = mockNotifications.map((n) =>
+    n.is_read ? n : { ...n, is_read: true, read_at: now }
+  );
+  return delay([...mockNotifications].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
+};
+
+export const deleteNotification = (id) => {
+  mockNotifications = mockNotifications.filter((n) => n.id !== id);
+  return delay(null);
+};

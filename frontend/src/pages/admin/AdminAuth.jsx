@@ -38,12 +38,12 @@ export default function AdminAuth({ initialMode = "login" }) {
     try {
       if (mode === "login") {
         await login({ email: form.email, password: form.password });
+        const redirectTo = location.state?.from?.pathname || "/admin";
+        navigate(redirectTo, { replace: true });
       } else {
         await signup({ name: form.name, email: form.email, password: form.password });
+        navigate("/verify-email", { replace: true, state: { email: form.email } });
       }
-
-      const redirectTo = location.state?.from?.pathname || "/admin";
-      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {
@@ -158,7 +158,7 @@ export default function AdminAuth({ initialMode = "login" }) {
                 />
                 Remember for 30 days
               </label>
-              <a href="#" className="auth-link">Forgot password</a>
+              <Link to="/forgot-password" className="auth-link">Forgot password</Link>
             </div>
           )}
 
