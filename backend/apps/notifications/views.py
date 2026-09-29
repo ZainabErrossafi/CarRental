@@ -11,6 +11,10 @@ class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [IsAdminOrOwner]
 
+    filterset_fields = ['type', 'is_read', 'user']
+    ordering_fields = ['created_at']
+    ordering = ['-created_at']
+
     @action(detail=True, methods=['post'])
     def mark_as_read(self, request, pk=None):
         notification = self.get_object()
