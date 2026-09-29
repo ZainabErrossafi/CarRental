@@ -11,6 +11,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
 
+    filterset_fields = ['status', 'vehicle', 'user']
+    search_fields = ['reference', 'driver_name', 'email']
+    ordering_fields = ['pickup_date', 'return_date', 'total_price', 'created_at']
+    ordering = ['-created_at']
+
     def get_permissions(self):
         if self.action == 'create':
             return [IsAuthenticated()]

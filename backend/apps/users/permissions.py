@@ -11,4 +11,7 @@ class IsAdminOrOwner(BasePermission):
         return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        return request.user.is_admin() or obj.user_id == request.user.id
+        if request.user.is_admin():
+            return True
+        owner_id = getattr(obj, 'user_id', obj.id)
+        return owner_id == request.user.id
