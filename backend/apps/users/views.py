@@ -11,6 +11,11 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+    filterset_fields = ['role', 'is_active']
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+    ordering_fields = ['username', 'date_joined']
+    ordering = ['-date_joined']
+
     def get_permissions(self):
         if self.action in ['retrieve', 'update', 'partial_update']:
             return [IsAdminOrOwner()]
