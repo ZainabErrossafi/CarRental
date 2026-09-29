@@ -1,3 +1,4 @@
+import uuid
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -25,8 +26,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return [IsAdmin()]
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
+        reference = f"RES-{uuid.uuid4().hex[:8].upper()}"
+        reservation = serializer.save(user=self.request.user, reference=reference, total_price=0)
+        reservation.total_price = reservation.calculate_total()
+        reservation.save()
+        
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
         reservation = self.get_object()
