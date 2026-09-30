@@ -50,14 +50,29 @@ class Reservation(models.Model):
     def confirm(self):
         self.status = ReservationStatus.CONFIRMED
         self.save()
+        self._notify('reservation_confirmed', 'Reservation confirmed', f"Your reservation {self.reference} has been confirmed.")
 
     def cancel(self):
         self.status = ReservationStatus.CANCELLED
         self.save()
+        self._notify('reservation_cancelled', 'Reservation cancelled', f"Your reservation {self.reference} has been cancelled.")
 
     def complete(self):
         self.status = ReservationStatus.COMPLETED
         self.save()
+        self._notify('review_request', 'How was your rental?', f"Leave a review for your reservation {self.reference}.")
+
+    def _notify(self, notif_type, title, message):
+        from apps.notifications.models import Notification
+        Notification.objects.create(
+            user=self.user,
+            type=notif_type,
+            title=title,
+            message=message,
+            related_id=self.id,
+            related_type='reservation',
+        )
+          
     def __str__(self):
         return self.reference
 
