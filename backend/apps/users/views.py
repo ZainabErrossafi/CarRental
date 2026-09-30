@@ -10,6 +10,7 @@ from .serializers import UserSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
 
     filterset_fields = ['role', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name']
@@ -27,4 +28,20 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def me(self, request):
         serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
+    def deactivate(self, request, pk=None):
+        user = self.get_object()
+        user.is_active = False
+        user.save()
+        serializer = self.get_serializer(user)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
+    def activate(self, request, pk=None):
+        user = self.get_object()
+        user.is_active = True
+        user.save()
+        serializer = self.get_serializer(user)
         return Response(serializer.data)
