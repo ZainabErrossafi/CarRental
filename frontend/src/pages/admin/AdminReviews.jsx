@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Trash2, Star } from "lucide-react";
 import { getReviews, deleteReview } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
 
 const RATING_TABS = ["All", "5", "4", "3", "2", "1"];
 
 export default function AdminReviews() {
+  const confirm = useConfirm();
   const [reviews, setReviews] = useState([]);
   const [tab, setTab] = useState("All");
   const [query, setQuery] = useState("");
@@ -27,7 +29,7 @@ export default function AdminReviews() {
   const avgRating = reviews.length ? avgRatingNum.toFixed(1) : "—";
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this review?")) return;
+    if (!(await confirm("Are you sure you want to delete this review?", { danger: true, confirmLabel: "Delete" }))) return;
     await deleteReview(id);
     setReviews((prev) => prev.filter((r) => r.id !== id));
   };

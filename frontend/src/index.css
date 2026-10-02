@@ -134,7 +134,7 @@ body {
   width: 60px;
   height: 60px;
   border-radius: 8px;
-  background: url('../logo.png') no-repeat center / cover;
+  background: url('../src/assets/logo.png') no-repeat center / cover;
   flex-shrink: 0;
 }
 
@@ -957,6 +957,15 @@ th {
   padding: 2rem 1rem;
 }
 
+/* Full-screen variant, used by the sliding login/signup card only
+   (Forgot Password keeps the padded, centered .auth-page above). */
+.auth-page-full {
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0;
+  overflow: hidden;
+}
+
 .auth-card {
   width: 100%;
   max-width: 380px;
@@ -973,7 +982,7 @@ th {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: url('../logo.png') no-repeat center / cover;
+  background: url('../src/assets/logo.png') no-repeat center / cover;
   box-shadow: 0 4px 14px rgba(254, 131, 42, 0.25);
 }
 
@@ -1341,7 +1350,7 @@ th {
 }
 
 .image-upload-remove:hover {
-  border-color: #FCA5A5;
+  border-color: #a5b9fc;
   background: #FEF2F2;
 }
 
@@ -1793,4 +1802,864 @@ th {
   border-color: var(--orange);
   background: var(--orange-light);
   color: var(--orange);
+}
+
+/* =========================
+   CONFIRM DIALOG
+   ========================= */
+
+.confirm-card {
+  background: var(--white);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 360px;
+  padding: 1.5rem;
+  box-shadow: 0 20px 50px rgba(2, 23, 49, 0.25);
+  text-align: center;
+}
+
+.confirm-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--orange-light);
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.confirm-icon.danger {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.confirm-message {
+  color: var(--navy);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  margin: 0 0 1.5rem;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.confirm-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+.btn-danger {
+  background: #DC2626;
+  border-color: #DC2626;
+  color: var(--white);
+}
+
+.btn-danger:hover {
+  background: #B91C1C;
+  border-color: #B91C1C;
+}
+
+/* =========================
+   SPLIT-SCREEN LOGIN
+   ========================= */
+
+.split-auth {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* --- Left: brand panel --- */
+
+.split-auth-brand {
+  position: relative;
+  flex: 0 0 44%;
+  max-width: 620px;
+  background: linear-gradient(160deg, var(--navy) 0%, #0a2c52 100%);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.split-auth-brand-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(254, 131, 42, 0.18) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(254, 131, 42, 0.12) 0%, transparent 50%);
+}
+
+.split-auth-brand-content {
+  position: relative;
+  z-index: 1;
+  padding: 3rem;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.split-auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--white);
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 3.5rem;
+}
+
+.split-auth-logo .logo-dot {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: url('../src/assets/logo.png') no-repeat center / cover;
+}
+
+.split-auth-brand-copy h2 {
+  color: var(--white);
+  font-size: 1.9rem;
+  line-height: 1.25;
+  margin: 0 0 0.85rem;
+}
+
+.split-auth-brand-copy p {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 2.5rem;
+  max-width: 360px;
+}
+
+.split-auth-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.split-auth-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.88rem;
+}
+
+.split-auth-feature-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* --- Right: form panel --- */
+
+.split-auth-form-panel {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--white);
+  padding: 3rem 1.5rem;
+}
+
+.split-auth-form-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+.split-auth-mobile-logo {
+  display: none;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.split-auth-mobile-logo .logo-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  background: url('../src/assets/logo.png') no-repeat center / cover;
+}
+
+.split-auth-form-wrap .auth-title {
+  text-align: left;
+}
+
+.split-auth-form-wrap .auth-subtitle {
+  text-align: left;
+  margin-bottom: 1.75rem;
+}
+
+.split-auth-form-wrap .auth-tabs {
+  width: 100%;
+}
+
+.split-auth-form-wrap .auth-footer {
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .split-auth-brand {
+    display: none;
+  }
+
+  .split-auth-mobile-logo {
+    display: flex;
+  }
+}
+
+/* =========================
+   PHOTO LOGIN CARD
+   ========================= */
+
+.gcard {
+  display: flex;
+  align-items: stretch;
+  width: 100vw;
+  height: 100vh;
+  background: var(--white);
+  overflow: hidden;
+}
+
+/* --- Icon rail --- */
+
+.gcard-nav {
+  position: relative;
+  flex: 0 0 90px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  overflow: hidden;
+}
+
+.gcard-nav-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 110px;
+}
+
+.gcard-nav-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: url('../src/assets/logo.png') no-repeat center / cover;
+}
+
+.gcard-nav li:not(.gcard-nav-brand) {
+  flex: 1 1 auto;
+  display: grid;
+  place-items: center;
+  max-height: 110px;
+}
+
+.gcard-nav button {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: center;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.gcard-nav button.active {
+  color: var(--navy);
+}
+
+.gcard-nav button:not(.active):hover {
+  color: var(--orange);
+}
+
+.gcard-nav-indicator {
+  position: absolute;
+  left: 0;
+  top: 110px;
+  width: 3px;
+  height: calc((100% - 110px) / 2);
+  background: var(--orange);
+  border-radius: 0 4px 4px 0;
+  transition: translate 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.gcard.signup .gcard-nav-indicator {
+  translate: 0 100%;
+}
+
+/* --- Photo hero --- */
+
+.gcard-hero {
+  position: relative;
+  flex: 0 0 720px;
+  overflow: hidden;
+}
+
+.gcard-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gcard-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.1) 45%, rgba(2, 23, 49, 0.35) 100%);
+}
+
+.gcard-hero-inner {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.gcard-hero-content {
+  padding: 0 2.25rem 3rem;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.gcard.signin .gcard-hero-content.signin,
+.gcard.signup .gcard-hero-content.signup {
+  opacity: 1;
+  max-height: none;
+}
+
+.gcard-hero-content h2 {
+  color: var(--white);
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.gcard-hero-content p {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.gcard-hero-terms {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+}
+
+.gcard-hero-terms:hover {
+  color: var(--white);
+}
+
+/* --- Form panel --- */
+
+.gcard-form {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 3rem;
+  overflow-y: auto;
+}
+
+.gcard-form-top {
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+}
+
+.gcard-form-top button {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--orange);
+  font-weight: 700;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+.gcard-form-top button:hover {
+  text-decoration: underline;
+}
+
+.gcard-hint {
+  margin-top: -1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.gcard-error {
+  margin-bottom: 1rem;
+}
+
+.gcard-forms {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.gcard-forms form {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+}
+
+.gcard.signin .gcard-forms form.signin,
+.gcard.signup .gcard-forms form.signup {
+  display: flex;
+}
+
+/* Pill-style inputs with a trailing icon */
+
+.gfield {
+  margin-bottom: 1.4rem;
+}
+
+.gfield label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+}
+
+.gfield-input {
+  display: flex;
+  align-items: center;
+  background: #F3F4F6;
+  border-radius: 999px;
+  padding: 0 1.1rem;
+  color: var(--muted);
+}
+
+.gfield-input input {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: 0.85rem 0;
+  font-size: 0.92rem;
+  color: var(--navy);
+  outline: none;
+}
+
+.gfield-input input::placeholder {
+  color: #9CA3AF;
+}
+
+.gfield-input:focus-within {
+  box-shadow: 0 0 0 2px var(--navy);
+}
+
+.gfield-icon-btn {
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  padding: 0;
+}
+
+.gcard-submit {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  background: var(--navy);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.95rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.gcard-submit:hover {
+  background: #FF4F00;
+}
+
+.gcard-submit:active {
+  transform: scale(0.98);
+}
+
+.gcard-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.gcard-social-label {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.gcard-social-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.9rem;
+}
+
+.gcard-social-row button {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: none;
+  background: #F3F4F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--navy);
+  transition: background 0.15s ease;
+}
+
+.gcard-social-row button:hover {
+  background: #E5E7EB;
+}
+
+@media (max-width: 860px) {
+  .gcard-hero {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .auth-page-full {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .gcard {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .gcard-nav {
+    flex-direction: row;
+    flex: 0 0 auto;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .gcard-nav-brand {
+    height: auto;
+    width: 70px;
+  }
+
+  .gcard-nav li:not(.gcard-nav-brand) {
+    max-height: none;
+    height: 64px;
+  }
+
+  .gcard-nav-indicator {
+    top: 0;
+    left: 70px;
+    width: 33.33%;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .gcard.signup .gcard-nav-indicator {
+    translate: 100% 0;
+  }
+
+  .gcard-form {
+    padding: 2rem 1.25rem;
+  }
+}
+
+.gfield-forgot {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -0.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.forgot-password-link {
+  font-size: 0.82rem;
+  color: #FF4F00;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+  color: #FF4F00;
+}
+
+/* =====================================================
+   RESPONSIVE – ADMIN PANEL
+   Breakpoints: 1024px (tablet) · 768px (mobile) · 480px (small phone)
+   Kept at the end of the file so these rules override the base styles.
+   (Auth/login pages already have their own queries at 900/860/560px.)
+   ===================================================== */
+
+/* Elements that only exist on mobile are hidden by default */
+.admin-topbar,
+.sidebar-overlay {
+  display: none;
+}
+
+/* ---------- Tablet: ≤ 1024px ---------- */
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 220px;
+  }
+
+  .admin-content {
+    padding: 1.5rem;
+  }
+}
+
+/* ---------- Mobile: ≤ 768px ---------- */
+@media (max-width: 768px) {
+
+  /* Layout: sidebar becomes an off-canvas drawer */
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    padding: 0.7rem 1rem;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .admin-topbar button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--navy);
+    cursor: pointer;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    max-width: 85vw;
+    z-index: 80;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 0 0 40px rgba(2, 23, 49, 0.25);
+  }
+
+  .sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(2, 23, 49, 0.45);
+  }
+
+  /* keyboard hint is meaningless on touch devices */
+  .sidebar-search kbd,
+  .search-box kbd {
+    display: none;
+  }
+
+  .admin-content {
+    padding: 1rem;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Page header: title on top, actions below */
+  .page-header,
+  .admin-edit-container .page-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .page-header-actions {
+    flex-wrap: wrap;
+  }
+
+  /* Tables: scroll horizontally inside the card instead of being clipped */
+  .table-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-card > table {
+    min-width: 640px;
+  }
+
+  th,
+  td {
+    padding: 0.65rem 0.85rem;
+  }
+
+  th {
+    white-space: nowrap;
+  }
+
+  /* Toolbar: stack search / filters */
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.8rem 1rem;
+  }
+
+  .toolbar-tabs,
+  .pill-tabs {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .toolbar-tab,
+  .pill-tab {
+    white-space: nowrap;
+  }
+
+  .toolbar-right {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-right .search-box,
+  .table-toolbar > .search-box {
+    flex: 1 1 100%;
+  }
+
+  /* search inputs have inline pixel widths in the JSX, hence !important */
+  .search-box input {
+    width: 100% !important;
+    min-width: 0;
+  }
+
+  .filter-select {
+    flex: 1 1 auto;
+  }
+
+  /* Forms */
+  .form-grid {
+    grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .form-card {
+    padding: 1.1rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions .btn,
+  .form-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Modals */
+  .modal-card {
+    max-height: 90vh;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .detail-row {
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+  }
+}
+
+/* ---------- Small phones: ≤ 480px ---------- */
+@media (max-width: 480px) {
+  .admin-content {
+    padding: 0.85rem;
+  }
+
+  .page-header h1,
+  .admin-edit-container .page-header h1 {
+    font-size: 1.2rem;
+  }
+
+  .page-header-actions {
+    width: 100%;
+  }
+
+  .page-header-actions .btn,
+  .page-header-actions button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .modal-footer {
+    flex-wrap: wrap;
+  }
+
+  .modal-footer .btn,
+  .modal-footer button {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
 }

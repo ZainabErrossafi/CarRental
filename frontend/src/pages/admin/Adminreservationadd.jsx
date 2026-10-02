@@ -1,33 +1,73 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getVehicles, createReservation } from "../../services/adminApi";
+import { 
+  getVehicles, 
+  getLocations, 
+  getUsers, 
+  getExtras, 
+  createReservation 
+} from "../../services/adminApi";
 
 const EMPTY_RESERVATION = {
+  user_id: "", // Optional, if booking for a registered user
   vehicle_id: "",
+  pickup_location_id: "",
+  dropoff_location_id: "",
   driver_name: "",
   phone: "",
   email: "",
   pickup_date: "",
   return_date: "",
+  extras: [], // Array of selected extra IDs
 };
 
 export default function AdminReservationAdd() {
   const navigate = useNavigate();
+  
+  // Data states
   const [vehicles, setVehicles] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [availableExtras, setAvailableExtras] = useState([]);
+
+  // Form states
   const [form, setForm] = useState(EMPTY_RESERVATION);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
+  // Fetch initial data
   useEffect(() => {
-    getVehicles().then((data) =>
-      setVehicles(data.filter((v) => v.status === "available"))
-    );
+    Promise.all([
+      getVehicles(),
+      getLocations(),
+      getUsers(),
+      getExtras()
+    ]).then(([vData, lData, uData, eData]) => {
+      setVehicles(vData.filter((v) => v.status === "available"));
+      setLocations(lData);
+      setUsers(uData);
+      setAvailableExtras(eData.filter((e) => e.active !== false)); // Assuming active flag
+    }).catch(err => {
+      console.error("Failed to fetch initial form data", err);
+    });
   }, []);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  const handleExtraToggle = (extraId) => {
+    setForm((prev) => {
+      const currentExtras = prev.extras;
+      if (currentExtras.includes(extraId)) {
+        return { ...prev, extras: currentExtras.filter(id => id !== extraId) };
+      } else {
+        return { ...prev, extras: [...currentExtras, extraId] };
+      }
+    });
+  };
+
+  // Calculations
   const selectedVehicle = vehicles.find((v) => v.id === Number(form.vehicle_id));
 
   const estimatedDays = (() => {
@@ -38,14 +78,31 @@ export default function AdminReservationAdd() {
     return diff > 0 ? diff : 0;
   })();
 
-  const estimatedTotal = selectedVehicle ? estimatedDays * selectedVehicle.dailyRate : 0;
+  const estimatedTotal = (() => {
+    if (!selectedVehicle || estimatedDays === 0) return 0;
+    
+    // Vehicle daily rate
+    let total = estimatedDays * Number(selectedVehicle.dailyRate || 0);
+    
+    // Add Extras (accounting for flat price or per day price)
+    form.extras.forEach(extraId => {
+      const extra = availableExtras.find(e => e.id === Number(extraId));
+      if (extra) {
+        total += Number(extra.flat_price || 0);
+        total += Number(extra.price_per_day || 0) * estimatedDays;
+      }
+    });
+    
+    return total;
+  })();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
-    if (!form.vehicle_id) {
-      setError("Please select a vehicle.");
+    // Basic Validation
+    if (!form.vehicle_id || !form.pickup_location_id || !form.dropoff_location_id) {
+      setError("Please select a vehicle and both pickup/dropoff locations.");
       return;
     }
     if (!form.pickup_date || !form.return_date) {
@@ -59,7 +116,13 @@ export default function AdminReservationAdd() {
 
     setSaving(true);
     try {
-      await createReservation(form);
+      // Append calculated total_price to the submission payload
+      const payload = {
+        ...form,
+        total_price: estimatedTotal
+      };
+      
+      await createReservation(payload);
       navigate("/admin/reservations");
     } catch (err) {
       setError(err.message || "Failed to create reservation. Please try again.");
@@ -84,10 +147,33 @@ export default function AdminReservationAdd() {
       <form onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
 
+          {/* User Details */}
+          <div className="form-card">
+            <h3>Client Selection (Optional)</h3>
+            <div className="form-grid">
+              <div className="form-field full-width">
+                <label htmlFor="user_id">Registered User</label>
+                <select
+                  id="user_id"
+                  value={form.user_id}
+                  onChange={(e) => handleChange("user_id", e.target.value)}
+                >
+                  <option value="">Guest (No Account)</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.first_name} {u.last_name} ({u.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
           {/* Vehicle & Dates */}
           <div className="form-card">
-            <h3>Vehicle & Dates</h3>
+            <h3>Reservation Details</h3>
             <div className="form-grid">
+              
               <div className="form-field full-width">
                 <label htmlFor="vehicle_id">Vehicle</label>
                 <select
@@ -104,9 +190,36 @@ export default function AdminReservationAdd() {
                     </option>
                   ))}
                 </select>
-                {vehicles.length === 0 && (
-                  <span className="field-hint">No available vehicles right now.</span>
-                )}
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="pickup_location_id">Pickup Location</label>
+                <select
+                  id="pickup_location_id"
+                  value={form.pickup_location_id}
+                  onChange={(e) => handleChange("pickup_location_id", e.target.value)}
+                  required
+                >
+                  <option value="" disabled>Select Location</option>
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="dropoff_location_id">Dropoff Location</label>
+                <select
+                  id="dropoff_location_id"
+                  value={form.dropoff_location_id}
+                  onChange={(e) => handleChange("dropoff_location_id", e.target.value)}
+                  required
+                >
+                  <option value="" disabled>Select Location</option>
+                  {locations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-field">
@@ -131,16 +244,42 @@ export default function AdminReservationAdd() {
                 />
               </div>
 
-              {estimatedDays > 0 && selectedVehicle && (
-                <div className="form-field full-width">
-                  <div className="estimate-box">
-                    <span>{estimatedDays} day{estimatedDays > 1 ? "s" : ""} × {selectedVehicle.dailyRate} MAD</span>
-                    <strong>{estimatedTotal} MAD estimated total</strong>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
+
+          {/* Extras */}
+          {availableExtras.length > 0 && (
+            <div className="form-card">
+              <h3>Extras & Add-ons</h3>
+              <div className="form-grid">
+                {availableExtras.map((extra) => (
+                  <div key={extra.id} className="form-field checkbox-field">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={form.extras.includes(extra.id)}
+                        onChange={() => handleExtraToggle(extra.id)}
+                      />
+                      {extra.name} 
+                      ({extra.price_per_day ? `${extra.price_per_day} MAD/day` : `${extra.flat_price} MAD flat`})
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pricing Summary */}
+          {estimatedDays > 0 && selectedVehicle && (
+            <div className="form-card">
+               <div className="form-field full-width">
+                  <div className="estimate-box">
+                    <span>{estimatedDays} day{estimatedDays > 1 ? "s" : ""} reservation</span>
+                    <strong>{estimatedTotal} MAD total</strong>
+                  </div>
+                </div>
+            </div>
+          )}
 
           {/* Driver Details */}
           <div className="form-card">

@@ -19,6 +19,7 @@ import {
   markAllNotificationsAsRead,
   deleteNotification,
 } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
 
 const TABS = ["All", "Unread", "Read"];
 
@@ -44,6 +45,7 @@ function timeAgo(iso) {
 }
 
 export default function AdminNotifications() {
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [tab, setTab] = useState("All");
@@ -71,12 +73,12 @@ export default function AdminNotifications() {
   };
 
   const handleMarkAllRead = async () => {
-    if (!confirm("Are you sure you want to mark all notifications as read?")) return;
+    if (!(await confirm("Are you sure you want to mark all notifications as read?", { confirmLabel: "Mark all read" }))) return;
     setNotifications(await markAllNotificationsAsRead());
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this notification?")) return;
+    if (!(await confirm("Are you sure you want to delete this notification?", { danger: true, confirmLabel: "Delete" }))) return;
     await deleteNotification(id);
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Download, RefreshCw, Search, Trash2, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getVehicles, deleteVehicle } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
 
 const TABLE_TABS = ["View all", "Available", "Maintenance", "Hidden"];
 
@@ -10,6 +11,7 @@ const SPARK_B = [9, 7, 10, 8, 12, 9, 13, 10, 15, 13];
 const SPARK_C = [3, 5, 4, 6, 5, 8, 6, 9, 8, 11];
 
 export default function AdminDashboard() {
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [filterTab, setFilterTab] = useState("All vehicles");
@@ -38,7 +40,7 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this vehicle?")) return;
+    if (!(await confirm("Delete this vehicle?", { danger: true, confirmLabel: "Delete" }))) return;
 
     await deleteVehicle(id);
     setVehicles((prev) => prev.filter((v) => v.id !== id));

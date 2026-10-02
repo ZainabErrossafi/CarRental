@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Car,
@@ -13,6 +14,7 @@ import {
   BarChart2,
   Search,
   LogOut,
+  Menu,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -52,7 +54,14 @@ const NAV_SECTIONS = [
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Close the mobile drawer whenever the user navigates
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -61,7 +70,23 @@ export default function AdminLayout() {
 
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar">
+      <header className="admin-topbar">
+        <button
+          type="button"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open menu"
+          aria-expanded={sidebarOpen}
+        >
+          <Menu size={18} />
+        </button>
+        Rently Admin
+      </header>
+
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      <aside className={`admin-sidebar${sidebarOpen ? " open" : ""}`}>
         <div className="sidebar-brand">
           <span className="logo-dot" />
           Rently Admin

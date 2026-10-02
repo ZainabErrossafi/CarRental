@@ -7,6 +7,7 @@ import {
   cancelReservation,
   completeReservation,
 } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
 
 const STATUS_TABS = ["All", "Pending", "Confirmed", "Completed", "Cancelled"];
 
@@ -32,6 +33,7 @@ function EyeIcon(props) {
 }
 
 export default function AdminReservations() {
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
   const [tab, setTab] = useState("All");
@@ -50,21 +52,19 @@ export default function AdminReservations() {
     setReservations((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
   };
 
-  // Mirrors the Reservation model's confirm() / cancel() / complete() methods.
   const handleConfirm = async (id) => {
-    if (!confirm("Are you sure you want to confirm this reservation?")) return;
+    if (!(await confirm("Are you sure you want to confirm this reservation?", { confirmLabel: "Confirm" }))) return;
     applyUpdate(await confirmReservation(id));
   };
   const handleCancel = async (id) => {
-    if (!confirm("Are you sure you want to cancel this reservation?")) return;
+    if (!(await confirm("Are you sure you want to cancel this reservation?", { danger: true, confirmLabel: "Cancel Reservation", cancelLabel: "Back" }))) return;
     applyUpdate(await cancelReservation(id));
   };
   const handleComplete = async (id) => {
-    if (!confirm("Are you sure you want to mark this reservation as completed?")) return;
+    if (!(await confirm("Are you sure you want to mark this reservation as completed?", { confirmLabel: "Mark Completed" }))) return;
     applyUpdate(await completeReservation(id));
   };
 
-  // Mirrors the Reservation model's duration_days() method.
   const durationDays = (r) => {
     const start = new Date(r.pickup_date);
     const end = new Date(r.return_date);
@@ -231,6 +231,16 @@ export default function AdminReservations() {
               </div>
 
               <div className="detail-row">
+                <span className="detail-label">Pickup Location</span>
+                <span className="detail-value">{viewing.pickup_location || "N/A"}</span>
+              </div>
+
+              <div className="detail-row">
+                <span className="detail-label">Dropoff Location</span>
+                <span className="detail-value">{viewing.dropoff_location || "N/A"}</span>
+              </div>
+
+              <div className="detail-row">
                 <span className="detail-label">Pickup Date</span>
                 <span className="detail-value">{viewing.pickup_date}</span>
               </div>
@@ -244,6 +254,15 @@ export default function AdminReservations() {
                 <span className="detail-label">Duration</span>
                 <span className="detail-value">
                   {durationDays(viewing)} day{durationDays(viewing) > 1 ? "s" : ""}
+                </span>
+              </div>
+              
+              <div className="detail-row">
+                <span className="detail-label">Extras</span>
+                <span className="detail-value">
+                  {viewing.extras && viewing.extras.length > 0 
+                    ? viewing.extras.map(e => e.name || e).join(", ") 
+                    : "None"}
                 </span>
               </div>
 

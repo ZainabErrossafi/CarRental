@@ -32,10 +32,34 @@ import {
   updateCatalogItem,
   deleteCatalogItem,
 } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
+
+// Lucide has no dedicated "sports car" icon, so this one is hand-drawn to
+// match Lucide's stroke style (2px round-cap/join) for visual consistency.
+function SportsCar(props) {
+  return (
+    <svg
+      width={props.size || 24}
+      height={props.size || 24}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 16H3.2a.7.7 0 0 1-.7-.7v-1.8c0-.5.3-.9.8-1.1L8 11.4l2.3-1.6c.4-.3.8-.4 1.3-.4h1.5c.5 0 .9.2 1.3.5l1.6 1.5 4.8 1.2c.8.2 1.2.9 1.2 1.8v.9a.7.7 0 0 1-.7.7H19" />
+      <path d="M9 16h6" />
+      <circle cx="7" cy="16" r="2" />
+      <circle cx="17" cy="16" r="2" />
+    </svg>
+  );
+}
 
 // The `icon` field on Category / Feature / Extra stores one of these keys.
 const ICONS = {
   car: Car,
+  sportscar: SportsCar,
   truck: Truck,
   gem: Gem,
   snowflake: Snowflake,
@@ -58,7 +82,7 @@ const ICONS = {
 };
 
 // Categories only offer these three icons (Economy / SUV / Luxury style).
-const CATEGORY_ICON_KEYS = ["car", "truck", "gem"];
+const CATEGORY_ICON_KEYS = ["car", "truck", "sportscar"];
 
 const KINDS = {
   brands: { label: "Brands", singular: "Brand" },
@@ -92,6 +116,7 @@ function IconBadge({ name }) {
 }
 
 export default function AdminCatalog() {
+  const confirm = useConfirm();
   const [catalog, setCatalog] = useState(null);
   const [tab, setTab] = useState("brands");
   const [query, setQuery] = useState("");
@@ -171,7 +196,7 @@ export default function AdminCatalog() {
   };
 
   const handleDelete = async (item) => {
-    if (!confirm(`Are you sure you want to delete "${item.name}"?`)) return;
+    if (!(await confirm(`Are you sure you want to delete "${item.name}"?`, { danger: true, confirmLabel: "Delete" }))) return;
     await deleteCatalogItem(tab, item.id);
     setCatalog((prev) => ({ ...prev, [tab]: prev[tab].filter((i) => i.id !== item.id) }));
   };
@@ -373,7 +398,7 @@ export default function AdminCatalog() {
 
                 <div className="form-field">
                   <label htmlFor="c_name">
-                    {tab === "brands" ? "Name" : "Name"}
+                    {tab === "brands" ? "Name" : "Name (English)"}
                   </label>
                   <input
                     id="c_name"

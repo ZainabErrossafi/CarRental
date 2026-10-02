@@ -7,12 +7,14 @@ import {
   deleteFaq,
   swapFaqOrder,
 } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
 
 const STATUS_TABS = ["All", "Active", "Hidden"];
 
 const EMPTY_FAQ = { question: "", answer: "", active: true };
 
 export default function AdminFaqs() {
+  const confirm = useConfirm();
   const [faqs, setFaqs] = useState([]);
   const [tab, setTab] = useState("All");
   const [query, setQuery] = useState("");
@@ -69,7 +71,7 @@ export default function AdminFaqs() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this FAQ?")) return;
+    if (!(await confirm("Are you sure you want to delete this FAQ?", { danger: true, confirmLabel: "Delete" }))) return;
     await deleteFaq(id);
     setFaqs((prev) => prev.filter((f) => f.id !== id));
   };

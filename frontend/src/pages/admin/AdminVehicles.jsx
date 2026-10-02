@@ -7,8 +7,10 @@ import {
   deleteVehicle,
   updateVehicleStatus,
 } from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
 
 export default function AdminVehicles() {
+  const confirm = useConfirm();
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
 
@@ -17,7 +19,7 @@ export default function AdminVehicles() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this vehicle?")) return;
+    if (!(await confirm("Delete this vehicle?", { danger: true, confirmLabel: "Delete" }))) return;
 
     await deleteVehicle(id);
     setVehicles((prev) => prev.filter((v) => v.id !== id));

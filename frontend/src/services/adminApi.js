@@ -45,96 +45,38 @@ export const createVehicle = (data) => {
   return delay(newVehicle);
 };
 
-let mockReservations = [
-  {
-    id: 1,
-    reference: "DG-0001",
-    vehicle: "Toyota Yaris",
-    status: "confirmed",
-    driver_name: "Amine El Fassi",
-    phone: "+212 6 12 34 56 78",
-    email: "amine@example.com",
-    pickup_date: "2026-09-20",
-    return_date: "2026-09-25",
-    total_price: 1250,
-    created_at: "2026-09-15",
-    updated_at: "2026-09-16",
-  },
-  {
-    id: 2,
-    reference: "DG-0002",
-    vehicle: "Dacia Duster",
-    status: "pending",
-    driver_name: "Sara Bennani",
-    phone: "+212 6 98 76 54 32",
-    email: "sara@example.com",
-    pickup_date: "2026-09-22",
-    return_date: "2026-09-23",
-    total_price: 350,
-    created_at: "2026-09-18",
-    updated_at: "2026-09-18",
-  },
-];
-
-export const getReservations = () => delay(mockReservations);
-
-const setReservationStatus = (id, status) => {
-  mockReservations = mockReservations.map((r) =>
-    r.id === id ? { ...r, status, updated_at: new Date().toISOString().slice(0, 10) } : r
-  );
-  return delay(mockReservations.find((r) => r.id === id));
-};
-
-// Mirrors the Reservation model's confirm()/cancel()/complete() methods.
-export const confirmReservation = (id) => setReservationStatus(id, "confirmed");
-export const cancelReservation = (id) => setReservationStatus(id, "cancelled");
-export const completeReservation = (id) => setReservationStatus(id, "completed");
-
-// Kept for backward compatibility with any existing callers.
-export const updateReservationStatus = (id, status) => setReservationStatus(id, status);
-
-
-// Mirrors the Reservation model's calculate_total() method:
-// total = vehicle's daily rate × duration in days.
-export const createReservation = (data) => {
-  const start = new Date(data.pickup_date);
-  const end = new Date(data.return_date);
-  const days = Math.max(1, Math.round((end - start) / (1000 * 60 * 60 * 24)));
-
-  const vehicle = mockVehicles.find((v) => v.id === Number(data.vehicle_id));
-  const total_price = vehicle ? vehicle.dailyRate * days : Number(data.total_price) || 0;
-
-  const newReservation = {
-    id: mockReservations.length
-      ? Math.max(...mockReservations.map((r) => r.id)) + 1
-      : 1,
-    reference: `DG-${String(
-      mockReservations.length
-        ? Math.max(...mockReservations.map((r) => r.id)) + 1
-        : 1
-    ).padStart(4, "0")}`,
-    vehicle: vehicle ? `${vehicle.brand} ${vehicle.model}` : data.vehicle,
-    status: "pending",
-    driver_name: data.driver_name,
-    phone: data.phone,
-    email: data.email,
-    pickup_date: data.pickup_date,
-    return_date: data.return_date,
-    total_price,
-    created_at: new Date().toISOString().slice(0, 10),
-    updated_at: new Date().toISOString().slice(0, 10),
-  };
-
-  mockReservations = [...mockReservations, newReservation];
-  return delay(newReservation);
-};
-
 let mockLocations = [
-  { id: 1, name: "Rabat Agdal", city: "Rabat", country: "Morocco", active: true },
-  { id: 2, name: "Casablanca Aéroport", city: "Casablanca", country: "Morocco", active: true },
-  { id: 3, name: "Marrakech Centre", city: "Marrakech", country: "Morocco", active: false },
+  { id: 1, name: "Rabat Agdal", city: "Rabat", country: "Morocco", active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+  { id: 2, name: "Casablanca Aéroport", city: "Casablanca", country: "Morocco", active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
+  { id: 3, name: "Marrakech Centre", city: "Marrakech", country: "Morocco", active: false, created_at: "2026-02-14", updated_at: "2026-02-14" },
 ];
+
+const locationToday = () => new Date().toISOString().slice(0, 10);
+
 export const getLocations = () => delay(mockLocations);
+
+export const createLocation = (data) => {
+  const newLocation = {
+    ...data,
+    id: mockLocations.length ? Math.max(...mockLocations.map((l) => l.id)) + 1 : 1,
+    created_at: locationToday(),
+    updated_at: locationToday(),
+  };
+  mockLocations = [...mockLocations, newLocation];
+  return delay(newLocation);
+};
+
+export const updateLocation = (id, data) => {
+  mockLocations = mockLocations.map((l) =>
+    l.id === id ? { ...l, ...data, updated_at: locationToday() } : l
+  );
+  return delay(mockLocations.find((l) => l.id === id));
+};
+
+export const deleteLocation = (id) => {
+  mockLocations = mockLocations.filter((l) => l.id !== id);
+  return delay(null);
+};
 
 // =========================
 // CATALOG
@@ -150,7 +92,7 @@ let catalogData = {
   categories: [
     { id: 1, icon: "car", name: "Economy", name_fr: "Économique", name_ar: "اقتصادية", order: 1, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
     { id: 2, icon: "truck", name: "SUV", name_fr: "SUV", name_ar: "دفع رباعي", order: 2, active: true, created_at: "2026-01-05", updated_at: "2026-01-05" },
-    { id: 3, icon: "gem", name: "Luxury", name_fr: "Luxe", name_ar: "فاخرة", order: 3, active: false, created_at: "2026-01-05", updated_at: "2026-03-10" },
+    { id: 3, icon: "sportscar", name: "Luxury", name_fr: "Luxe", name_ar: "فاخرة", order: 3, active: false, created_at: "2026-01-05", updated_at: "2026-03-10" },
   ],
   features: [
     { id: 1, icon: "snowflake", name: "Air Conditioning", name_fr: "Climatisation", name_ar: "تكييف الهواء" },
@@ -167,6 +109,7 @@ let catalogData = {
 const catalogToday = () => new Date().toISOString().slice(0, 10);
 
 export const getCatalog = () => delay(catalogData);
+export const getExtras = () => delay(catalogData.extras);
 
 // kind: "brands" | "categories" | "features" | "extras"
 export const createCatalogItem = (kind, data) => {
@@ -204,6 +147,108 @@ export const deleteCatalogItem = (kind, id) => {
     [kind]: catalogData[kind].filter((i) => i.id !== id),
   };
   return delay(null);
+};
+
+
+let mockReservations = [
+  {
+    id: 1,
+    reference: "DG-0001",
+    vehicle: "Toyota Yaris",
+    status: "confirmed",
+    driver_name: "Amine El Fassi",
+    phone: "+212 6 12 34 56 78",
+    email: "amine@example.com",
+    pickup_date: "2026-09-20",
+    return_date: "2026-09-25",
+    pickup_location: "Rabat Agdal",
+    dropoff_location: "Rabat Agdal",
+    extras: [{ id: 1, name: "Child Seat" }],
+    total_price: 1250,
+    created_at: "2026-09-15",
+    updated_at: "2026-09-16",
+  },
+  {
+    id: 2,
+    reference: "DG-0002",
+    vehicle: "Dacia Duster",
+    status: "pending",
+    driver_name: "Sara Bennani",
+    phone: "+212 6 98 76 54 32",
+    email: "sara@example.com",
+    pickup_date: "2026-09-22",
+    return_date: "2026-09-23",
+    pickup_location: "Casablanca Aéroport",
+    dropoff_location: "Rabat Agdal",
+    extras: [],
+    total_price: 350,
+    created_at: "2026-09-18",
+    updated_at: "2026-09-18",
+  },
+];
+
+export const getReservations = () => delay(mockReservations);
+
+const setReservationStatus = (id, status) => {
+  mockReservations = mockReservations.map((r) =>
+    r.id === id ? { ...r, status, updated_at: new Date().toISOString().slice(0, 10) } : r
+  );
+  return delay(mockReservations.find((r) => r.id === id));
+};
+
+// Mirrors the Reservation model's confirm()/cancel()/complete() methods.
+export const confirmReservation = (id) => setReservationStatus(id, "confirmed");
+export const cancelReservation = (id) => setReservationStatus(id, "cancelled");
+export const completeReservation = (id) => setReservationStatus(id, "completed");
+
+// Kept for backward compatibility with any existing callers.
+export const updateReservationStatus = (id, status) => setReservationStatus(id, status);
+
+export const createReservation = (data) => {
+  const vehicle = mockVehicles.find((v) => v.id === Number(data.vehicle_id));
+  
+  // Resolve relationships for the frontend display table/modal
+  const pickupLoc = mockLocations.find(l => l.id === Number(data.pickup_location_id));
+  const dropoffLoc = mockLocations.find(l => l.id === Number(data.dropoff_location_id));
+  
+  const resolvedExtras = (data.extras || []).map(extraId => {
+    return catalogData.extras.find(e => e.id === Number(extraId));
+  }).filter(Boolean);
+
+  const newReservation = {
+    id: mockReservations.length
+      ? Math.max(...mockReservations.map((r) => r.id)) + 1
+      : 1,
+    reference: `DG-${String(
+      mockReservations.length
+        ? Math.max(...mockReservations.map((r) => r.id)) + 1
+        : 1
+    ).padStart(4, "0")}`,
+    vehicle: vehicle ? `${vehicle.brand} ${vehicle.model}` : "Unknown Vehicle",
+    status: "pending",
+    driver_name: data.driver_name,
+    phone: data.phone,
+    email: data.email,
+    pickup_date: data.pickup_date,
+    return_date: data.return_date,
+    
+    // Store relational IDs & strings for the frontend view
+    user_id: data.user_id || null,
+    pickup_location_id: data.pickup_location_id,
+    dropoff_location_id: data.dropoff_location_id,
+    pickup_location: pickupLoc ? pickupLoc.name : "Unknown",
+    dropoff_location: dropoffLoc ? dropoffLoc.name : "Unknown",
+    extras: resolvedExtras,
+    
+    // Rely on the frontend's calculated total or fallback
+    total_price: Number(data.total_price) || 0,
+    
+    created_at: new Date().toISOString().slice(0, 10),
+    updated_at: new Date().toISOString().slice(0, 10),
+  };
+
+  mockReservations = [...mockReservations, newReservation];
+  return delay(newReservation);
 };
 
 let mockReviews = [
