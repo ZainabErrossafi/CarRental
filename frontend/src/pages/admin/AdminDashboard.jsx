@@ -3,6 +3,7 @@ import { ArrowUpRight, Download, RefreshCw, Search, Trash2, Pencil } from "lucid
 import { useNavigate } from "react-router-dom";
 import { getVehicles, deleteVehicle } from "../../services/adminApi";
 import { useConfirm } from "../../context/Confirmcontext";
+import { useI18n } from "../../context/I18nContext";
 
 const TABLE_TABS = ["View all", "Available", "Maintenance", "Hidden"];
 
@@ -12,6 +13,7 @@ const SPARK_C = [3, 5, 4, 6, 5, 8, 6, 9, 8, 11];
 
 export default function AdminDashboard() {
   const confirm = useConfirm();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState([]);
   const [filterTab, setFilterTab] = useState("All vehicles");
@@ -40,7 +42,7 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (id) => {
-    if (!(await confirm("Delete this vehicle?", { danger: true, confirmLabel: "Delete" }))) return;
+    if (!(await confirm(t("Delete this vehicle?"), { danger: true, confirmLabel: t("Delete") }))) return;
 
     await deleteVehicle(id);
     setVehicles((prev) => prev.filter((v) => v.id !== id));
@@ -49,26 +51,26 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="page-header">
-        <h1>Fleet overview</h1>
+        <h1>{t("Fleet overview")}</h1>
       </div>
 
       <div className="stats-grid">
-        <StatCard label="Total vehicles" value={vehicles.length || "—"} delta="2.4%" spark={SPARK_A} />
-        <StatCard label="Avg. daily rate" value={`${Math.round(totalRate / (vehicles.length || 1))} MAD`} delta="8.6%" spark={SPARK_B} />
-        <StatCard label="Active reservations" value="9" delta="6.0%" spark={SPARK_C} />
+        <StatCard label={t("Total vehicles")} value={vehicles.length || "—"} delta="2.4%" spark={SPARK_A} />
+        <StatCard label={t("Avg. daily rate")} value={`${Math.round(totalRate / (vehicles.length || 1))} MAD`} delta="8.6%" spark={SPARK_B} />
+        <StatCard label={t("Active reservations")} value="9" delta="6.0%" spark={SPARK_C} />
       </div>
 
       <div className="table-card">
-        <div className="table-card-header">Vehicles</div>
+        <div className="table-card-header">{t("Vehicles")}</div>
         <div className="table-toolbar">
           <div className="toolbar-tabs">
-            {TABLE_TABS.map((t) => (
+            {TABLE_TABS.map((tab) => (
               <button
-                key={t}
-                className={`toolbar-tab ${tableTab === t ? "active" : ""}`}
-                onClick={() => setTableTab(t)}
+                key={tab}
+                className={`toolbar-tab ${tableTab === tab ? "active" : ""}`}
+                onClick={() => setTableTab(tab)}
               >
-                {t}
+                {t(tab)}
               </button>
             ))}
           </div>
@@ -76,7 +78,7 @@ export default function AdminDashboard() {
             <div className="search-box">
               <Search size={14} />
               <input
-                placeholder="Search"
+                placeholder={t("Search")}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 style={{ border: "none", outline: "none", background: "none", width: "100px" }}
@@ -90,10 +92,10 @@ export default function AdminDashboard() {
           <thead>
             <tr>
               <th><input type="checkbox" /></th>
-              <th>Vehicle</th>
-              <th>Daily rate</th>
-              <th>Share of fleet value</th>
-              <th>Category</th>
+              <th>{t("Vehicle")}</th>
+              <th>{t("Daily rate")}</th>
+              <th>{t("Share of fleet value")}</th>
+              <th>{t("Category")}</th>
               <th></th>
             </tr>
           </thead>
@@ -106,7 +108,7 @@ export default function AdminDashboard() {
                   <td>
                     {v.brand} {v.model}
                     <div style={{ marginTop: "0.2rem" }}>
-                      <span className={`badge badge-${v.status}`}>{v.status}</span>
+                      <span className={`badge badge-${v.status}`}>{t(v.status)}</span>
                     </div>
                   </td>
                   <td>{v.dailyRate} MAD</td>
@@ -120,15 +122,15 @@ export default function AdminDashboard() {
                   </td>
                   <td>
                     <span className="tag">
-                      <span className="tag-dot" /> {v.category}
+                      <span className="tag-dot" /> {t(v.category)}
                     </span>
                   </td>
                   <td>
                     <div className="row-actions">
-                      <button onClick={() => handleEdit(v.id)} title="Edit">
+                      <button onClick={() => handleEdit(v.id)} title={t("Edit")}>
                         <Pencil size={15} />
                       </button>
-                      <button onClick={() => handleDelete(v.id)} title="Delete" className="danger">
+                      <button onClick={() => handleDelete(v.id)} title={t("Delete")} className="danger">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -139,7 +141,7 @@ export default function AdminDashboard() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={6} style={{ textAlign: "center", color: "#98a2b3", padding: "2rem" }}>
-                  No vehicles match this filter.
+                  {t("No vehicles match this filter.")}
                 </td>
               </tr>
             )}
@@ -151,6 +153,7 @@ export default function AdminDashboard() {
 }
 
 function StatCard({ label, value, delta, spark }) {
+  const { t } = useI18n();
   return (
     <div className="stat-card">
       <div className="stat-card-top">
@@ -161,7 +164,7 @@ function StatCard({ label, value, delta, spark }) {
         <span className="stat-delta">
           <ArrowUpRight size={13} /> {delta}
         </span>
-        <span className="stat-delta-label">vs last month</span>
+        <span className="stat-delta-label">{t("vs last month")}</span>
       </div>
       <Sparkline data={spark} />
     </div>

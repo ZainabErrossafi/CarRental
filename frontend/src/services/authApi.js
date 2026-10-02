@@ -66,10 +66,31 @@ export const signup = async ({ name, email, password }) => {
     email,
     password,
     role: "admin",
+    verified: false,
   };
   mockAccounts = [...mockAccounts, newAccount];
 
+  // No session yet: the user must verify their email first.
   const { password: _pw, ...safeUser } = newAccount;
+  return safeUser;
+};
+
+// Mock verification: any complete code is accepted until a real backend exists.
+export const verifyEmail = async ({ email, code }) => {
+  await delay(null);
+
+  const account = mockAccounts.find(
+    (a) => a.email.toLowerCase() === (email || "").toLowerCase()
+  );
+  if (!account) {
+    throw new Error("Account not found. Please sign up again.");
+  }
+  if (!code || code.length < 4) {
+    throw new Error("Invalid verification code.");
+  }
+
+  account.verified = true;
+  const { password: _pw, ...safeUser } = account;
   writeSession(safeUser);
   return safeUser;
 };

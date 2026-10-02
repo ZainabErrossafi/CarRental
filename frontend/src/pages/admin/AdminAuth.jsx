@@ -79,11 +79,12 @@ export default function AdminAuth({ initialMode = "login" }) {
     try {
       if (view === "signin") {
         await login({ email: form.email, password: form.password });
+        const redirectTo = location.state?.from?.pathname || "/admin";
+        navigate(redirectTo, { replace: true });
       } else {
         await signup({ name: form.name, email: form.email, password: form.password });
+        navigate("/verify-email", { state: { email: form.email }, replace: true });
       }
-      const redirectTo = location.state?.from?.pathname || "/admin";
-      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
     } finally {

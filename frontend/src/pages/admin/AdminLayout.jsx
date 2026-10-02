@@ -17,6 +17,9 @@ import {
   Menu,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useI18n } from "../../context/I18nContext";
+import GlobalSearch from "../../components/GlobalSearch.jsx";
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 
 const NAV_SECTIONS = [
   {
@@ -52,11 +55,27 @@ const NAV_SECTIONS = [
   },
 ];
 
+const ALL_PAGES = NAV_SECTIONS.flatMap((s) => s.items);
+
 export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { t } = useI18n();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // ⌘K / Ctrl+K opens the global search from anywhere
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Close the mobile drawer whenever the user navigates
   useEffect(() => {
@@ -74,12 +93,16 @@ export default function AdminLayout() {
         <button
           type="button"
           onClick={() => setSidebarOpen(true)}
-          aria-label="Open menu"
+          aria-label={t("Open menu")}
           aria-expanded={sidebarOpen}
         >
           <Menu size={18} />
         </button>
-        Rently Admin
+        <span className="topbar-title">{t("Rently Admin")}</span>
+        <button type="button" onClick={() => setSearchOpen(true)} aria-label={t("Search")}>
+          <Search size={18} />
+        </button>
+        <LanguageSwitcher />
       </header>
 
       {sidebarOpen && (
@@ -89,25 +112,30 @@ export default function AdminLayout() {
       <aside className={`admin-sidebar${sidebarOpen ? " open" : ""}`}>
         <div className="sidebar-brand">
           <span className="logo-dot" />
-          Rently Admin
+          {t("Rently Admin")}
         </div>
 
-        <div className="sidebar-search">
+        <button
+          type="button"
+          className="sidebar-search"
+          onClick={() => setSearchOpen(true)}
+          aria-label={t("Search")}
+        >
           <Search size={15} />
-          Search
+          {t("Search")}
           <kbd>⌘K</kbd>
-        </div>
+        </button>
 
         <nav>
           {NAV_SECTIONS.map((section) => (
             <div className="nav-section" key={section.label}>
-              <span className="nav-section-label">{section.label}</span>
+              <span className="nav-section-label">{t(section.label)}</span>
               {section.items.map((item) => {
                 const Icon = item.icon;
                 return (
                   <NavLink key={item.to} to={item.to} end={item.end}>
                     <Icon size={16} />
-                    {item.label}
+                    {t(item.label)}
                   </NavLink>
                 );
               })}
@@ -118,23 +146,30 @@ export default function AdminLayout() {
         <div className="sidebar-footer">
           <span className="avatar" />
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600 }}>{user?.name || "Admin User"}</div>
+            <div style={{ fontWeight: 600 }}>{user?.name || t("Admin User")}</div>
             <div style={{ color: "#98a2b3", fontSize: "0.78rem", overflow: "hidden", textOverflow: "ellipsis" }}>
               {user?.email}
             </div>
           </div>
           <button
             onClick={handleLogout}
-            title="Log out"
+            title={t("Log out")}
             style={{ background: "none", border: "none", cursor: "pointer", color: "#897973", display: "flex" }}
           >
             <LogOut size={16} />
           </button>
         </div>
       </aside>
-      <main className="admin-content">
-        <Outlet />
-      </main>
+      <div className="admin-main">
+        <div className="admin-header">
+          <LanguageSwitcher />
+        </div>
+        <main className="admin-content">
+          <Outlet />
+        </main>
+      </div>
+
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} pages={ALL_PAGES} />
     </div>
   );
 }

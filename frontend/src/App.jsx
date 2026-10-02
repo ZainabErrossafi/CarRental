@@ -10,7 +10,7 @@ import AdminReservationAdd from "./pages/admin/Adminreservationadd.jsx";
 import AdminVehicleAdd from "./pages/admin/AdminVehicleAdd.jsx";
 import AdminAuth from "./pages/admin/AdminAuth.jsx";
 import AdminForgotPassword from "./pages/admin/AdminForgotPassword.jsx";
-import AdminVerifyEmail from "./pages/admin/ AdminVerifyEmail.jsx";
+import AdminVerifyEmail from "./pages/admin/AdminVerifyEmail.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminReviews from "./pages/admin/AdminReviews.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";

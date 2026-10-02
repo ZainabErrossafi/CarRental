@@ -49,7 +49,7 @@ export default function AdminForgotPassword() {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary auth-submit" disabled={loading}>
+            <button type="submit" className="gcard-submit" disabled={loading}>
               {loading ? "Sending..." : "Reset password"}
             </button>
           </form>

@@ -4,6 +4,7 @@ import {
   login as loginApi,
   signup as signupApi,
   logout as logoutApi,
+  verifyEmail as verifyEmailApi,
 } from "../services/authApi";
 
 const AuthContext = createContext(null);
@@ -24,9 +25,14 @@ export function AuthProvider({ children }) {
   };
 
   const signup = async (details) => {
-    const newUser = await signupApi(details);
-    setUser(newUser);
-    return newUser;
+    // Account is created but not signed in until the email is verified.
+    return signupApi(details);
+  };
+
+  const verifyEmail = async (payload) => {
+    const verifiedUser = await verifyEmailApi(payload);
+    setUser(verifiedUser);
+    return verifiedUser;
   };
 
   const logout = async () => {
@@ -35,7 +41,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, verifyEmail, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,13 +1,16 @@
 import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const CODE_LENGTH = 4;
 
 export default function AdminVerifyEmail() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || "your email";
+  const { verifyEmail } = useAuth();
+  const signupEmail = location.state?.email;
+  const email = signupEmail || "your email";
 
   const [digits, setDigits] = useState(Array(CODE_LENGTH).fill(""));
   const [error, setError] = useState(null);
@@ -55,11 +58,14 @@ export default function AdminVerifyEmail() {
     setLoading(true);
     setError(null);
 
-    // No real backend yet — just simulate verification.
-    await new Promise((res) => setTimeout(res, 500));
-    setLoading(false);
-
-    navigate("/admin", { replace: true });
+    try {
+      await verifyEmail({ email: signupEmail, code });
+      navigate("/admin", { replace: true });
+    } catch (err) {
+      setError(err.message || "Verification failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleResend = () => {
@@ -101,7 +107,7 @@ export default function AdminVerifyEmail() {
 
           <button
             type="submit"
-            className="btn btn-primary auth-submit"
+            className="gcard-submit"
             disabled={!isComplete || loading}
           >
             {loading ? "Verifying..." : "Verify email"}
