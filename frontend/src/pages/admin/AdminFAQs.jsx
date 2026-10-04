@@ -1,0 +1,302 @@
+import { useEffect, useMemo, useState } from "react";
+import { Plus, Pencil, Trash2, ChevronUp, ChevronDown, X } from "lucide-react";
+import {
+  getFaqs,
+  createFaq,
+  updateFaq,
+  deleteFaq,
+  swapFaqOrder,
+} from "../../services/adminApi";
+import { useConfirm } from "../../context/Confirmcontext";
+
+const STATUS_TABS = ["All", "Active", "Hidden"];
+
+const EMPTY_FAQ = { question: "", answer: "", active: true };
+
+export default function AdminFaqs() {
+  const confirm = useConfirm();
+  const [faqs, setFaqs] = useState([]);
+  const [tab, setTab] = useState("All");
+  const [query, setQuery] = useState("");
+  const [editing, setEditing] = useState(null); // null | "new" | faq object
+  const [form, setForm] = useState(EMPTY_FAQ);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getFaqs().then(setFaqs);
+  }, []);
+
+  const filtered = useMemo(() => {
+    return faqs
+      .filter((f) => {
+        if (tab === "Active") return f.active;
+        if (tab === "Hidden") return !f.active;
+        return true;
+      })
+      .filter((f) =>
+        `${f.question} ${f.answer}`.toLowerCase().includes(query.toLowerCase())
+      );
+  }, [faqs, tab, query]);
+
+  const activeCount = faqs.filter((f) => f.active).length;
+
+  const openNew = () => {
+    setForm(EMPTY_FAQ);
+    setEditing("new");
+  };
+
+  const openEdit = (faq) => {
+    setForm({ question: faq.question, answer: faq.answer, active: faq.active });
+    setEditing(faq);
+  };
+
+  const closeModal = () => {
+    setEditing(null);
+    setSaving(false);
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+
+    if (editing === "new") {
+      const created = await createFaq(form);
+      setFaqs((prev) => [...prev, created].sort((a, b) => a.order - b.order));
+    } else {
+      const updated = await updateFaq(editing.id, form);
+      setFaqs((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+    }
+
+    closeModal();
+  };
+
+  const handleDelete = async (id) => {
+    if (!(await confirm("Are you sure you want to delete this FAQ?", { danger: true, confirmLabel: "Delete" }))) return;
+    await deleteFaq(id);
+    setFaqs((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  const handleToggleActive = async (faq) => {
+    const updated = await updateFaq(faq.id, { active: !faq.active });
+    setFaqs((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+  };
+
+  // Move up/down relative to the *full* ordered list (not the filtered view),
+  // so reordering stays correct even while a filter/search is active.
+  const handleMove = async (faq, direction) => {
+    const index = faqs.findIndex((f) => f.id === faq.id);
+    const neighbor = faqs[index + direction];
+    if (!neighbor) return;
+
+    const reordered = await swapFaqOrder(faq.id, neighbor.id);
+    setFaqs(reordered);
+  };
+
+  return (
+    <div>
+      <div className="page-header">
+        <h1>FAQs</h1>
+        <div className="page-header-actions">
+          <button className="btn-pill" onClick={openNew}>
+            <Plus size={16} strokeWidth={2.5} />
+            Add FAQ
+          </button>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">Total FAQs</span>
+          </div>
+          <div className="stat-value-row">
+            <span className="stat-value">{faqs.length}</span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">Published</span>
+          </div>
+          <div className="stat-value-row">
+            <span className="stat-value">{activeCount}</span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">Hidden</span>
+          </div>
+          <div className="stat-value-row">
+            <span className="stat-value">{faqs.length - activeCount}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="pill-tabs">
+        {STATUS_TABS.map((t) => (
+          <button
+            key={t}
+            className={`pill-tab ${tab === t ? "active" : ""}`}
+            onClick={() => setTab(t)}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div className="table-card">
+        <div className="table-card-header">
+          {tab === "All" ? "All FAQs" : `${tab} FAQs`}
+          <span className="count-pill">{filtered.length}</span>
+
+          <div className="search-box" style={{ marginLeft: "auto" }}>
+            <input
+              placeholder="Search FAQs"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ border: "none", outline: "none", background: "none", width: "160px" }}
+            />
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style={{ width: "90px" }}>Order</th>
+              <th>Question</th>
+              <th>Answer</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filtered.map((f) => {
+              const fullIndex = faqs.findIndex((x) => x.id === f.id);
+
+              return (
+                <tr key={f.id}>
+                  <td>
+                    <div className="order-cell">
+                      <span className="order-number">{f.order}</span>
+                      <div className="order-arrows">
+                        <button
+                          onClick={() => handleMove(f, -1)}
+                          disabled={fullIndex === 0}
+                          title="Move up"
+                        >
+                          <ChevronUp size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleMove(f, 1)}
+                          disabled={fullIndex === faqs.length - 1}
+                          title="Move down"
+                        >
+                          <ChevronDown size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="faq-question">{f.question}</td>
+
+                  <td className="faq-answer">{f.answer}</td>
+
+                  <td>
+                    <button
+                      className={`toggle ${f.active ? "on" : ""}`}
+                      onClick={() => handleToggleActive(f)}
+                      title={f.active ? "Click to hide" : "Click to publish"}
+                    >
+                      <span className="toggle-knob" />
+                    </button>
+                  </td>
+
+                  <td>
+                    <div className="row-actions">
+                      <button onClick={() => openEdit(f)} title="Edit FAQ">
+                        <Pencil size={15} />
+                      </button>
+                      <button onClick={() => handleDelete(f.id)} title="Delete FAQ" className="danger">
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+
+            {filtered.length === 0 && (
+              <tr>
+                <td colSpan={5} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
+                  No FAQs match this filter.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {editing && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-card modal-wide" onClick={(e) => e.stopPropagation()}>
+            <form onSubmit={handleSave}>
+              <div className="modal-header">
+                <h3>{editing === "new" ? "Add FAQ" : "Edit FAQ"}</h3>
+                <button type="button" className="modal-close" onClick={closeModal}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="modal-body" style={{ gap: "1rem", padding: "1.25rem 1.5rem" }}>
+                <div className="form-field">
+                  <label htmlFor="faq_question">Question</label>
+                  <input
+                    id="faq_question"
+                    type="text"
+                    placeholder="e.g. Can I extend my rental?"
+                    value={form.question}
+                    onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
+                    required
+                  />
+                </div>
+
+                <div className="form-field">
+                  <label htmlFor="faq_answer">Answer</label>
+                  <textarea
+                    id="faq_answer"
+                    className="form-textarea"
+                    rows={5}
+                    placeholder="Write a clear, helpful answer..."
+                    value={form.answer}
+                    onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
+                    required
+                  />
+                </div>
+
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
+                  />
+                  Published (visible on the public site)
+                </label>
+              </div>
+
+              <div className="modal-footer" style={{ gap: "0.6rem" }}>
+                <button type="button" className="btn btn-secondary" onClick={closeModal} disabled={saving}>
+                  Cancel
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>
+                  {saving ? "Saving..." : editing === "new" ? "Add FAQ" : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
