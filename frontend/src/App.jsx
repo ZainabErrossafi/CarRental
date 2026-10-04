@@ -17,6 +17,11 @@ import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AdminSiteSettings from "./pages/admin/AdminSiteSettings.jsx";
 import AdminFaqs from "./pages/admin/AdminFAQs.jsx";
 import AdminNotifications from "./pages/admin/AdminNotifications.jsx";
+import ClientLayout from "./pages/client/ClientLayout.jsx";
+import ClientHome from "./pages/client/Clienthome.jsx";
+import ClientVehicles from "./pages/client/ClientVehicles.jsx";
+import ClientVehicleDetails from "./pages/client/ClientVehicleDetails.jsx";
+
 function ComingSoon({ label }) {
   return (
     <div>
@@ -35,7 +40,11 @@ export default function App() {
       <Route path="/signup" element={<AdminAuth initialMode="signup" />} />
       <Route path="/forgot-password" element={<AdminForgotPassword />} />
       <Route path="/verify-email" element={<AdminVerifyEmail />} />
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<ClientLayout />}>
+        <Route index element={<ClientHome />} />
+        <Route path="vehicles" element={<ClientVehicles />} />
+        <Route path="vehicles/:id" element={<ClientVehicleDetails />} />
+      </Route>
       <Route
         path="/admin"
         element={
