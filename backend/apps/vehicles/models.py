@@ -60,7 +60,7 @@ class Vehicle(models.Model):
     min_license_years = models.PositiveSmallIntegerField(default=1)
 
     # Media & descriptions
-    # main_image = models.ImageField(upload_to="vehicles/", blank=True)
+    main_image = models.ImageField(upload_to="vehicles/main/", blank=True, null=True)
     description_en = models.TextField(blank=True)
     description_fr = models.TextField(blank=True)
     description_ar = models.TextField(blank=True)
@@ -84,3 +84,19 @@ class Vehicle(models.Model):
         (pickup_date < end and return_date > start).
         """
         return True
+
+
+class VehicleImage(models.Model):
+    vehicle = models.ForeignKey(
+        Vehicle, on_delete=models.CASCADE, related_name="gallery"
+    )
+    image = models.ImageField(upload_to="vehicles/gallery/")
+    alt_text = models.CharField(max_length=255, blank=True)
+    order = models.PositiveSmallIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "created_at"]
+
+    def __str__(self):
+        return f"Image for {self.vehicle.model} (Order: {self.order})"
