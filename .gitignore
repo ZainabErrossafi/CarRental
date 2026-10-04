@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 venv/
 __pycache__/
 *.pyc
@@ -5,3 +6,7 @@ db.sqlite3
 .env
 *.log
 .DS_Store
+=======
+frontend/node_modules
+.env
+>>>>>>> origin/frontend_admin
