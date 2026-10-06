@@ -14,8 +14,17 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setUser(getCurrentUser());
-    setLoading(false);
+    let active = true;
+    const onLogout = () => setUser(null);
+    window.addEventListener('rently:logout', onLogout);
+    getCurrentUser()
+      .then((currentUser) => { if (active) setUser(currentUser); })
+      .catch(() => { if (active) setUser(null); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => {
+      active = false;
+      window.removeEventListener('rently:logout', onLogout);
+    };
   }, []);
 
   const login = async (credentials) => {

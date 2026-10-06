@@ -124,6 +124,7 @@ export default function AdminCatalog() {
   const [form, setForm] = useState(EMPTY_FORMS.brands);
   const [slugTouched, setSlugTouched] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getCatalog().then(setCatalog);
@@ -180,7 +181,8 @@ export default function AdminCatalog() {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-
+    setError(null);
+    try {
     if (editing === "new") {
       const created = await createCatalogItem(tab, form);
       setCatalog((prev) => ({ ...prev, [tab]: [...prev[tab], created] }));
@@ -193,26 +195,37 @@ export default function AdminCatalog() {
     }
 
     closeModal();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (item) => {
     if (!(await confirm(`Are you sure you want to delete "${item.name}"?`, { danger: true, confirmLabel: "Delete" }))) return;
+    try {
     await deleteCatalogItem(tab, item.id);
     setCatalog((prev) => ({ ...prev, [tab]: prev[tab].filter((i) => i.id !== item.id) }));
+    } catch (err) { setError(err.message); }
   };
 
   const handleToggleActive = async (item) => {
+    try {
     const updated = await updateCatalogItem(tab, item.id, { active: !item.active });
     setCatalog((prev) => ({
       ...prev,
       [tab]: prev[tab].map((i) => (i.id === updated.id ? updated : i)),
     }));
+    } catch (err) { setError(err.message); }
   };
 
   const colCount = { brands: 3, categories: 4, features: 2, extras: 6 }[tab];
 
   return (
     <div>
+      <p className="local-editor-note">Catalog changes are saved in this browser only. They are not backend rental options.</p>
+      {error && <div role="alert" className="alert alert-error">{error}</div>}
       <div className="page-header">
         <h1>Vehicle Catalog</h1>
         <div className="page-header-actions">
@@ -365,20 +378,25 @@ export default function AdminCatalog() {
 
       {editing && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-card modal-wide" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-card modal-wide catalog-dialog vehicle-details-card"
+            role="dialog" aria-modal="true" aria-labelledby="catalog-dialog-title" onClick={(e) => e.stopPropagation()}>
             <form onSubmit={handleSave}>
               <div className="modal-header">
-                <h3>{editing === "new" ? `Add ${meta.singular}` : `Edit ${meta.singular}`}</h3>
-                <button type="button" className="modal-close" onClick={closeModal}>
+                <div className="catalog-dialog-heading">
+                  <h3 id="catalog-dialog-title">{editing === "new" ? `Add ${meta.singular}` : `Edit ${meta.singular}`}</h3>
+                  <p>Organize your fleet catalog with clear, consistent details.</p>
+                </div>
+                <button type="button" className="modal-close" aria-label="Close dialog" onClick={closeModal}>
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="modal-body" style={{ gap: "1rem", padding: "1.25rem 1.5rem" }}>
+              <div className="modal-body catalog-dialog-body">
+                {error && <div role="alert" className="alert alert-error">{error}</div>}
                 {tab !== "brands" && (
                   <div className="form-field">
-                    <label>Icon</label>
-                    <div className="icon-picker">
+                    <span className="catalog-field-label" id="catalog-icon-label">Choose an icon</span>
+                    <div className="icon-picker" role="group" aria-labelledby="catalog-icon-label">
                       {Object.entries(ICONS)
                         .filter(([key]) => tab !== "categories" || CATEGORY_ICON_KEYS.includes(key))
                         .map(([key, Icon]) => (
@@ -386,6 +404,8 @@ export default function AdminCatalog() {
                             type="button"
                             key={key}
                             title={key}
+                            aria-label={key}
+                            aria-pressed={form.icon === key}
                             className={form.icon === key ? "selected" : ""}
                             onClick={() => setField("icon", key)}
                           >
@@ -398,10 +418,12 @@ export default function AdminCatalog() {
 
                 <div className="form-field">
                   <label htmlFor="c_name">
-                    {tab === "brands" ? "Name" : "Name (English)"}
+                    Name
                   </label>
                   <input
                     id="c_name"
+                    placeholder={tab === "brands" ? "e.g. Toyota" : tab === "categories" ? "e.g. Economy" : tab === "extras" ? "e.g. Child seat" : "e.g. Bluetooth"}
+                    autoFocus
                     type="text"
                     value={form.name}
                     onChange={(e) => handleNameChange(e.target.value)}
@@ -422,12 +444,12 @@ export default function AdminCatalog() {
                       }}
                       required
                     />
-                    <span className="field-hint">Used in URLs, e.g. /brands/{form.slug || "toyota"}</span>
+                    <span className="field-hint">URL-friendly name, e.g. {form.slug || "toyota"}</span>
                   </div>
                 )}
 
                 {tab === "extras" && (
-                  <div className="form-grid" style={{ marginTop: 0, maxWidth: "none" }}>
+                  <div className="form-grid catalog-pricing-grid">
                     <div className="form-field">
                       <label htmlFor="c_ppd">Price per day</label>
                       <div className="input-group">
@@ -472,13 +494,19 @@ export default function AdminCatalog() {
                 )}
 
                 {(tab === "categories" || tab === "extras") && (
-                  <label className="checkbox-label">
+                  <label className="vehicle-featured-control">
+                    <span className="vehicle-featured-copy">
+                      <span className="vehicle-featured-title">Active</span>
+                      <span className="field-hint">Show this item in your local catalog.</span>
+                    </span>
                     <input
+                      className="vehicle-featured-input"
                       type="checkbox"
-                      checked={form.active}
+                      role="switch"
+                      checked={!!form.active}
                       onChange={(e) => setField("active", e.target.checked)}
                     />
-                    Active (available on the public site)
+                    <span className="vehicle-featured-switch" aria-hidden="true" />
                   </label>
                 )}
               </div>

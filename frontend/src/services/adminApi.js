@@ -1,4 +1,4 @@
-import api from './api';
+import api, { getList } from './api';
 
 // DASHBOARD STATS
 export const getAdminStats = async () => {
@@ -8,8 +8,7 @@ export const getAdminStats = async () => {
 
 // VEHICLES
 export const getVehicles = async () => {
-  const { data } = await api.get('vehicles/');
-  return data;
+  return getList('vehicles/');
 };
 
 export const getVehicle = async (id) => {
@@ -39,8 +38,7 @@ export const updateVehicleStatus = async (id, status) => {
 
 // LOCATIONS
 export const getLocations = async () => {
-  const { data } = await api.get('locations/');
-  return data;
+  return getList('locations/');
 };
 
 export const createLocation = async (locationData) => {
@@ -58,38 +56,16 @@ export const deleteLocation = async (id) => {
   return data;
 };
 
-// CATALOG (Brands, Categories, Features, Extras)
-export const getCatalog = async () => {
-  // Assuming a custom backend endpoint that returns all catalog lists together
-  const { data } = await api.get('catalog/');
-  return data;
-};
+// Catalog and site settings are browser-local editors.
+export { getCatalog, createCatalogItem, updateCatalogItem,
+  deleteCatalogItem, getSiteSettings, updateSiteSettings } from './localAdminData';
 
-export const getExtras = async () => {
-  const { data } = await api.get('extras/');
-  return data;
-};
-
-// kind: "brands" | "categories" | "features" | "extras"
-export const createCatalogItem = async (kind, itemData) => {
-  const { data } = await api.post(`${kind}/`, itemData);
-  return data;
-};
-
-export const updateCatalogItem = async (kind, id, itemData) => {
-  const { data } = await api.patch(`${kind}/${id}/`, itemData);
-  return data;
-};
-
-export const deleteCatalogItem = async (kind, id) => {
-  const { data } = await api.delete(`${kind}/${id}/`);
-  return data;
-};
+// Reservation extras must be backend records, not browser-local catalog IDs.
+export const getExtras = async () => getList('extras/');
 
 // RESERVATIONS
 export const getReservations = async () => {
-  const { data } = await api.get('reservations/');
-  return data;
+  return getList('reservations/');
 };
 
 export const createReservation = async (reservationData) => {
@@ -98,7 +74,9 @@ export const createReservation = async (reservationData) => {
 };
 
 export const updateReservationStatus = async (id, status) => {
-  const { data } = await api.patch(`reservations/${id}/`, { status });
+  const action = { confirmed: 'confirm', cancelled: 'cancel', completed: 'complete' }[status];
+  if (!action) throw new Error('Unsupported reservation status.');
+  const { data } = await api.post(`reservations/${id}/${action}/`);
   return data;
 };
 
@@ -108,8 +86,7 @@ export const completeReservation = (id) => updateReservationStatus(id, "complete
 
 // REVIEWS
 export const getReviews = async () => {
-  const { data } = await api.get('reviews/');
-  return data;
+  return getList('reviews/');
 };
 
 export const deleteReview = async (id) => {
@@ -119,8 +96,7 @@ export const deleteReview = async (id) => {
 
 // USERS
 export const getUsers = async () => {
-  const { data } = await api.get('users/');
-  return data;
+  return getList('users/');
 };
 
 export const updateUserRole = async (id, role) => {
@@ -130,8 +106,7 @@ export const updateUserRole = async (id, role) => {
 
 // FAQS
 export const getFaqs = async () => {
-  const { data } = await api.get('faqs/');
-  return data;
+  return getList('faqs/');
 };
 
 export const createFaq = async (faqData) => {
@@ -155,31 +130,19 @@ export const swapFaqOrder = async (idA, idB) => {
   return data;
 };
 
-// SITE SETTINGS
-export const getSiteSettings = async () => {
-  const { data } = await api.get('settings/');
-  return data;
-};
-
-export const updateSiteSettings = async (settingsData) => {
-  const { data } = await api.patch('settings/', settingsData);
-  return data;
-};
-
 // NOTIFICATIONS
 export const getNotifications = async () => {
-  const { data } = await api.get('notifications/');
-  return data;
+  return getList('notifications/');
 };
 
 export const markNotificationAsRead = async (id) => {
-  const { data } = await api.patch(`notifications/${id}/read/`);
+  const { data } = await api.post(`notifications/${id}/mark_as_read/`);
   return data;
 };
 
 export const markAllNotificationsAsRead = async () => {
-  const { data } = await api.post('notifications/read-all/');
-  return data;
+  const notifications = await getNotifications();
+  return Promise.all(notifications.filter((item) => !item.is_read).map((item) => markNotificationAsRead(item.id)));
 };
 
 export const deleteNotification = async (id) => {

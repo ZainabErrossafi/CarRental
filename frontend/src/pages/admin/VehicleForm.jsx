@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { X, ImagePlus } from "lucide-react";
 
 const CATEGORY_OPTIONS = [
@@ -68,21 +67,24 @@ export default function VehicleForm({
   submitLabel = "Save Changes",
   savingLabel = "Saving...",
 }) {
-  const [descTab, setDescTab] = useState("en");
 
   return (
     <form onSubmit={onSubmit} className="vehicle-form">
       <div className="form-sections">
 
         {/* Identity */}
-        <div className="form-card">
-          <h3>Identity</h3>
+        <div className="form-card vehicle-identity-card">
+          <div className="vehicle-identity-heading">
+            <h3>Vehicle identity</h3>
+            <p>Start with the details customers will use to find your vehicle.</p>
+          </div>
           <div className="form-grid">
             <div className="form-field">
               <label htmlFor="brand">Brand / Make</label>
               <input
                 id="brand"
                 type="text"
+                placeholder="e.g. Toyota"
                 value={form.brand}
                 onChange={(e) => onChange("brand", e.target.value)}
                 required
@@ -94,6 +96,7 @@ export default function VehicleForm({
               <input
                 id="model"
                 type="text"
+                placeholder="e.g. Corolla"
                 value={form.model}
                 onChange={(e) => onChange("model", e.target.value)}
                 required
@@ -114,10 +117,11 @@ export default function VehicleForm({
             </div>
 
             <div className="form-field full-width">
-              <label htmlFor="category">Vehicle Category / Fleet Segment</label>
+              <label htmlFor="category">Vehicle category</label>
               <select
                 id="category"
                 className="select-lg"
+                aria-describedby="vehicle-category-hint"
                 value={form.category}
                 onChange={(e) => onChange("category", e.target.value)}
                 required
@@ -132,28 +136,35 @@ export default function VehicleForm({
                   </optgroup>
                 ))}
               </select>
-              <span className="field-hint">
-                Determines how this car is listed and filtered in the public catalog.
+              <span id="vehicle-category-hint" className="field-hint">
+                Choose the category customers will browse to find this vehicle.
               </span>
             </div>
 
-            <div className="form-field checkbox-field">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={!!form.is_featured}
-                  onChange={(e) => onChange("is_featured", e.target.checked)}
-                />
-                Featured vehicle
-              </label>
-              <span className="field-hint">Shown in highlighted spots on the site.</span>
-            </div>
+            <label className="vehicle-featured-control full-width">
+              <span className="vehicle-featured-copy">
+                <span className="vehicle-featured-title">Featured vehicle</span>
+                <span className="field-hint" id="vehicle-featured-hint">Highlight this vehicle on the site to help it stand out.</span>
+              </span>
+              <input
+                className="vehicle-featured-input"
+                type="checkbox"
+                role="switch"
+                aria-describedby="vehicle-featured-hint"
+                checked={!!form.is_featured}
+                onChange={(e) => onChange("is_featured", e.target.checked)}
+              />
+              <span className="vehicle-featured-switch" aria-hidden="true" />
+            </label>
           </div>
         </div>
 
         {/* Specs */}
-        <div className="form-card">
-          <h3>Vehicle Specs</h3>
+        <div className="form-card vehicle-details-card vehicle-specs-card">
+          <div className="vehicle-identity-heading">
+            <h3>Vehicle specifications</h3>
+            <p>Add the practical details customers need before booking.</p>
+          </div>
           <div className="form-grid">
             <div className="form-field">
               <label htmlFor="transmission">Transmission</label>
@@ -217,28 +228,37 @@ export default function VehicleForm({
               <span className="field-hint">Number of standard suitcases it fits.</span>
             </div>
 
-            <div className="form-field checkbox-field">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={!!form.air_conditioning}
-                  onChange={(e) => onChange("air_conditioning", e.target.checked)}
-                />
-                Air Conditioning
-              </label>
-            </div>
+            <label className="vehicle-featured-control full-width">
+              <span className="vehicle-featured-copy">
+                <span className="vehicle-featured-title">Air conditioning</span>
+                <span className="field-hint" id="vehicle-ac-hint">Keep passengers comfortable on warm days.</span>
+              </span>
+              <input
+                className="vehicle-featured-input"
+                type="checkbox"
+                role="switch"
+                aria-describedby="vehicle-ac-hint"
+                checked={!!form.air_conditioning}
+                onChange={(e) => onChange("air_conditioning", e.target.checked)}
+              />
+              <span className="vehicle-featured-switch" aria-hidden="true" />
+            </label>
           </div>
         </div>
 
         {/* Pricing & Rental Rules */}
-        <div className="form-card">
-          <h3>Pricing & Rental Rules</h3>
+        <div className="form-card vehicle-details-card vehicle-pricing-card">
+          <div className="vehicle-identity-heading">
+            <h3>Pricing & rental rules</h3>
+            <p>Set your daily price, deposit, and driver requirements.</p>
+          </div>
           <div className="form-grid">
             <div className="form-field">
               <label htmlFor="dailyRate">Daily Rate</label>
               <div className="input-group">
                 <input
                   id="dailyRate"
+                  placeholder="e.g. 350"
                   type="number"
                   min="0"
                   step="10"
@@ -255,6 +275,7 @@ export default function VehicleForm({
               <div className="input-group">
                 <input
                   id="deposit"
+                  placeholder="e.g. 2000"
                   type="number"
                   min="0"
                   step="50"
@@ -313,11 +334,14 @@ export default function VehicleForm({
         </div>
 
         {/* Media */}
-        <div className="form-card">
-          <h3>Media</h3>
+        <div className="form-card vehicle-details-card vehicle-media-card">
+          <div className="vehicle-identity-heading">
+            <h3>Vehicle photo</h3>
+            <p>Choose a clear photo that shows your vehicle at its best.</p>
+          </div>
           <div className="form-grid">
             <div className="form-field full-width">
-              <label htmlFor="main_image">Main Image</label>
+              <label htmlFor="main_image_file">Main image</label>
 
               <div className="image-upload">
                 {form.main_image ? (
@@ -333,11 +357,12 @@ export default function VehicleForm({
                     </button>
                   </div>
                 ) : (
-                  <label htmlFor="main_image_file" className="image-upload-dropzone">
+                  <button type="button" className="image-upload-dropzone" onClick={() => document.getElementById("main_image_file").click()}>
                     <ImagePlus size={22} />
-                    <span>Click to choose an image from your computer</span>
+                    <span className="vehicle-upload-title">Choose a vehicle photo</span>
+                    <span className="vehicle-upload-caption">Browse files on your computer</span>
                     <span className="field-hint">PNG, JPG or WEBP — up to 5MB</span>
-                  </label>
+                  </button>
                 )}
 
                 <input
@@ -366,51 +391,26 @@ export default function VehicleForm({
           </div>
         </div>
 
-        {/* Descriptions */}
-        <div className="form-card">
-          <h3>Descriptions</h3>
-
-          <div className="pill-tabs" style={{ marginBottom: "1rem" }}>
-            {["en", "fr", "ar"].map((lang) => (
-              <button
-                key={lang}
-                type="button"
-                className={`pill-tab ${descTab === lang ? "active" : ""}`}
-                onClick={() => setDescTab(lang)}
-              >
-                {lang.toUpperCase()}
-              </button>
-            ))}
+        {/* Description */}
+        <div className="form-card vehicle-description-card">
+          <div className="vehicle-description-heading">
+            <h3><label htmlFor="vehicle-description">Description</label></h3>
+            <p id="vehicle-description-hint">Help customers get to know this vehicle. Include its comfort, features, and what makes it a good choice.</p>
           </div>
-
-          {descTab === "en" && (
-            <textarea
-              className="form-textarea"
-              rows={4}
-              placeholder="Description (English)"
-              value={form.description_en}
-              onChange={(e) => onChange("description_en", e.target.value)}
-            />
-          )}
-          {descTab === "fr" && (
-            <textarea
-              className="form-textarea"
-              rows={4}
-              placeholder="Description (Français)"
-              value={form.description_fr}
-              onChange={(e) => onChange("description_fr", e.target.value)}
-            />
-          )}
-          {descTab === "ar" && (
-            <textarea
-              className="form-textarea"
-              rows={4}
-              dir="rtl"
-              placeholder="الوصف (عربي)"
-              value={form.description_ar}
-              onChange={(e) => onChange("description_ar", e.target.value)}
-            />
-          )}
+          <textarea
+            id="vehicle-description"
+            className="vehicle-description-input"
+            rows={6}
+            lang="en"
+            placeholder="For example: A comfortable, fuel-efficient car for city trips and weekend getaways…"
+            aria-describedby="vehicle-description-hint"
+            value={form.description_en ?? ""}
+            onChange={(e) => onChange("description_en", e.target.value)}
+          />
+          <div className="vehicle-description-footer">
+            <span>Write your description in English.</span>
+            <span>{(form.description_en ?? "").length} characters</span>
+          </div>
         </div>
 
       </div>
