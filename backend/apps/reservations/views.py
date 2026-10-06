@@ -1,5 +1,6 @@
 from django.db.models import Sum, Count, Q
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from apps.users.permissions import IsAdmin, IsAdminOrOwner

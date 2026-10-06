@@ -9,15 +9,13 @@ import {
 } from "lucide-react";
 import { getSiteSettings, updateSiteSettings } from "../../services/adminApi";
 
-const LANGS = ["en", "fr", "ar"];
-const LANG_LABEL = { en: "EN", fr: "FR", ar: "AR" };
+
 
 export default function AdminSiteSettings() {
   const [settings, setSettings] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [heroTab, setHeroTab] = useState("en");
-  const [aboutTab, setAboutTab] = useState("en");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getSiteSettings().then(setSettings);
@@ -43,10 +41,13 @@ export default function AdminSiteSettings() {
     e.preventDefault();
     setSaving(true);
     setSaved(false);
+    setError(null);
     try {
       const updated = await updateSiteSettings(settings);
       setSettings(updated);
       setSaved(true);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setSaving(false);
     }
@@ -60,20 +61,22 @@ export default function AdminSiteSettings() {
         <div>
           <h1>Site Settings</h1>
           <p className="subtitle">
-            Company info shown across the site (footer, contact page, emails).
+            Manage company details, social links, and homepage content.
           </p>
         </div>
       </div>
 
+      <p className="local-editor-note">Changes are saved in this browser only and do not update the public site.</p>
+      {error && <div role="alert" className="alert alert-error mb-4">{error}</div>}
       {saved && (
-        <div className="alert alert-success mb-4">✓ Settings saved successfully.</div>
+        <div className="alert alert-success mb-4">✓ Settings saved in this browser.</div>
       )}
 
       <form onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
 
           {/* Company Info */}
-          <div className="form-card">
+          <div className="form-card vehicle-details-card">
             <h3>Company Information</h3>
             <div className="form-grid">
               <div className="form-field">
@@ -151,7 +154,7 @@ export default function AdminSiteSettings() {
           </div>
 
           {/* Social Links */}
-          <div className="form-card">
+          <div className="form-card vehicle-details-card">
             <h3>Social Links</h3>
             <div className="form-grid">
               <div className="form-field">
@@ -201,11 +204,11 @@ export default function AdminSiteSettings() {
           </div>
 
           {/* Hero Section */}
-          <div className="form-card">
+          <div className="form-card vehicle-details-card vehicle-media-card">
             <h3>Homepage Hero</h3>
 
             <div className="form-field full-width">
-              <label>Hero Image</label>
+              <label htmlFor="hero_image_file">Hero image</label>
               <div className="image-upload">
                 {settings.hero_image ? (
                   <div className="image-upload-preview">
@@ -220,11 +223,11 @@ export default function AdminSiteSettings() {
                     </button>
                   </div>
                 ) : (
-                  <label htmlFor="hero_image_file" className="image-upload-dropzone">
+                  <button type="button" className="image-upload-dropzone" onClick={() => document.getElementById("hero_image_file").click()}>
                     <ImagePlus size={22} />
                     <span>Click to choose an image from your computer</span>
                     <span className="field-hint">PNG, JPG or WEBP — up to 5MB</span>
-                  </label>
+                  </button>
                 )}
                 <input
                   id="hero_image_file"
@@ -239,68 +242,43 @@ export default function AdminSiteSettings() {
               </div>
             </div>
 
-            <div className="pill-tabs" style={{ margin: "1rem 0" }}>
-              {LANGS.map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  className={`pill-tab ${heroTab === lang ? "active" : ""}`}
-                  onClick={() => setHeroTab(lang)}
-                >
-                  {LANG_LABEL[lang]}
-                </button>
-              ))}
-            </div>
 
             <div className="form-grid">
               <div className="form-field full-width">
-                <label htmlFor={`hero_title_${heroTab}`}>Hero Title ({LANG_LABEL[heroTab]})</label>
+                <label htmlFor="hero_title_en">Hero title</label>
                 <input
-                  id={`hero_title_${heroTab}`}
+                  id="hero_title_en"
                   type="text"
-                  dir={heroTab === "ar" ? "rtl" : "ltr"}
-                  value={settings[`hero_title_${heroTab}`]}
-                  onChange={(e) => handleChange(`hero_title_${heroTab}`, e.target.value)}
+                  value={settings.hero_title_en}
+                  onChange={(e) => handleChange("hero_title_en", e.target.value)}
                 />
               </div>
 
               <div className="form-field full-width">
-                <label htmlFor={`hero_subtitle_${heroTab}`}>Hero Subtitle ({LANG_LABEL[heroTab]})</label>
+                <label htmlFor="hero_subtitle_en">Hero subtitle</label>
                 <input
-                  id={`hero_subtitle_${heroTab}`}
+                  id="hero_subtitle_en"
                   type="text"
-                  dir={heroTab === "ar" ? "rtl" : "ltr"}
-                  value={settings[`hero_subtitle_${heroTab}`]}
-                  onChange={(e) => handleChange(`hero_subtitle_${heroTab}`, e.target.value)}
+                  value={settings.hero_subtitle_en}
+                  onChange={(e) => handleChange("hero_subtitle_en", e.target.value)}
                 />
               </div>
             </div>
           </div>
 
           {/* About */}
-          <div className="form-card">
+          <div className="form-card vehicle-details-card">
             <h3>About Section</h3>
 
-            <div className="pill-tabs" style={{ marginBottom: "1rem" }}>
-              {LANGS.map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  className={`pill-tab ${aboutTab === lang ? "active" : ""}`}
-                  onClick={() => setAboutTab(lang)}
-                >
-                  {LANG_LABEL[lang]}
-                </button>
-              ))}
-            </div>
 
+            <label className="settings-about-label" htmlFor="company-about">About your company</label>
             <textarea
-              className="form-textarea"
+              id="company-about"
+              className="vehicle-description-input"
               rows={5}
-              dir={aboutTab === "ar" ? "rtl" : "ltr"}
-              placeholder={`About the company (${LANG_LABEL[aboutTab]})`}
-              value={settings[`about_${aboutTab}`]}
-              onChange={(e) => handleChange(`about_${aboutTab}`, e.target.value)}
+              placeholder="Tell customers about your company and rental service…"
+              value={settings.about_en}
+              onChange={(e) => handleChange("about_en", e.target.value)}
             />
           </div>
 

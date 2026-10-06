@@ -48,7 +48,7 @@ export default function AdminReservationAdd() {
       setUsers(uData);
       setAvailableExtras(eData.filter((e) => e.active !== false)); // Assuming active flag
     }).catch(err => {
-      console.error("Failed to fetch initial form data", err);
+      setError(err.message || "Could not load reservation options.");
     });
   }, []);
 
@@ -148,8 +148,8 @@ export default function AdminReservationAdd() {
         <div className="form-sections">
 
           {/* User Details */}
-          <div className="form-card">
-            <h3>Client Selection (Optional)</h3>
+          <div className="form-card vehicle-details-card">
+            <div className="vehicle-identity-heading"><h3>Customer</h3><p>Select an existing customer or enter guest details below.</p></div>
             <div className="form-grid">
               <div className="form-field full-width">
                 <label htmlFor="user_id">Registered User</label>
@@ -170,8 +170,8 @@ export default function AdminReservationAdd() {
           </div>
 
           {/* Vehicle & Dates */}
-          <div className="form-card">
-            <h3>Reservation Details</h3>
+          <div className="form-card vehicle-details-card">
+            <div className="vehicle-identity-heading"><h3>Reservation details</h3><p>Choose a vehicle, locations, and rental dates.</p></div>
             <div className="form-grid">
               
               <div className="form-field full-width">
@@ -249,11 +249,11 @@ export default function AdminReservationAdd() {
 
           {/* Extras */}
           {availableExtras.length > 0 && (
-            <div className="form-card">
+            <div className="form-card vehicle-details-card">
               <h3>Extras & Add-ons</h3>
               <div className="form-grid">
                 {availableExtras.map((extra) => (
-                  <div key={extra.id} className="form-field checkbox-field">
+                  <div key={extra.id} className="reservation-extra-option">
                     <label>
                       <input
                         type="checkbox"
@@ -271,7 +271,7 @@ export default function AdminReservationAdd() {
 
           {/* Pricing Summary */}
           {estimatedDays > 0 && selectedVehicle && (
-            <div className="form-card">
+            <div className="form-card vehicle-details-card">
                <div className="form-field full-width">
                   <div className="estimate-box">
                     <span>{estimatedDays} day{estimatedDays > 1 ? "s" : ""} reservation</span>
@@ -282,8 +282,8 @@ export default function AdminReservationAdd() {
           )}
 
           {/* Driver Details */}
-          <div className="form-card">
-            <h3>Driver Details</h3>
+          <div className="form-card vehicle-details-card">
+            <div className="vehicle-identity-heading"><h3>Driver details</h3><p>Add the contact details for the person driving the vehicle.</p></div>
             <div className="form-grid">
               <div className="form-field">
                 <label htmlFor="driver_name">Driver Name</label>
