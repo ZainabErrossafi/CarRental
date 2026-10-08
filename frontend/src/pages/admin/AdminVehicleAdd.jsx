@@ -24,6 +24,7 @@ export default function AdminVehicleAdd() {
     } catch (err) {
       setError(err.message || "Failed to create vehicle. Please try again.");
       setSaving(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -49,6 +50,7 @@ export default function AdminVehicleAdd() {
         saving={saving}
         submitLabel="Create Vehicle"
         savingLabel="Creating..."
+        multiStep
       />
     </div>
   );

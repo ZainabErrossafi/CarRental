@@ -8,6 +8,10 @@ function initials(email) {
   return email.charAt(0).toUpperCase();
 }
 
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [reservations, setReservations] = useState([]);
@@ -41,6 +45,10 @@ export default function AdminUsers() {
   const activeCount = users.filter((u) => u.isActive).length;
   const staffCount = users.filter((u) => u.role === "staff").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
+
+  const viewingReservations = viewing
+    ? reservationsByEmail[viewing.email.toLowerCase()] || []
+    : [];
 
   return (
     <div>
@@ -103,62 +111,83 @@ export default function AdminUsers() {
           {tab === "All" ? "All Users" : `${tab} Users`}
           <span className="count-pill">{filtered.length}</span>
 
-          <div className="search-box" style={{ marginLeft: "auto" }}>
+          <div className="search-box users-search">
             <input
-              placeholder="Search users"
+              placeholder="Search by email"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              style={{ border: "none", outline: "none", background: "none", width: "160px" }}
             />
           </div>
         </div>
 
-        <table>
+        <table className="users-table">
           <thead>
             <tr>
-              <th>Email</th>
+              <th>User</th>
               <th>Status</th>
               <th>Role</th>
               <th>Reservations</th>
-              <th>Actions</th>
+              <th className="th-actions">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {filtered.map((u) => {
-              const userReservations = reservationsByEmail[u.email.toLowerCase()] || [];
+              const userReservations =
+                reservationsByEmail[u.email.toLowerCase()] || [];
+              const name = u.email.split("@")[0];
 
               return (
                 <tr key={u.id}>
                   <td>
-                    <div className="driver-cell" style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+                    <div className="user-cell">
                       <div className="user-avatar">{initials(u.email)}</div>
-                      <span>{u.email}</span>
+                      <div className="user-cell-text">
+                        <span className="user-name">{name}</span>
+                        <span className="user-email">{u.email}</span>
+                      </div>
                     </div>
                   </td>
 
                   <td>
-                    <span className="status-dot-label">
-                      <span className={`dot dot-${u.isActive ? "active" : "inactive"}`} />
+                    <span
+                      className={`status-pill ${
+                        u.isActive ? "is-active" : "is-inactive"
+                      }`}
+                    >
+                      <span className="status-pill-dot" />
                       {u.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
 
                   <td>
                     <span className={`badge badge-role-${u.role}`}>
-                      {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
+                      {capitalize(u.role)}
                     </span>
                   </td>
 
                   <td>
-                    <span className="count-pill">{userReservations.length}</span>
+                    <span
+                      className={`res-count ${
+                        userReservations.length === 0 ? "is-zero" : ""
+                      }`}
+                    >
+                      {userReservations.length}
+                      <span className="res-count-label">
+                        {userReservations.length === 1 ? "booking" : "bookings"}
+                      </span>
+                    </span>
                   </td>
 
-                  <td>
+                  <td className="td-actions">
                     <div className="row-actions">
                       <button
                         onClick={() => setViewing(u)}
-                        title="Review reservations"
+                        title={
+                          userReservations.length === 0
+                            ? "No reservations to review"
+                            : "Review reservations"
+                        }
                         disabled={userReservations.length === 0}
                       >
                         <Eye size={15} />
@@ -171,7 +200,7 @@ export default function AdminUsers() {
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
+                <td colSpan={5} className="table-empty">
                   No users match this filter.
                 </td>
               </tr>
@@ -182,14 +211,17 @@ export default function AdminUsers() {
 
       {viewing && (
         <div className="modal-overlay" onClick={() => setViewing(null)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-card modal-wide"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="modal-header">
-              <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
+              <div className="user-cell">
                 <div className="user-avatar">{initials(viewing.email)}</div>
-                <div>
+                <div className="user-cell-text">
                   <h3>{viewing.email}</h3>
                   <span className={`badge badge-role-${viewing.role}`}>
-                    {viewing.role.charAt(0).toUpperCase() + viewing.role.slice(1)}
+                    {capitalize(viewing.role)}
                   </span>
                 </div>
               </div>
@@ -199,7 +231,7 @@ export default function AdminUsers() {
             </div>
 
             <div className="modal-body" style={{ padding: 0 }}>
-              <table>
+              <table className="users-table">
                 <thead>
                   <tr>
                     <th>Reference</th>
@@ -210,11 +242,15 @@ export default function AdminUsers() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(reservationsByEmail[viewing.email.toLowerCase()] || []).map((r) => (
+                  {viewingReservations.map((r) => (
                     <tr key={r.id}>
-                      <td><strong>{r.reference}</strong></td>
+                      <td>
+                        <strong>{r.reference}</strong>
+                      </td>
                       <td>{r.vehicle}</td>
-                      <td>{r.pickup_date} → {r.return_date}</td>
+                      <td>
+                        {r.pickup_date} → {r.return_date}
+                      </td>
                       <td>
                         <span className="status-dot-label">
                           <span className={`dot dot-${r.status}`} />
@@ -225,9 +261,9 @@ export default function AdminUsers() {
                     </tr>
                   ))}
 
-                  {(reservationsByEmail[viewing.email.toLowerCase()] || []).length === 0 && (
+                  {viewingReservations.length === 0 && (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
+                      <td colSpan={5} className="table-empty">
                         No reservations for this user.
                       </td>
                     </tr>
@@ -237,7 +273,10 @@ export default function AdminUsers() {
             </div>
 
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setViewing(null)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setViewing(null)}
+              >
                 Close
               </button>
             </div>

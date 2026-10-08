@@ -22,7 +22,8 @@ clean:
 
 migrate:
 	docker compose exec backend python manage.py migrate
-
+create_user: 
+	docker compose exec backend python manage.py createsuperuser
 certs:
 	mkdir -p nginx/certs
 	openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
