@@ -1,9 +1,11 @@
+import { useI18n } from "../../context/I18nContext";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getVehicle, updateVehicle } from "../../services/adminApi";
 import VehicleForm from "./VehicleForm";
 
 export default function AdminVehicleEdit() {
+  const { t } = useI18n();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -59,7 +61,7 @@ export default function AdminVehicleEdit() {
     return (
       <div className="admin-edit-container flex-center">
         <div className="spinner"></div>
-        <p style={{ marginTop: "1rem", color: "#64748b" }}>Loading vehicle details...</p>
+        <p style={{ marginTop: "1rem", color: "#64748b" }}>{t("Loading vehicle details...")}</p>
       </div>
     );
   }
@@ -68,9 +70,9 @@ export default function AdminVehicleEdit() {
     return (
       <div className="admin-edit-container">
         <div className="alert alert-error">
-          <span>⚠️ {error}</span>
+          <span>⚠️ {t(error)}</span>
           <button className="btn btn-secondary" onClick={() => navigate("/admin/vehicles")}>
-            Back to Vehicles
+            {t("Back to Vehicles")}
           </button>
         </div>
       </div>
@@ -82,22 +84,22 @@ export default function AdminVehicleEdit() {
       <div className="page-header">
         <div>
           <button className="btn-back" onClick={() => navigate("/admin/vehicles")}>
-            ← Back to Fleet List
+            {t("← Back to Fleet List")}
           </button>
-          <h1>Edit Vehicle</h1>
+          <h1>{t("Edit Vehicle")}</h1>
           <p className="subtitle">
             {form?.brand} {form?.model} ({form?.year})
           </p>
         </div>
         <div className="header-badges">
-          <span className="category-badge">{form?.category || "Economy"}</span>
+          <span className="category-badge">{t(form?.category || "Economy")}</span>
           <span className={`status-badge status-${form?.status?.toLowerCase() || "available"}`}>
-            {form?.status || "Available"}
+            {t(form?.status || "Available")}
           </span>
         </div>
       </div>
 
-      {error && <div className="alert alert-error mb-4">⚠️ {error}</div>}
+      {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
       <VehicleForm
         form={form}
@@ -105,8 +107,8 @@ export default function AdminVehicleEdit() {
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/vehicles")}
         saving={saving}
-        submitLabel="Save Changes"
-        savingLabel="Saving Changes..."
+        submitLabel={t("Save Changes")}
+        savingLabel={t("Saving Changes...")}
       />
     </div>
   );

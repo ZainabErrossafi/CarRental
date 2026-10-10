@@ -1,3 +1,6 @@
+import { useI18n } from "../../context/I18nContext";
+import Pagination from "../../components/Pagination.jsx";
+import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
 import { Trash2, Star } from "lucide-react";
 import { getReviews, deleteReview } from "../../services/adminApi";
@@ -6,6 +9,7 @@ import { useConfirm } from "../../context/Confirmcontext";
 const RATING_TABS = ["All", "5", "4", "3", "2", "1"];
 
 export default function AdminReviews() {
+  const { t } = useI18n();
   const confirm = useConfirm();
   const [reviews, setReviews] = useState([]);
   const [tab, setTab] = useState("All");
@@ -23,6 +27,8 @@ export default function AdminReviews() {
       );
   }, [reviews, tab, query]);
 
+  const pagination = usePagination(filtered, JSON.stringify([tab, query]));
+
   const avgRatingNum = reviews.length
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
     : 0;
@@ -37,13 +43,13 @@ export default function AdminReviews() {
   return (
     <div>
       <div className="page-header">
-        <h1>Reviews</h1>
+        <h1>{t("Reviews")}</h1>
       </div>
 
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Total reviews</span>
+            <span className="stat-label">{t("Total reviews")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{reviews.length}</span>
@@ -52,7 +58,7 @@ export default function AdminReviews() {
 
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Average rating</span>
+            <span className="stat-label">{t("Average rating")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{avgRating}</span>
@@ -62,25 +68,25 @@ export default function AdminReviews() {
       </div>
 
       <div className="pill-tabs">
-        {RATING_TABS.map((t) => (
+        {RATING_TABS.map((tabLabel) => (
           <button
-            key={t}
-            className={`pill-tab ${tab === t ? "active" : ""}`}
-            onClick={() => setTab(t)}
+            key={tabLabel}
+            className={`pill-tab ${tab === tabLabel ? "active" : ""}`}
+            onClick={() => setTab(tabLabel)}
           >
-            {t === "All" ? "All" : `${t} ★`}
+            {tabLabel === "All" ? t("All") : `${t(tabLabel)} ★`}
           </button>
         ))}
       </div>
 
       <div className="table-card">
         <div className="table-card-header">
-          Reviews
+          {t("Reviews")}
           <span className="count-pill">{filtered.length}</span>
 
-          <div className="search-box" style={{ marginLeft: "auto" }}>
+          <div className="search-box" style={{ marginInlineStart: "auto" }}>
             <input
-              placeholder="Search reviews"
+              placeholder={t("Search reviews")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{ border: "none", outline: "none", background: "none", width: "160px" }}
@@ -91,16 +97,16 @@ export default function AdminReviews() {
         <table>
           <thead>
             <tr>
-              <th>Vehicle</th>
-              <th>User</th>
-              <th>Rating</th>
-              <th>Comment</th>
-              <th>Actions</th>
+              <th>{t("Vehicle")}</th>
+              <th>{t("User")}</th>
+              <th>{t("Rating")}</th>
+              <th>{t("Comment")}</th>
+              <th>{t("Actions")}</th>
             </tr>
           </thead>
 
           <tbody>
-            {filtered.map((r) => (
+            {pagination.pageItems.map((r) => (
               <tr key={r.id}>
                 <td>{r.vehicle}</td>
                 <td>{r.user}</td>
@@ -110,7 +116,7 @@ export default function AdminReviews() {
                 <td className="review-comment">{r.comment}</td>
                 <td>
                   <div className="row-actions">
-                    <button onClick={() => handleDelete(r.id)} title="Delete" className="danger">
+                    <button onClick={() => handleDelete(r.id)} title={t("Delete")} className="danger">
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -121,12 +127,13 @@ export default function AdminReviews() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={5} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
-                  No reviews match this filter.
+                  {t("No reviews match this filter.")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        <Pagination {...pagination} />
       </div>
     </div>
   );

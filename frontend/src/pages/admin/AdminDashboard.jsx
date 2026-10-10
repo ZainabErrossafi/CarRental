@@ -1,3 +1,5 @@
+import Pagination from "../../components/Pagination.jsx";
+import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Download, RefreshCw, Search, Trash2, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -35,6 +37,8 @@ export default function AdminDashboard() {
       );
   }, [vehicles, filterTab, tableTab, query]);
 
+  const pagination = usePagination(filtered, JSON.stringify([filterTab, tableTab, query]));
+
   const totalRate = vehicles.reduce((sum, v) => sum + v.dailyRate, 0) || 1;
 
   const handleEdit = (id) => {
@@ -56,7 +60,7 @@ export default function AdminDashboard() {
 
       <div className="stats-grid">
         <StatCard label={t("Total vehicles")} value={vehicles.length || "—"} delta="2.4%" spark={SPARK_A} />
-        <StatCard label={t("Avg. daily rate")} value={`${Math.round(totalRate / (vehicles.length || 1))} MAD`} delta="8.6%" spark={SPARK_B} />
+        <StatCard label={t("Avg. daily rate")} value={t("{value0} MAD", { value0: Math.round(totalRate / (vehicles.length || 1)) })} delta="8.6%" spark={SPARK_B} />
         <StatCard label={t("Active reservations")} value="9" delta="6.0%" spark={SPARK_C} />
       </div>
 
@@ -83,7 +87,7 @@ export default function AdminDashboard() {
                 onChange={(e) => setQuery(e.target.value)}
                 style={{ border: "none", outline: "none", background: "none", width: "100px" }}
               />
-              <kbd>⌘K</kbd>
+              <kbd>{t("⌘K")}</kbd>
             </div>
           </div>
         </div>
@@ -100,7 +104,7 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map((v) => {
+            {pagination.pageItems.map((v) => {
               const share = Math.round((v.dailyRate / totalRate) * 100);
               return (
                 <tr key={v.id}>
@@ -111,7 +115,7 @@ export default function AdminDashboard() {
                       <span className={`badge badge-${v.status}`}>{t(v.status)}</span>
                     </div>
                   </td>
-                  <td>{v.dailyRate} MAD</td>
+                  <td>{v.dailyRate} {t("MAD")}</td>
                   <td>
                     <div className="progress-cell">
                       <div className="progress-track">
@@ -147,6 +151,7 @@ export default function AdminDashboard() {
             )}
           </tbody>
         </table>
+        <Pagination {...pagination} />
       </div>
     </div>
   );

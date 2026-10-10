@@ -1,3 +1,6 @@
+import { useI18n } from "../../context/I18nContext";
+import Pagination from "../../components/Pagination.jsx";
+import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
 import { Eye, X } from "lucide-react";
 import { getUsers, getReservations } from "../../services/adminApi";
@@ -13,6 +16,7 @@ function capitalize(str) {
 }
 
 export default function AdminUsers() {
+  const { t } = useI18n();
   const [users, setUsers] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [tab, setTab] = useState("All");
@@ -42,6 +46,8 @@ export default function AdminUsers() {
       .filter((u) => u.email.toLowerCase().includes(query.toLowerCase()));
   }, [users, tab, query]);
 
+  const pagination = usePagination(filtered, JSON.stringify([tab, query]));
+
   const activeCount = users.filter((u) => u.isActive).length;
   const staffCount = users.filter((u) => u.role === "staff").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
@@ -50,16 +56,18 @@ export default function AdminUsers() {
     ? reservationsByEmail[viewing.email.toLowerCase()] || []
     : [];
 
+  const reservationPagination = usePagination(viewingReservations, viewing?.id ?? viewing?.email ?? "");
+
   return (
     <div>
       <div className="page-header">
-        <h1>Users & Roles</h1>
+        <h1>{t("Users & Roles")}</h1>
       </div>
 
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Total users</span>
+            <span className="stat-label">{t("Total users")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{users.length}</span>
@@ -68,7 +76,7 @@ export default function AdminUsers() {
 
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Active</span>
+            <span className="stat-label">{t("Active")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{activeCount}</span>
@@ -77,7 +85,7 @@ export default function AdminUsers() {
 
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Staff</span>
+            <span className="stat-label">{t("Staff")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{staffCount}</span>
@@ -86,7 +94,7 @@ export default function AdminUsers() {
 
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Admins</span>
+            <span className="stat-label">{t("Admins")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{adminCount}</span>
@@ -95,25 +103,25 @@ export default function AdminUsers() {
       </div>
 
       <div className="pill-tabs">
-        {ROLE_TABS.map((t) => (
+        {ROLE_TABS.map((tabLabel) => (
           <button
-            key={t}
-            className={`pill-tab ${tab === t ? "active" : ""}`}
-            onClick={() => setTab(t)}
+            key={tabLabel}
+            className={`pill-tab ${tab === tabLabel ? "active" : ""}`}
+            onClick={() => setTab(tabLabel)}
           >
-            {t}
+            {t(tabLabel)}
           </button>
         ))}
       </div>
 
       <div className="table-card">
         <div className="table-card-header">
-          {tab === "All" ? "All Users" : `${tab} Users`}
+          {tab === "All" ? t("All Users") : t("{value0} Users", { value0: t(tab) })}
           <span className="count-pill">{filtered.length}</span>
 
           <div className="search-box users-search">
             <input
-              placeholder="Search by email"
+              placeholder={t("Search by email")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -123,16 +131,16 @@ export default function AdminUsers() {
         <table className="users-table">
           <thead>
             <tr>
-              <th>User</th>
-              <th>Status</th>
-              <th>Role</th>
-              <th>Reservations</th>
-              <th className="th-actions">Actions</th>
+              <th>{t("User")}</th>
+              <th>{t("Status")}</th>
+              <th>{t("Role")}</th>
+              <th>{t("Reservations")}</th>
+              <th className="th-actions">{t("Actions")}</th>
             </tr>
           </thead>
 
           <tbody>
-            {filtered.map((u) => {
+            {pagination.pageItems.map((u) => {
               const userReservations =
                 reservationsByEmail[u.email.toLowerCase()] || [];
               const name = u.email.split("@")[0];
@@ -156,13 +164,13 @@ export default function AdminUsers() {
                       }`}
                     >
                       <span className="status-pill-dot" />
-                      {u.isActive ? "Active" : "Inactive"}
+                      {u.isActive ? t("Active") : t("Inactive")}
                     </span>
                   </td>
 
                   <td>
                     <span className={`badge badge-role-${u.role}`}>
-                      {capitalize(u.role)}
+                      {t(capitalize(u.role))}
                     </span>
                   </td>
 
@@ -174,7 +182,7 @@ export default function AdminUsers() {
                     >
                       {userReservations.length}
                       <span className="res-count-label">
-                        {userReservations.length === 1 ? "booking" : "bookings"}
+                        {userReservations.length === 1 ? t("booking") : t("bookings")}
                       </span>
                     </span>
                   </td>
@@ -185,8 +193,8 @@ export default function AdminUsers() {
                         onClick={() => setViewing(u)}
                         title={
                           userReservations.length === 0
-                            ? "No reservations to review"
-                            : "Review reservations"
+                            ? t("No reservations to review")
+                            : t("Review reservations")
                         }
                         disabled={userReservations.length === 0}
                       >
@@ -201,12 +209,13 @@ export default function AdminUsers() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={5} className="table-empty">
-                  No users match this filter.
+                  {t("No users match this filter.")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        <Pagination {...pagination} />
       </div>
 
       {viewing && (
@@ -221,7 +230,7 @@ export default function AdminUsers() {
                 <div className="user-cell-text">
                   <h3>{viewing.email}</h3>
                   <span className={`badge badge-role-${viewing.role}`}>
-                    {capitalize(viewing.role)}
+                    {t(capitalize(viewing.role))}
                   </span>
                 </div>
               </div>
@@ -234,15 +243,15 @@ export default function AdminUsers() {
               <table className="users-table">
                 <thead>
                   <tr>
-                    <th>Reference</th>
-                    <th>Vehicle</th>
-                    <th>Pickup → Return</th>
-                    <th>Status</th>
-                    <th>Total Price</th>
+                    <th>{t("Reference")}</th>
+                    <th>{t("Vehicle")}</th>
+                    <th>{t("Pickup → Return")}</th>
+                    <th>{t("Status")}</th>
+                    <th>{t("Total Price")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {viewingReservations.map((r) => (
+                  {reservationPagination.pageItems.map((r) => (
                     <tr key={r.id}>
                       <td>
                         <strong>{r.reference}</strong>
@@ -254,22 +263,23 @@ export default function AdminUsers() {
                       <td>
                         <span className="status-dot-label">
                           <span className={`dot dot-${r.status}`} />
-                          {r.status}
+                          {t(r.status)}
                         </span>
                       </td>
-                      <td>{r.total_price} MAD</td>
+                      <td>{r.total_price} {t("MAD")}</td>
                     </tr>
                   ))}
 
                   {viewingReservations.length === 0 && (
                     <tr>
                       <td colSpan={5} className="table-empty">
-                        No reservations for this user.
+                        {t("No reservations for this user.")}
                       </td>
                     </tr>
                   )}
                 </tbody>
               </table>
+              <Pagination {...reservationPagination} />
             </div>
 
             <div className="modal-footer">
@@ -277,7 +287,7 @@ export default function AdminUsers() {
                 className="btn btn-secondary"
                 onClick={() => setViewing(null)}
               >
-                Close
+                {t("Close")}
               </button>
             </div>
           </div>

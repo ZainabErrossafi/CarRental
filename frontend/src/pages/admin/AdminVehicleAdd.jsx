@@ -1,9 +1,11 @@
+import { useI18n } from "../../context/I18nContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVehicle } from "../../services/adminApi";
 import VehicleForm, { EMPTY_VEHICLE } from "./VehicleForm";
 
 export default function AdminVehicleAdd() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [form, setForm] = useState(EMPTY_VEHICLE);
   const [saving, setSaving] = useState(false);
@@ -33,14 +35,14 @@ export default function AdminVehicleAdd() {
       <div className="page-header">
         <div>
           <button className="btn-back" onClick={() => navigate("/admin/vehicles")}>
-            ← Back to Fleet List
+            {t("← Back to Fleet List")}
           </button>
-          <h1>Add Vehicle</h1>
-          <p className="subtitle">Create a new vehicle listing</p>
+          <h1>{t("Add Vehicle")}</h1>
+          <p className="subtitle">{t("Create a new vehicle listing")}</p>
         </div>
       </div>
 
-      {error && <div className="alert alert-error mb-4">⚠️ {error}</div>}
+      {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
       <VehicleForm
         form={form}
@@ -48,8 +50,8 @@ export default function AdminVehicleAdd() {
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/vehicles")}
         saving={saving}
-        submitLabel="Create Vehicle"
-        savingLabel="Creating..."
+        submitLabel={t("Create Vehicle")}
+        savingLabel={t("Creating...")}
         multiStep
       />
     </div>

@@ -1,3 +1,4 @@
+import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { X, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -71,6 +72,7 @@ export default function VehicleForm({
   savingLabel = "Saving...",
   multiStep = false,
 }) {
+  const { t } = useI18n();
   const [step, setStep] = useState(0);
   const formRef = useRef(null);
 
@@ -109,7 +111,7 @@ export default function VehicleForm({
               className={`step-item ${i === step ? "active" : ""} ${i < step ? "done" : ""}`}
             >
               <span className="step-number">{i < step ? "✓" : i + 1}</span>
-              <span className="step-label">{label}</span>
+              <span className="step-label">{t(label)}</span>
             </div>
           ))}
         </div>
@@ -124,16 +126,16 @@ export default function VehicleForm({
               {/* Identity */}
               <div className="form-card vehicle-identity-card">
                 <div className="vehicle-identity-heading">
-                  <h3>Vehicle identity</h3>
-                  <p>Start with the details customers will use to find your vehicle.</p>
+                  <h3>{t("Vehicle identity")}</h3>
+                  <p>{t("Start with the details customers will use to find your vehicle.")}</p>
                 </div>
                 <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="brand">Brand / Make</label>
+                    <label htmlFor="brand">{t("Brand / Make")}</label>
                     <input
                       id="brand"
                       type="text"
-                      placeholder="e.g. Toyota"
+                      placeholder={t("e.g. Toyota")}
                       value={form.brand}
                       onChange={(e) => onChange("brand", e.target.value)}
                       required
@@ -141,11 +143,11 @@ export default function VehicleForm({
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="model">Model</label>
+                    <label htmlFor="model">{t("Model")}</label>
                     <input
                       id="model"
                       type="text"
-                      placeholder="e.g. Corolla"
+                      placeholder={t("e.g. Corolla")}
                       value={form.model}
                       onChange={(e) => onChange("model", e.target.value)}
                       required
@@ -153,7 +155,7 @@ export default function VehicleForm({
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="year">Year</label>
+                    <label htmlFor="year">{t("Year")}</label>
                     <input
                       id="year"
                       type="number"
@@ -166,7 +168,7 @@ export default function VehicleForm({
                   </div>
 
                   <div className="form-field full-width">
-                    <label htmlFor="category">Vehicle category</label>
+                    <label htmlFor="category">{t("Vehicle category")}</label>
                     <select
                       id="category"
                       className="select-lg"
@@ -176,25 +178,25 @@ export default function VehicleForm({
                       required
                     >
                       {CATEGORY_OPTIONS.map((group) => (
-                        <optgroup key={group.group} label={group.group}>
+                        <optgroup key={group.group} label={t(group.group)}>
                           {group.options.map((opt) => (
                             <option key={opt.value} value={opt.value}>
-                              {opt.label}
+                              {t(opt.label)}
                             </option>
                           ))}
                         </optgroup>
                       ))}
                     </select>
                     <span id="vehicle-category-hint" className="field-hint">
-                      Choose the category customers will browse to find this vehicle.
+                      {t("Choose the category customers will browse to find this vehicle.")}
                     </span>
                   </div>
 
                   <label className="vehicle-featured-control full-width">
                     <span className="vehicle-featured-copy">
-                      <span className="vehicle-featured-title">Featured vehicle</span>
+                      <span className="vehicle-featured-title">{t("Featured vehicle")}</span>
                       <span className="field-hint" id="vehicle-featured-hint">
-                        Highlight this vehicle on the site to help it stand out.
+                        {t("Highlight this vehicle on the site to help it stand out.")}
                       </span>
                     </span>
                     <input
@@ -213,38 +215,38 @@ export default function VehicleForm({
               {/* Specs */}
               <div className="form-card vehicle-details-card vehicle-specs-card">
                 <div className="vehicle-identity-heading">
-                  <h3>Vehicle specifications</h3>
-                  <p>Add the practical details customers need before booking.</p>
+                  <h3>{t("Vehicle specifications")}</h3>
+                  <p>{t("Add the practical details customers need before booking.")}</p>
                 </div>
                 <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="transmission">Transmission</label>
+                    <label htmlFor="transmission">{t("Transmission")}</label>
                     <select
                       id="transmission"
                       value={form.transmission}
                       onChange={(e) => onChange("transmission", e.target.value)}
                     >
-                      <option value="Manual">Manual</option>
-                      <option value="Automatic">Automatic</option>
+                      <option value="Manual">{t("Manual")}</option>
+                      <option value="Automatic">{t("Automatic")}</option>
                     </select>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="fuel">Fuel Type</label>
+                    <label htmlFor="fuel">{t("Fuel Type")}</label>
                     <select
                       id="fuel"
                       value={form.fuel}
                       onChange={(e) => onChange("fuel", e.target.value)}
                     >
-                      <option value="Diesel">Diesel</option>
-                      <option value="Gasoline">Gasoline (Essence)</option>
-                      <option value="Hybrid">Hybrid</option>
-                      <option value="Electric">Electric</option>
+                      <option value="Diesel">{t("Diesel")}</option>
+                      <option value="Gasoline">{t("Gasoline (Essence)")}</option>
+                      <option value="Hybrid">{t("Hybrid")}</option>
+                      <option value="Electric">{t("Electric")}</option>
                     </select>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="seats">Seats</label>
+                    <label htmlFor="seats">{t("Seats")}</label>
                     <input
                       id="seats"
                       type="number"
@@ -256,7 +258,7 @@ export default function VehicleForm({
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="doors">Doors</label>
+                    <label htmlFor="doors">{t("Doors")}</label>
                     <input
                       id="doors"
                       type="number"
@@ -268,7 +270,7 @@ export default function VehicleForm({
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="luggage">Luggage Capacity</label>
+                    <label htmlFor="luggage">{t("Luggage Capacity")}</label>
                     <input
                       id="luggage"
                       type="number"
@@ -276,14 +278,14 @@ export default function VehicleForm({
                       value={form.luggage}
                       onChange={(e) => onChange("luggage", Number(e.target.value))}
                     />
-                    <span className="field-hint">Number of standard suitcases it fits.</span>
+                    <span className="field-hint">{t("Number of standard suitcases it fits.")}</span>
                   </div>
 
                   <label className="vehicle-featured-control full-width">
                     <span className="vehicle-featured-copy">
-                      <span className="vehicle-featured-title">Air conditioning</span>
+                      <span className="vehicle-featured-title">{t("Air conditioning")}</span>
                       <span className="field-hint" id="vehicle-ac-hint">
-                        Keep passengers comfortable on warm days.
+                        {t("Keep passengers comfortable on warm days.")}
                       </span>
                     </span>
                     <input
@@ -302,16 +304,16 @@ export default function VehicleForm({
               {/* Pricing & Rental Rules */}
               <div className="form-card vehicle-details-card vehicle-pricing-card">
                 <div className="vehicle-identity-heading">
-                  <h3>Pricing & rental rules</h3>
-                  <p>Set your daily price, deposit, and driver requirements.</p>
+                  <h3>{t("Pricing & rental rules")}</h3>
+                  <p>{t("Set your daily price, deposit, and driver requirements.")}</p>
                 </div>
                 <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="dailyRate">Daily Rate</label>
+                    <label htmlFor="dailyRate">{t("Daily Rate")}</label>
                     <div className="input-group">
                       <input
                         id="dailyRate"
-                        placeholder="e.g. 350"
+                        placeholder={t("e.g. 350")}
                         type="number"
                         min="0"
                         step="10"
@@ -319,28 +321,28 @@ export default function VehicleForm({
                         onChange={(e) => onChange("dailyRate", Number(e.target.value))}
                         required
                       />
-                      <span className="input-suffix">MAD/day</span>
+                      <span className="input-suffix">{t("MAD/day")}</span>
                     </div>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="deposit">Security Deposit</label>
+                    <label htmlFor="deposit">{t("Security Deposit")}</label>
                     <div className="input-group">
                       <input
                         id="deposit"
-                        placeholder="e.g. 2000"
+                        placeholder={t("e.g. 2000")}
                         type="number"
                         min="0"
                         step="50"
                         value={form.deposit}
                         onChange={(e) => onChange("deposit", Number(e.target.value))}
                       />
-                      <span className="input-suffix">MAD</span>
+                      <span className="input-suffix">{t("MAD")}</span>
                     </div>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="daily_mileage_limit">Daily Mileage Limit</label>
+                    <label htmlFor="daily_mileage_limit">{t("Daily Mileage Limit")}</label>
                     <div className="input-group">
                       <input
                         id="daily_mileage_limit"
@@ -352,12 +354,12 @@ export default function VehicleForm({
                           onChange("daily_mileage_limit", Number(e.target.value))
                         }
                       />
-                      <span className="input-suffix">km/day</span>
+                      <span className="input-suffix">{t("km/day")}</span>
                     </div>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="min_driver_age">Minimum Driver Age</label>
+                    <label htmlFor="min_driver_age">{t("Minimum Driver Age")}</label>
                     <div className="input-group">
                       <input
                         id="min_driver_age"
@@ -367,12 +369,12 @@ export default function VehicleForm({
                         value={form.min_driver_age}
                         onChange={(e) => onChange("min_driver_age", Number(e.target.value))}
                       />
-                      <span className="input-suffix">years</span>
+                      <span className="input-suffix">{t("years")}</span>
                     </div>
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="min_license_years">Minimum License Held</label>
+                    <label htmlFor="min_license_years">{t("Minimum License Held")}</label>
                     <div className="input-group">
                       <input
                         id="min_license_years"
@@ -384,7 +386,7 @@ export default function VehicleForm({
                           onChange("min_license_years", Number(e.target.value))
                         }
                       />
-                      <span className="input-suffix">years</span>
+                      <span className="input-suffix">{t("years")}</span>
                     </div>
                   </div>
                 </div>
@@ -398,19 +400,19 @@ export default function VehicleForm({
               {/* Media */}
               <div className="form-card vehicle-details-card vehicle-media-card">
                 <div className="vehicle-identity-heading">
-                  <h3>Vehicle photo</h3>
-                  <p>Choose a clear photo that shows your vehicle at its best.</p>
+                  <h3>{t("Vehicle photo")}</h3>
+                  <p>{t("Choose a clear photo that shows your vehicle at its best.")}</p>
                 </div>
                 <div className="form-grid">
                   <div className="form-field full-width">
-                    <label htmlFor="main_image_file">Main image</label>
+                    <label htmlFor="main_image_file">{t("Main image")}</label>
 
                     <div className="image-upload">
                       {form.main_image ? (
                         <div className="image-upload-preview">
                           <img
                             src={form.main_image}
-                            alt="Preview"
+                            alt={t("Preview")}
                             className="image-preview"
                           />
                           <button
@@ -419,7 +421,7 @@ export default function VehicleForm({
                             onClick={() => onChange("main_image", "")}
                           >
                             <X size={14} />
-                            Remove
+                            {t("Remove")}
                           </button>
                         </div>
                       ) : (
@@ -431,11 +433,11 @@ export default function VehicleForm({
                           }
                         >
                           <ImagePlus size={22} />
-                          <span className="vehicle-upload-title">Choose a vehicle photo</span>
+                          <span className="vehicle-upload-title">{t("Choose a vehicle photo")}</span>
                           <span className="vehicle-upload-caption">
-                            Browse files on your computer
+                            {t("Browse files on your computer")}
                           </span>
-                          <span className="field-hint">PNG, JPG or WEBP — up to 5MB</span>
+                          <span className="field-hint">{t("PNG, JPG or WEBP — up to 5MB")}</span>
                         </button>
                       )}
 
@@ -449,7 +451,7 @@ export default function VehicleForm({
                           if (!file) return;
 
                           if (file.size > 5 * 1024 * 1024) {
-                            alert("Image is too large. Please choose a file under 5MB.");
+                            alert(t("Image is too large. Please choose a file under 5MB."));
                             e.target.value = "";
                             return;
                           }
@@ -469,11 +471,10 @@ export default function VehicleForm({
               <div className="form-card vehicle-description-card">
                 <div className="vehicle-description-heading">
                   <h3>
-                    <label htmlFor="vehicle-description">Description</label>
+                    <label htmlFor="vehicle-description">{t("Description")}</label>
                   </h3>
                   <p id="vehicle-description-hint">
-                    Help customers get to know this vehicle. Include its comfort, features,
-                    and what makes it a good choice.
+                    {t("Help customers get to know this vehicle. Include its comfort, features, and what makes it a good choice.")}
                   </p>
                 </div>
                 <textarea
@@ -481,14 +482,14 @@ export default function VehicleForm({
                   className="vehicle-description-input"
                   rows={6}
                   lang="en"
-                  placeholder="For example: A comfortable, fuel-efficient car for city trips and weekend getaways…"
+                  placeholder={t("For example: A comfortable, fuel-efficient car for city trips and weekend getaways…")}
                   aria-describedby="vehicle-description-hint"
                   value={form.description_en ?? ""}
                   onChange={(e) => onChange("description_en", e.target.value)}
                 />
                 <div className="vehicle-description-footer">
-                  <span>Write your description in English.</span>
-                  <span>{(form.description_en ?? "").length} characters</span>
+                  <span>{t("Write your description in English.")}</span>
+                  <span>{t("{count} characters", { count: (form.description_en ?? "").length })}</span>
                 </div>
               </div>
             </>
@@ -505,7 +506,7 @@ export default function VehicleForm({
               onClick={onCancel}
               disabled={saving}
             >
-              Cancel
+              {t("Cancel")}
             </button>
           ) : (
             <button
@@ -514,17 +515,17 @@ export default function VehicleForm({
               onClick={goBack}
               disabled={saving}
             >
-              <ChevronLeft size={16} /> Back
+              <ChevronLeft size={16} /> {t("Back")}
             </button>
           )}
 
           {!isLastStep ? (
             <button type="button" className="btn btn-primary" onClick={goNext}>
-              Next <ChevronRight size={16} />
+              {t("Next")} <ChevronRight size={16} />
             </button>
           ) : (
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? savingLabel : submitLabel}
+              {t(saving ? savingLabel : submitLabel)}
             </button>
           )}
         </div>

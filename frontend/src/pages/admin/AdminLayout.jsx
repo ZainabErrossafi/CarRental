@@ -123,7 +123,7 @@ export default function AdminLayout() {
         >
           <Search size={15} />
           {t("Search")}
-          <kbd>⌘K</kbd>
+          <kbd>{t("⌘K")}</kbd>
         </button>
 
         <nav>
