@@ -59,15 +59,18 @@ export default function AdminLocations() {
     e.preventDefault();
     setSaving(true);
 
-    if (editing === "new") {
-      const created = await createLocation(form);
-      setLocations((prev) => [...prev, created]);
-    } else {
-      const updated = await updateLocation(editing.id, form);
-      setLocations((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+    try {
+      if (editing === "new") {
+        const created = await createLocation(form);
+        setLocations((prev) => [...prev, created]);
+      } else {
+        const updated = await updateLocation(editing.id, form);
+        setLocations((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+      }
+      closeModal();
+    } catch (err) {
+      setSaving(false);
     }
-
-    closeModal();
   };
 
   const handleDelete = async (loc) => {
@@ -80,6 +83,8 @@ export default function AdminLocations() {
     const updated = await updateLocation(loc.id, { active: !loc.active });
     setLocations((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
   };
+
+  const isNew = editing === "new";
 
   return (
     <div>
@@ -139,12 +144,11 @@ export default function AdminLocations() {
           {tab === "All" ? "All Locations" : `${tab} Locations`}
           <span className="count-pill">{filtered.length}</span>
 
-          <div className="search-box" style={{ marginLeft: "auto" }}>
+          <div className="search-box users-search">
             <input
               placeholder="Search locations"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              style={{ border: "none", outline: "none", background: "none", width: "160px" }}
             />
           </div>
         </div>
@@ -200,7 +204,7 @@ export default function AdminLocations() {
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
+                <td colSpan={5} className="table-empty">
                   {query ? "No locations match your search." : "No locations yet."}
                 </td>
               </tr>
@@ -211,33 +215,41 @@ export default function AdminLocations() {
 
       {editing && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-card modal-wide" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-card modal-wide catalog-dialog"
+            onClick={(e) => e.stopPropagation()}
+          >
             <form onSubmit={handleSave}>
               <div className="modal-header">
-                <h3>{editing === "new" ? "Add Location" : "Edit Location"}</h3>
-                <button type="button" className="modal-close" onClick={closeModal}>
+                <div className="catalog-dialog-heading">
+                  <h3>{isNew ? "Add Location" : "Edit Location"}</h3>
+                  <p>Set up a pickup or dropoff point customers can choose when booking.</p>
+                </div>
+                <button type="button" className="modal-close" onClick={closeModal} aria-label="Close">
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="modal-body" style={{ gap: "1rem", padding: "1.25rem 1.5rem" }}>
+              <div className="modal-body catalog-dialog-body">
                 <div className="form-field">
-                  <label htmlFor="loc_name">Location Name</label>
+                  <label className="catalog-field-label" htmlFor="loc_name">Name</label>
                   <input
                     id="loc_name"
                     type="text"
                     placeholder="e.g. Rabat Agdal"
                     value={form.name}
                     onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                    autoFocus
                     required
                   />
                 </div>
 
                 <div className="form-field">
-                  <label htmlFor="loc_city">City</label>
+                  <label className="catalog-field-label" htmlFor="loc_city">City</label>
                   <input
                     id="loc_city"
                     type="text"
+                    placeholder="e.g. Rabat"
                     value={form.city}
                     onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
                     required
@@ -245,23 +257,30 @@ export default function AdminLocations() {
                 </div>
 
                 <div className="form-field">
-                  <label htmlFor="loc_country">Country</label>
+                  <label className="catalog-field-label" htmlFor="loc_country">Country</label>
                   <input
                     id="loc_country"
                     type="text"
                     value={form.country}
                     onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
-                    required
+                    required 
                   />
                 </div>
 
-                <label className="checkbox-label">
+                <label className="vehicle-featured-control">
+                  <span className="vehicle-featured-copy">
+                    <span className="vehicle-featured-title">Active</span>
+                    <span className="field-hint"> Available as a pickup and dropoff point.
+                    </span>
+                  </span>
                   <input
+                    className="vehicle-featured-input"
                     type="checkbox"
-                    checked={form.active}
-                    onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
+                    role="switch"
+                    checked={!!form.active}
+                      onChange={(e) => setField("active", e.target.checked)}
                   />
-                  Active (available as a pickup/dropoff point)
+                  <span className="vehicle-featured-switch" aria-hidden="true" />
                 </label>
               </div>
 
@@ -270,7 +289,7 @@ export default function AdminLocations() {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? "Saving..." : editing === "new" ? "Add Location" : "Save Changes"}
+                  {saving ? "Saving..." : isNew ? "Add Location" : "Save Changes"}
                 </button>
               </div>
             </form>

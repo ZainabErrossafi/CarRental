@@ -3524,4 +3524,99 @@ th {
   .catalog-dialog .modal-footer {
     padding: 1rem;
   }
+  
+  .catalog-dialog .form-field label,
+.catalog-dialog .form-field label.catalog-field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+ 
+.catalog-dialog .form-field {
+  gap: 0.5rem;
+}
+ 
+  .catalog-dialog .form-field input,
+  .catalog-dialog .form-field select {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.75rem;
+    border-radius: 10px;
+    background: var(--off-white);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.925rem;
+  }
+ 
+  .catalog-dialog .form-field input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .catalog-dialog .field-hint {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  
+  .catalog-dialog .modal-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--navy);
+  }
+  
+  .catalog-dialog-heading p {
+    margin: 0.5rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.825rem;
+    line-height: 1.6;
+  }
+  
+  .catalog-dialog form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .catalog-dialog .form-field textarea,
+  .catalog-dialog .form-textarea {
+    display: block;
+    width: 100%;
+    min-height: 130px;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--off-white);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.925rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .catalog-dialog .form-field textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  .catalog-dialog .form-field textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px var(--orange-light);
+  }
+  .vehicle-description-input {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .vehicle-description-input::placeholder {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .vehicle-description-footer {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
 }

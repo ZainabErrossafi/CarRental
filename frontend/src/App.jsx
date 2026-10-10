@@ -17,16 +17,7 @@ import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AdminSiteSettings from "./pages/admin/AdminSiteSettings.jsx";
 import AdminFaqs from "./pages/admin/AdminFAQs.jsx";
 import AdminNotifications from "./pages/admin/AdminNotifications.jsx";
-function ComingSoon({ label }) {
-  return (
-    <div>
-      <div className="page-header"><h1>{label}</h1></div>
-      <div className="table-card" style={{ padding: "3rem", textAlign: "center", color: "#667085" }}>
-        This page isn't built yet.
-      </div>
-    </div>
-  );
-}
+
 
 export default function App() {
   return (
@@ -57,7 +48,6 @@ export default function App() {
         <Route path="site-settings" element={<AdminSiteSettings label="Site Settings" />} />
         <Route path="faqs" element={<AdminFaqs label="FAQs" />} />
         <Route path="notifications" element={<AdminNotifications label="Notifications" />} />
-        <Route path="analytics" element={<ComingSoon label="Analytics" />} />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>

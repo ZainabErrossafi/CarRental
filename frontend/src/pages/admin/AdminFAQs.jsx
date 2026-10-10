@@ -39,6 +39,7 @@ export default function AdminFaqs() {
   }, [faqs, tab, query]);
 
   const activeCount = faqs.filter((f) => f.active).length;
+  const isNew = editing === "new";
 
   const openNew = () => {
     setForm(EMPTY_FAQ);
@@ -59,15 +60,18 @@ export default function AdminFaqs() {
     e.preventDefault();
     setSaving(true);
 
-    if (editing === "new") {
-      const created = await createFaq(form);
-      setFaqs((prev) => [...prev, created].sort((a, b) => a.order - b.order));
-    } else {
-      const updated = await updateFaq(editing.id, form);
-      setFaqs((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+    try {
+      if (isNew) {
+        const created = await createFaq(form);
+        setFaqs((prev) => [...prev, created].sort((a, b) => a.order - b.order));
+      } else {
+        const updated = await updateFaq(editing.id, form);
+        setFaqs((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
+      }
+      closeModal();
+    } catch (err) {
+      setSaving(false);
     }
-
-    closeModal();
   };
 
   const handleDelete = async (id) => {
@@ -150,12 +154,11 @@ export default function AdminFaqs() {
           {tab === "All" ? "All FAQs" : `${tab} FAQs`}
           <span className="count-pill">{filtered.length}</span>
 
-          <div className="search-box" style={{ marginLeft: "auto" }}>
+          <div className="search-box users-search">
             <input
               placeholder="Search FAQs"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              style={{ border: "none", outline: "none", background: "none", width: "160px" }}
             />
           </div>
         </div>
@@ -229,7 +232,7 @@ export default function AdminFaqs() {
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
+                <td colSpan={5} className="table-empty">
                   No FAQs match this filter.
                 </td>
               </tr>
@@ -240,30 +243,37 @@ export default function AdminFaqs() {
 
       {editing && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-card modal-wide" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="modal-card modal-wide catalog-dialog"
+            onClick={(e) => e.stopPropagation()}
+          >
             <form onSubmit={handleSave}>
               <div className="modal-header">
-                <h3>{editing === "new" ? "Add FAQ" : "Edit FAQ"}</h3>
-                <button type="button" className="modal-close" onClick={closeModal}>
+                <div className="catalog-dialog-heading">
+                  <h3>{isNew ? "Add FAQ" : "Edit FAQ"}</h3>
+                  <p>Answer the questions your customers ask most often.</p>
+                </div>
+                <button type="button" className="modal-close" onClick={closeModal} aria-label="Close">
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="modal-body" style={{ gap: "1rem", padding: "1.25rem 1.5rem" }}>
+              <div className="modal-body catalog-dialog-body">
                 <div className="form-field">
-                  <label htmlFor="faq_question">Question</label>
+                  <label className="catalog-field-label" htmlFor="faq_question">Question</label>
                   <input
                     id="faq_question"
                     type="text"
                     placeholder="e.g. Can I extend my rental?"
                     value={form.question}
                     onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
+                    autoFocus
                     required
                   />
                 </div>
 
                 <div className="form-field">
-                  <label htmlFor="faq_answer">Answer</label>
+                  <label className="catalog-field-label" htmlFor="faq_answer">Answer</label>
                   <textarea
                     id="faq_answer"
                     className="form-textarea"
@@ -273,15 +283,25 @@ export default function AdminFaqs() {
                     onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
                     required
                   />
+                  <span className="field-hint">Keep it short and easy to scan.</span>
                 </div>
 
-                <label className="checkbox-label">
+                <label className="vehicle-featured-control">
+                  <span className="vehicle-featured-copy">
+                    <span className="vehicle-featured-title">Published</span>
+                    <span className="field-hint" id="faq-active-hint">
+                      Show this FAQ on the public site.
+                    </span>
+                  </span>
                   <input
+                    className="vehicle-featured-input"
                     type="checkbox"
-                    checked={form.active}
+                    role="switch"
+                    aria-describedby="faq-active-hint"
+                    checked={!!form.active}
                     onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
                   />
-                  Published (visible on the public site)
+                  <span className="vehicle-featured-switch" aria-hidden="true" />
                 </label>
               </div>
 
@@ -290,7 +310,7 @@ export default function AdminFaqs() {
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? "Saving..." : editing === "new" ? "Add FAQ" : "Save Changes"}
+                  {saving ? "Saving..." : isNew ? "Add FAQ" : "Save Changes"}
                 </button>
               </div>
             </form>
