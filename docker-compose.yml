@@ -27,11 +27,15 @@ services:
     container_name: car_rental_backend
     restart: unless-stopped
     env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DJANGO_HTTPS: "true"
     depends_on:
       postgres:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/app
     networks:
@@ -64,8 +68,11 @@ services:
     restart: unless-stopped
     ports:
       - "${HTTP_PORT:-8081}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    environment:
+      HTTPS_PORT: ${HTTPS_PORT:-8443}
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:ro
       - ./nginx/certs:/etc/nginx/certs:ro
     depends_on:
       - frontend
