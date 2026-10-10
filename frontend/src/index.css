@@ -36,6 +36,34 @@ body {
 }
 
 
+.list-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--white);
+}
+
+.pagination-summary,
+.pagination-page {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+[dir="rtl"] .pagination-controls svg {
+  transform: rotate(180deg);
+}
+
 /* =========================
    STATUS SELECT
    ========================= */
@@ -137,6 +165,11 @@ body {
    ========================= */
 
 .admin-sidebar {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  height: 100dvh;
   width: 260px;
   flex-shrink: 0;
   background: var(--white);
@@ -201,6 +234,7 @@ button.sidebar-search:hover {
 
 /* Navigation */
 .admin-sidebar nav {
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
@@ -1149,7 +1183,7 @@ th {
   max-width: 680px;
 }
 
-.vehicle-description-input {
+.admin-layout textarea {
   display: block;
   width: 100%;
   min-height: 170px;
@@ -1165,11 +1199,11 @@ th {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.vehicle-description-input::placeholder {
+.admin-layout textarea::placeholder {
   color: var(--text-muted);
 }
 
-.vehicle-description-input:focus {
+.admin-layout textarea:focus {
   outline: none;
   border-color: var(--orange);
   box-shadow: 0 0 0 3px var(--orange-light);
@@ -1308,6 +1342,125 @@ th {
   background: var(--off-white);
   font-size: 0.85rem;
   line-height: 1.6;
+}
+
+/* Compact site settings editor */
+.site-settings-page .page-header {
+  margin-bottom: 1rem;
+}
+
+.site-settings-page .step-indicator {
+  margin-bottom: 1rem;
+}
+
+.site-settings-page .local-editor-note {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.site-settings-page .form-sections {
+  gap: 1rem;
+}
+
+.site-settings-page .form-card {
+  padding: 1.25rem 1.5rem;
+}
+
+.site-settings-page .form-card h3 {
+  margin-bottom: 1rem;
+}
+
+.site-settings-page .form-grid {
+  gap: 1rem 1.25rem;
+}
+
+.site-settings-page .form-field {
+  gap: 0.5rem;
+}
+
+.site-settings-page .form-field input {
+  min-height: 46px;
+  padding: 0.75rem;
+}
+
+.site-settings-page .form-actions {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+}
+
+@media (min-width: 769px) {
+  .site-settings-page .form-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .site-settings-page .settings-address-field {
+    grid-column: span 2;
+  }
+
+  .site-settings-page .settings-social-card .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Homepage and About use the same comfortable, compact proportions. */
+.site-settings-page .settings-hero-card .image-upload-dropzone {
+  min-height: 100px;
+  padding: 1rem;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 1rem;
+  border: 1px solid var(--border);
+  text-align: start;
+}
+
+.settings-hero-upload-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.settings-hero-upload-action {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--orange-light);
+  color: var(--orange);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.site-settings-page .settings-hero-card .form-grid {
+  margin-top: 0.875rem;
+}
+
+.site-settings-page .settings-hero-card .image-preview {
+  max-height: 135px;
+}
+
+.site-settings-page .settings-hero-card .image-upload-preview {
+  padding: 0.75rem;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.site-settings-page .settings-about-card textarea {
+  min-height: 120px;
+}
+
+@media (max-width: 480px) {
+  .site-settings-page .settings-hero-card .image-upload-dropzone {
+    flex-wrap: wrap;
+  }
+
+  .settings-hero-upload-action {
+    margin-inline-start: auto;
+  }
+}
+
+@media (min-width: 769px) {
+  .site-settings-page .settings-hero-card .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .settings-about-label {
@@ -1937,6 +2090,57 @@ th {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-primary);
+}
+
+.catalog-dialog .form-field label,
+.catalog-dialog .form-field label.catalog-field-label {
+font-size: 0.875rem;
+font-weight: 500;
+color: var(--text-primary);
+}
+
+.catalog-dialog .form-field {
+gap: 0.5rem;
+}
+
+.catalog-dialog .form-field input,
+.catalog-dialog .form-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--off-white);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.925rem;
+}
+
+.catalog-dialog .form-field input::placeholder {
+  color: var(--text-muted);
+}
+
+.catalog-dialog .field-hint {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.catalog-dialog .modal-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--navy);
+}
+
+.catalog-dialog-heading p {
+  margin: 0.5rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.825rem;
+  line-height: 1.6;
+}
+
+.catalog-dialog form {
+  display: flex;
+  flex-direction: column;
 }
 
 .catalog-dialog .icon-picker {
@@ -3524,92 +3728,15 @@ th {
   .catalog-dialog .modal-footer {
     padding: 1rem;
   }
-  
-  .catalog-dialog .form-field label,
-.catalog-dialog .form-field label.catalog-field-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
- 
-.catalog-dialog .form-field {
-  gap: 0.5rem;
-}
- 
-  .catalog-dialog .form-field input,
-  .catalog-dialog .form-field select {
-    width: 100%;
-    min-height: 46px;
-    padding: 0.75rem;
-    border-radius: 10px;
-    background: var(--off-white);
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.925rem;
-  }
- 
-  .catalog-dialog .form-field input::placeholder {
-    color: var(--text-muted);
-  }
-  
-  .catalog-dialog .field-hint {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    line-height: 1.5;
-  }
-  
-  .catalog-dialog .modal-header h3 {
-    margin: 0;
-    font-size: 1.05rem;
-    color: var(--navy);
-  }
-  
-  .catalog-dialog-heading p {
-    margin: 0.5rem 0 0;
-    color: var(--text-secondary);
-    font-size: 0.825rem;
-    line-height: 1.6;
-  }
-  
-  .catalog-dialog form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .catalog-dialog .form-field textarea,
-  .catalog-dialog .form-textarea {
-    display: block;
-    width: 100%;
-    min-height: 130px;
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--off-white);
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.925rem;
-    line-height: 1.6;
-    resize: vertical;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
 
-  .catalog-dialog .form-field textarea::placeholder {
-    color: var(--text-muted);
-  }
-
-  .catalog-dialog .form-field textarea:focus {
-    outline: none;
-    border-color: var(--orange);
-    box-shadow: 0 0 0 3px var(--orange-light);
-  }
-  .vehicle-description-input {
+  .admin-layout textarea {
     font-size: 0.9rem;
     line-height: 1.6;
     padding: 0.75rem;
     border-radius: 10px;
   }
 
-  .vehicle-description-input::placeholder {
+  .admin-layout textarea::placeholder {
     color: var(--text-muted);
     font-size: 0.9rem;
   }
@@ -3618,5 +3745,235 @@ th {
     font-size: 0.8rem;
     line-height: 1.5;
     color: var(--text-secondary);
+  }
+}
+@media (max-width: 768px) {
+  .vehicles-list-header {
+    flex-wrap: wrap;
+  }
+
+  .vehicles-list-header .search-box {
+    flex: 1 1 100%;
+    min-width: 0;
+    margin-inline-start: 0;
+  }
+}
+
+.auth-language-switcher {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+[dir="rtl"] .step-actions svg,
+[dir="rtl"] .auth-footer svg,
+[dir="rtl"] .notification-link svg {
+  transform: scaleX(-1);
+}
+
+/* Public terms page */
+.terms-page {
+  min-height: 100vh;
+  background: var(--off-white);
+  color: var(--navy);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.terms-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem max(1.25rem, calc((100vw - 1100px) / 2));
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+}
+
+.terms-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--navy);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.terms-brand img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.terms-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.terms-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.terms-back:hover,
+.auth-terms-link:hover {
+  color: var(--orange);
+}
+
+.terms-heading {
+  margin: 2rem 0;
+}
+
+.terms-icon {
+  display: inline-flex;
+  padding: 0.75rem;
+  border-radius: 12px;
+  color: var(--orange);
+  background: var(--orange-light);
+}
+
+.terms-heading h1 {
+  margin: 1rem 0 0.5rem;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  letter-spacing: -0.03em;
+}
+
+.terms-heading p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.terms-layout {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  align-items: start;
+  gap: 2rem;
+}
+
+.terms-contents {
+  position: sticky;
+  top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.terms-contents-title {
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.terms-contents a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  padding: 0.65rem 0.5rem;
+  border-radius: 8px;
+  color: var(--navy);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.terms-contents a span {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.terms-contents a:hover {
+  background: var(--orange-light);
+}
+
+.terms-document {
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--white);
+}
+
+.terms-intro {
+  margin: 0 0 1.5rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: var(--off-white);
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.75;
+}
+
+.terms-section {
+  padding: 1.25rem 0;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 1.5rem;
+}
+
+.terms-section h2 {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.terms-section h2 span {
+  color: var(--orange);
+}
+
+.terms-section p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.925rem;
+  line-height: 1.8;
+}
+
+.terms-document-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+}
+
+.terms-document-footer a {
+  text-decoration: none;
+}
+
+.terms-footer {
+  padding: 1.25rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.auth-terms-link {
+  align-self: center;
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+[dir="rtl"] .terms-back svg {
+  transform: scaleX(-1);
+}
+
+@media (max-width: 768px) {
+  .terms-layout {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .terms-contents {
+    position: static;
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
   }
 }

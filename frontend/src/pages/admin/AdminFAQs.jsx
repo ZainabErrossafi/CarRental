@@ -1,3 +1,6 @@
+import { useI18n } from "../../context/I18nContext";
+import Pagination from "../../components/Pagination.jsx";
+import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Pencil, Trash2, ChevronUp, ChevronDown, X } from "lucide-react";
 import {
@@ -14,6 +17,7 @@ const STATUS_TABS = ["All", "Active", "Hidden"];
 const EMPTY_FAQ = { question: "", answer: "", active: true };
 
 export default function AdminFaqs() {
+  const { t } = useI18n();
   const confirm = useConfirm();
   const [faqs, setFaqs] = useState([]);
   const [tab, setTab] = useState("All");
@@ -37,6 +41,8 @@ export default function AdminFaqs() {
         `${f.question} ${f.answer}`.toLowerCase().includes(query.toLowerCase())
       );
   }, [faqs, tab, query]);
+
+  const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 
   const activeCount = faqs.filter((f) => f.active).length;
   const isNew = editing === "new";
@@ -99,11 +105,11 @@ export default function AdminFaqs() {
   return (
     <div>
       <div className="page-header">
-        <h1>FAQs</h1>
+        <h1>{t("FAQs")}</h1>
         <div className="page-header-actions">
           <button className="btn-pill" onClick={openNew}>
             <Plus size={16} strokeWidth={2.5} />
-            Add FAQ
+            {t("Add FAQ")}
           </button>
         </div>
       </div>
@@ -111,7 +117,7 @@ export default function AdminFaqs() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Total FAQs</span>
+            <span className="stat-label">{t("Total FAQs")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{faqs.length}</span>
@@ -120,7 +126,7 @@ export default function AdminFaqs() {
 
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Published</span>
+            <span className="stat-label">{t("Published")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{activeCount}</span>
@@ -129,7 +135,7 @@ export default function AdminFaqs() {
 
         <div className="stat-card">
           <div className="stat-card-top">
-            <span className="stat-label">Hidden</span>
+            <span className="stat-label">{t("Hidden")}</span>
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{faqs.length - activeCount}</span>
@@ -138,25 +144,25 @@ export default function AdminFaqs() {
       </div>
 
       <div className="pill-tabs">
-        {STATUS_TABS.map((t) => (
+        {STATUS_TABS.map((tabLabel) => (
           <button
-            key={t}
-            className={`pill-tab ${tab === t ? "active" : ""}`}
-            onClick={() => setTab(t)}
+            key={tabLabel}
+            className={`pill-tab ${tab === tabLabel ? "active" : ""}`}
+            onClick={() => setTab(tabLabel)}
           >
-            {t}
+            {t(tabLabel)}
           </button>
         ))}
       </div>
 
       <div className="table-card">
         <div className="table-card-header">
-          {tab === "All" ? "All FAQs" : `${tab} FAQs`}
+          {tab === "All" ? t("All FAQs") : t("{value0} FAQs", { value0: t(tab) })}
           <span className="count-pill">{filtered.length}</span>
 
           <div className="search-box users-search">
             <input
-              placeholder="Search FAQs"
+              placeholder={t("Search FAQs")}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -166,16 +172,16 @@ export default function AdminFaqs() {
         <table>
           <thead>
             <tr>
-              <th style={{ width: "90px" }}>Order</th>
-              <th>Question</th>
-              <th>Answer</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={{ width: "90px" }}>{t("Order")}</th>
+              <th>{t("Question")}</th>
+              <th>{t("Answer")}</th>
+              <th>{t("Status")}</th>
+              <th>{t("Actions")}</th>
             </tr>
           </thead>
 
           <tbody>
-            {filtered.map((f) => {
+            {pagination.pageItems.map((f) => {
               const fullIndex = faqs.findIndex((x) => x.id === f.id);
 
               return (
@@ -187,14 +193,14 @@ export default function AdminFaqs() {
                         <button
                           onClick={() => handleMove(f, -1)}
                           disabled={fullIndex === 0}
-                          title="Move up"
+                          title={t("Move up")}
                         >
                           <ChevronUp size={14} />
                         </button>
                         <button
                           onClick={() => handleMove(f, 1)}
                           disabled={fullIndex === faqs.length - 1}
-                          title="Move down"
+                          title={t("Move down")}
                         >
                           <ChevronDown size={14} />
                         </button>
@@ -210,7 +216,7 @@ export default function AdminFaqs() {
                     <button
                       className={`toggle ${f.active ? "on" : ""}`}
                       onClick={() => handleToggleActive(f)}
-                      title={f.active ? "Click to hide" : "Click to publish"}
+                      title={f.active ? t("Click to hide") : t("Click to publish")}
                     >
                       <span className="toggle-knob" />
                     </button>
@@ -218,10 +224,10 @@ export default function AdminFaqs() {
 
                   <td>
                     <div className="row-actions">
-                      <button onClick={() => openEdit(f)} title="Edit FAQ">
+                      <button onClick={() => openEdit(f)} title={t("Edit FAQ")}>
                         <Pencil size={15} />
                       </button>
-                      <button onClick={() => handleDelete(f.id)} title="Delete FAQ" className="danger">
+                      <button onClick={() => handleDelete(f.id)} title={t("Delete FAQ")} className="danger">
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -233,12 +239,13 @@ export default function AdminFaqs() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={5} className="table-empty">
-                  No FAQs match this filter.
+                  {t("No FAQs match this filter.")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        <Pagination {...pagination} />
       </div>
 
       {editing && (
@@ -250,21 +257,21 @@ export default function AdminFaqs() {
             <form onSubmit={handleSave}>
               <div className="modal-header">
                 <div className="catalog-dialog-heading">
-                  <h3>{isNew ? "Add FAQ" : "Edit FAQ"}</h3>
-                  <p>Answer the questions your customers ask most often.</p>
+                  <h3>{isNew ? t("Add FAQ") : t("Edit FAQ")}</h3>
+                  <p>{t("Answer the questions your customers ask most often.")}</p>
                 </div>
-                <button type="button" className="modal-close" onClick={closeModal} aria-label="Close">
+                <button type="button" className="modal-close" onClick={closeModal} aria-label={t("Close")}>
                   <X size={18} />
                 </button>
               </div>
 
               <div className="modal-body catalog-dialog-body">
                 <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="faq_question">Question</label>
+                  <label className="catalog-field-label" htmlFor="faq_question">{t("Question")}</label>
                   <input
                     id="faq_question"
                     type="text"
-                    placeholder="e.g. Can I extend my rental?"
+                    placeholder={t("e.g. Can I extend my rental?")}
                     value={form.question}
                     onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
                     autoFocus
@@ -273,24 +280,24 @@ export default function AdminFaqs() {
                 </div>
 
                 <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="faq_answer">Answer</label>
+                  <label className="catalog-field-label" htmlFor="faq_answer">{t("Answer")}</label>
                   <textarea
                     id="faq_answer"
                     className="form-textarea"
                     rows={5}
-                    placeholder="Write a clear, helpful answer..."
+                    placeholder={t("Write a clear, helpful answer...")}
                     value={form.answer}
                     onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
                     required
                   />
-                  <span className="field-hint">Keep it short and easy to scan.</span>
+                  <span className="field-hint">{t("Keep it short and easy to scan.")}</span>
                 </div>
 
                 <label className="vehicle-featured-control">
                   <span className="vehicle-featured-copy">
-                    <span className="vehicle-featured-title">Published</span>
+                    <span className="vehicle-featured-title">{t("Published")}</span>
                     <span className="field-hint" id="faq-active-hint">
-                      Show this FAQ on the public site.
+                      {t("Show this FAQ on the public site.")}
                     </span>
                   </span>
                   <input
@@ -307,10 +314,10 @@ export default function AdminFaqs() {
 
               <div className="modal-footer" style={{ gap: "0.6rem" }}>
                 <button type="button" className="btn btn-secondary" onClick={closeModal} disabled={saving}>
-                  Cancel
+                  {t("Cancel")}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? "Saving..." : isNew ? "Add FAQ" : "Save Changes"}
+                  {saving ? t("Saving...") : isNew ? t("Add FAQ") : t("Save Changes")}
                 </button>
               </div>
             </form>

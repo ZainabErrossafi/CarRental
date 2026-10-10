@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { LANGUAGES, translations } from "../i18n/translations";
+import { LANGUAGES, translate } from "../i18n/translations";
 
 const I18nContext = createContext(null);
 const STORAGE_KEY = "rently_lang";
@@ -34,7 +34,7 @@ export function I18nProvider({ children }) {
   }, []);
 
   const t = useCallback(
-    (key) => (lang === "en" ? key : translations[lang]?.[key] ?? key),
+    (key, values) => translate(lang, key, values),
     [lang]
   );
 

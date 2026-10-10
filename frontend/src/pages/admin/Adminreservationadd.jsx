@@ -1,3 +1,4 @@
+import { useI18n } from "../../context/I18nContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -22,6 +23,7 @@ const EMPTY_RESERVATION = {
 };
 
 export default function AdminReservationAdd() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   
   // Data states
@@ -135,30 +137,30 @@ export default function AdminReservationAdd() {
       <div className="page-header">
         <div>
           <button className="btn-back" onClick={() => navigate("/admin/reservations")}>
-            ← Back to Reservations
+            {t("← Back to Reservations")}
           </button>
-          <h1>New Reservation</h1>
-          <p className="subtitle">Book a vehicle on behalf of a client</p>
+          <h1>{t("New Reservation")}</h1>
+          <p className="subtitle">{t("Book a vehicle on behalf of a client")}</p>
         </div>
       </div>
 
-      {error && <div className="alert alert-error mb-4">⚠️ {error}</div>}
+      {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
       <form onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
 
           {/* User Details */}
           <div className="form-card vehicle-details-card">
-            <div className="vehicle-identity-heading"><h3>Customer</h3><p>Select an existing customer or enter guest details below.</p></div>
+            <div className="vehicle-identity-heading"><h3>{t("Customer")}</h3><p>{t("Select an existing customer or enter guest details below.")}</p></div>
             <div className="form-grid">
               <div className="form-field full-width">
-                <label htmlFor="user_id">Registered User</label>
+                <label htmlFor="user_id">{t("Registered User")}</label>
                 <select
                   id="user_id"
                   value={form.user_id}
                   onChange={(e) => handleChange("user_id", e.target.value)}
                 >
-                  <option value="">Guest (No Account)</option>
+                  <option value="">{t("Guest (No Account)")}</option>
                   {users.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.first_name} {u.last_name} ({u.email})
@@ -171,11 +173,11 @@ export default function AdminReservationAdd() {
 
           {/* Vehicle & Dates */}
           <div className="form-card vehicle-details-card">
-            <div className="vehicle-identity-heading"><h3>Reservation details</h3><p>Choose a vehicle, locations, and rental dates.</p></div>
+            <div className="vehicle-identity-heading"><h3>{t("Reservation details")}</h3><p>{t("Choose a vehicle, locations, and rental dates.")}</p></div>
             <div className="form-grid">
               
               <div className="form-field full-width">
-                <label htmlFor="vehicle_id">Vehicle</label>
+                <label htmlFor="vehicle_id">{t("Vehicle")}</label>
                 <select
                   id="vehicle_id"
                   className="select-lg"
@@ -183,24 +185,24 @@ export default function AdminReservationAdd() {
                   onChange={(e) => handleChange("vehicle_id", e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select an available vehicle</option>
+                  <option value="" disabled>{t("Select an available vehicle")}</option>
                   {vehicles.map((v) => (
                     <option key={v.id} value={v.id}>
-                      {v.brand} {v.model} — {v.dailyRate} MAD/day
+                      {v.brand} {v.model} — {v.dailyRate} {t("MAD/day")}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-field">
-                <label htmlFor="pickup_location_id">Pickup Location</label>
+                <label htmlFor="pickup_location_id">{t("Pickup Location")}</label>
                 <select
                   id="pickup_location_id"
                   value={form.pickup_location_id}
                   onChange={(e) => handleChange("pickup_location_id", e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select Location</option>
+                  <option value="" disabled>{t("Select Location")}</option>
                   {locations.map((loc) => (
                     <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
                   ))}
@@ -208,14 +210,14 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="dropoff_location_id">Dropoff Location</label>
+                <label htmlFor="dropoff_location_id">{t("Dropoff Location")}</label>
                 <select
                   id="dropoff_location_id"
                   value={form.dropoff_location_id}
                   onChange={(e) => handleChange("dropoff_location_id", e.target.value)}
                   required
                 >
-                  <option value="" disabled>Select Location</option>
+                  <option value="" disabled>{t("Select Location")}</option>
                   {locations.map((loc) => (
                     <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
                   ))}
@@ -223,7 +225,7 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="pickup_date">Pickup Date</label>
+                <label htmlFor="pickup_date">{t("Pickup Date")}</label>
                 <input
                   id="pickup_date"
                   type="date"
@@ -234,7 +236,7 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="return_date">Return Date</label>
+                <label htmlFor="return_date">{t("Return Date")}</label>
                 <input
                   id="return_date"
                   type="date"
@@ -250,7 +252,7 @@ export default function AdminReservationAdd() {
           {/* Extras */}
           {availableExtras.length > 0 && (
             <div className="form-card vehicle-details-card">
-              <h3>Extras & Add-ons</h3>
+              <h3>{t("Extras & Add-ons")}</h3>
               <div className="form-grid">
                 {availableExtras.map((extra) => (
                   <div key={extra.id} className="reservation-extra-option">
@@ -261,7 +263,7 @@ export default function AdminReservationAdd() {
                         onChange={() => handleExtraToggle(extra.id)}
                       />
                       {extra.name} 
-                      ({extra.price_per_day ? `${extra.price_per_day} MAD/day` : `${extra.flat_price} MAD flat`})
+                      ({extra.price_per_day ? t("{value0} MAD/day", { value0: extra.price_per_day }) : t("{value0} MAD flat", { value0: extra.flat_price })})
                     </label>
                   </div>
                 ))}
@@ -274,8 +276,8 @@ export default function AdminReservationAdd() {
             <div className="form-card vehicle-details-card">
                <div className="form-field full-width">
                   <div className="estimate-box">
-                    <span>{estimatedDays} day{estimatedDays > 1 ? "s" : ""} reservation</span>
-                    <strong>{estimatedTotal} MAD total</strong>
+                    <span>{t("Reservation for {count} days", { count: estimatedDays })}</span>
+                    <strong>{estimatedTotal} {t("MAD total")}</strong>
                   </div>
                 </div>
             </div>
@@ -283,10 +285,10 @@ export default function AdminReservationAdd() {
 
           {/* Driver Details */}
           <div className="form-card vehicle-details-card">
-            <div className="vehicle-identity-heading"><h3>Driver details</h3><p>Add the contact details for the person driving the vehicle.</p></div>
+            <div className="vehicle-identity-heading"><h3>{t("Driver details")}</h3><p>{t("Add the contact details for the person driving the vehicle.")}</p></div>
             <div className="form-grid">
               <div className="form-field">
-                <label htmlFor="driver_name">Driver Name</label>
+                <label htmlFor="driver_name">{t("Driver Name")}</label>
                 <input
                   id="driver_name"
                   type="text"
@@ -297,7 +299,7 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t("Phone")}</label>
                 <input
                   id="phone"
                   type="tel"
@@ -309,7 +311,7 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field full-width">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t("Email")}</label>
                 <input
                   id="email"
                   type="email"
@@ -330,10 +332,10 @@ export default function AdminReservationAdd() {
             onClick={() => navigate("/admin/reservations")}
             disabled={saving}
           >
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? "Creating..." : "Create Reservation"}
+            {saving ? t("Creating...") : t("Create Reservation")}
           </button>
         </div>
       </form>

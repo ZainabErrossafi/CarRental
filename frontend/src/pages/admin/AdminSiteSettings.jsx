@@ -1,3 +1,4 @@
+import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import {
   Facebook,
@@ -14,6 +15,7 @@ import { getSiteSettings, updateSiteSettings } from "../../services/adminApi";
 const STEPS = ["Company & Social", "Homepage & About"];
 
 export default function AdminSiteSettings() {
+  const { t } = useI18n();
   const [settings, setSettings] = useState(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -35,7 +37,7 @@ export default function AdminSiteSettings() {
   const handleImageUpload = (file) => {
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      alert("Image is too large. Please choose a file under 5MB.");
+      alert(t("Image is too large. Please choose a file under 5MB."));
       return;
     }
     const reader = new FileReader();
@@ -78,15 +80,15 @@ export default function AdminSiteSettings() {
     }
   };
 
-  if (!settings) return <p>Loading...</p>;
+  if (!settings) return <p>{t("Loading...")}</p>;
 
   return (
-    <div className="admin-edit-container">
+    <div className="admin-edit-container site-settings-page">
       <div className="page-header">
         <div>
-          <h1>Site Settings</h1>
+          <h1>{t("Site Settings")}</h1>
           <p className="subtitle">
-            Manage company details, social links, and homepage content.
+            {t("Manage company details, social links, and homepage content.")}
           </p>
         </div>
       </div>
@@ -99,17 +101,17 @@ export default function AdminSiteSettings() {
             className={`step-item ${i === step ? "active" : ""} ${i < step ? "done" : ""}`}
           >
             <span className="step-number">{i < step ? "✓" : i + 1}</span>
-            <span className="step-label">{label}</span>
+            <span className="step-label">{t(label)}</span>
           </div>
         ))}
       </div>
 
       <p className="local-editor-note">
-        Changes are saved in this browser only and do not update the public site.
+        {t("Changes are saved in this browser only and do not update the public site.")}
       </p>
-      {error && <div role="alert" className="alert alert-error mb-4">{error}</div>}
+      {error && <div role="alert" className="alert alert-error mb-4">{t(error)}</div>}
       {saved && (
-        <div className="alert alert-success mb-4">✓ Settings saved in this browser.</div>
+        <div className="alert alert-success mb-4">{t("✓ Settings saved in this browser.")}</div>
       )}
 
       <form ref={formRef} onSubmit={handleSubmit} className="vehicle-form">
@@ -120,10 +122,10 @@ export default function AdminSiteSettings() {
             <>
               {/* Company Info */}
               <div className="form-card vehicle-details-card">
-                <h3>Company Information</h3>
+                <h3>{t("Company Information")}</h3>
                 <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="company_name">Company Name</label>
+                    <label htmlFor="company_name">{t("Company Name")}</label>
                     <input
                       id="company_name"
                       type="text"
@@ -134,7 +136,7 @@ export default function AdminSiteSettings() {
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="email">{t("Email")}</label>
                     <input
                       id="email"
                       type="email"
@@ -145,7 +147,7 @@ export default function AdminSiteSettings() {
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="phone">Phone</label>
+                    <label htmlFor="phone">{t("Phone")}</label>
                     <input
                       id="phone"
                       type="tel"
@@ -155,7 +157,7 @@ export default function AdminSiteSettings() {
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="whatsapp">WhatsApp</label>
+                    <label htmlFor="whatsapp">{t("WhatsApp")}</label>
                     <input
                       id="whatsapp"
                       type="tel"
@@ -164,8 +166,8 @@ export default function AdminSiteSettings() {
                     />
                   </div>
 
-                  <div className="form-field full-width">
-                    <label htmlFor="address">Address</label>
+                  <div className="form-field settings-address-field">
+                    <label htmlFor="address">{t("Address")}</label>
                     <input
                       id="address"
                       type="text"
@@ -175,7 +177,7 @@ export default function AdminSiteSettings() {
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="city">City</label>
+                    <label htmlFor="city">{t("City")}</label>
                     <input
                       id="city"
                       type="text"
@@ -185,7 +187,7 @@ export default function AdminSiteSettings() {
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="country">Country</label>
+                    <label htmlFor="country">{t("Country")}</label>
                     <input
                       id="country"
                       type="text"
@@ -197,48 +199,48 @@ export default function AdminSiteSettings() {
               </div>
 
               {/* Social Links */}
-              <div className="form-card vehicle-details-card">
-                <h3>Social Links</h3>
+              <div className="form-card vehicle-details-card settings-social-card">
+                <h3>{t("Social Links")}</h3>
                 <div className="form-grid">
                   <div className="form-field">
-                    <label htmlFor="facebook"><Facebook size={13} /> Facebook</label>
+                    <label htmlFor="facebook"><Facebook size={13} /> {t("Facebook")}</label>
                     <input
                       id="facebook"
                       type="url"
-                      placeholder="https://facebook.com/..."
+                      placeholder={t("https://facebook.com/...")}
                       value={settings.facebook}
                       onChange={(e) => handleChange("facebook", e.target.value)}
                     />
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="instagram"><Instagram size={13} /> Instagram</label>
+                    <label htmlFor="instagram"><Instagram size={13} /> {t("Instagram")}</label>
                     <input
                       id="instagram"
                       type="url"
-                      placeholder="https://instagram.com/..."
+                      placeholder={t("https://instagram.com/...")}
                       value={settings.instagram}
                       onChange={(e) => handleChange("instagram", e.target.value)}
                     />
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="twitter"><Twitter size={13} /> Twitter / X</label>
+                    <label htmlFor="twitter"><Twitter size={13} /> {t("Twitter / X")}</label>
                     <input
                       id="twitter"
                       type="url"
-                      placeholder="https://x.com/..."
+                      placeholder={t("https://x.com/...")}
                       value={settings.twitter}
                       onChange={(e) => handleChange("twitter", e.target.value)}
                     />
                   </div>
 
                   <div className="form-field">
-                    <label htmlFor="linkedin"><Linkedin size={13} /> LinkedIn</label>
+                    <label htmlFor="linkedin"><Linkedin size={13} /> {t("LinkedIn")}</label>
                     <input
                       id="linkedin"
                       type="url"
-                      placeholder="https://linkedin.com/..."
+                      placeholder={t("https://linkedin.com/...")}
                       value={settings.linkedin}
                       onChange={(e) => handleChange("linkedin", e.target.value)}
                     />
@@ -252,17 +254,17 @@ export default function AdminSiteSettings() {
           {step === 1 && (
             <>
               {/* Hero Section */}
-              <div className="form-card vehicle-details-card vehicle-media-card">
-                <h3>Homepage Hero</h3>
+              <div className="form-card vehicle-details-card vehicle-media-card settings-hero-card">
+                <h3>{t("Homepage Hero")}</h3>
 
                 <div className="form-field full-width">
-                  <label htmlFor="hero_image_file">Hero image</label>
+                  <label htmlFor="hero_image_file">{t("Hero image")}</label>
                   <div className="image-upload">
                     {settings.hero_image ? (
                       <div className="image-upload-preview">
                         <img
                           src={settings.hero_image}
-                          alt="Hero preview"
+                          alt={t("Hero preview")}
                           className="image-preview"
                         />
                         <button
@@ -271,7 +273,7 @@ export default function AdminSiteSettings() {
                           onClick={() => handleChange("hero_image", "")}
                         >
                           <X size={14} />
-                          Remove
+                          {t("Remove")}
                         </button>
                       </div>
                     ) : (
@@ -281,8 +283,11 @@ export default function AdminSiteSettings() {
                         onClick={() => document.getElementById("hero_image_file").click()}
                       >
                         <ImagePlus size={22} />
-                        <span>Click to choose an image from your computer</span>
-                        <span className="field-hint">PNG, JPG or WEBP — up to 5MB</span>
+                        <span className="settings-hero-upload-copy">
+                          <span className="vehicle-upload-title">{t("Choose a hero image")}</span>
+                          <span className="field-hint">{t("PNG, JPG or WEBP — up to 5MB")}</span>
+                        </span>
+                        <span className="settings-hero-upload-action">{t("Browse files")}</span>
                       </button>
                     )}
                     <input
@@ -299,8 +304,8 @@ export default function AdminSiteSettings() {
                 </div>
 
                 <div className="form-grid">
-                  <div className="form-field full-width">
-                    <label htmlFor="hero_title_en">Hero title</label>
+                  <div className="form-field">
+                    <label htmlFor="hero_title_en">{t("Hero title")}</label>
                     <input
                       id="hero_title_en"
                       type="text"
@@ -309,8 +314,8 @@ export default function AdminSiteSettings() {
                     />
                   </div>
 
-                  <div className="form-field full-width">
-                    <label htmlFor="hero_subtitle_en">Hero subtitle</label>
+                  <div className="form-field">
+                    <label htmlFor="hero_subtitle_en">{t("Hero subtitle")}</label>
                     <input
                       id="hero_subtitle_en"
                       type="text"
@@ -322,16 +327,16 @@ export default function AdminSiteSettings() {
               </div>
 
               {/* About */}
-              <div className="form-card vehicle-details-card">
-                <h3>About Section</h3>
+              <div className="form-card vehicle-details-card settings-about-card">
+                <h3>{t("About Section")}</h3>
                 <label className="settings-about-label" htmlFor="company-about">
-                  About your company
+                  {t("About your company")}
                 </label>
                 <textarea
                   id="company-about"
                   className="vehicle-description-input"
                   rows={5}
-                  placeholder="Tell customers about your company and rental service…"
+                  placeholder={t("Tell customers about your company and rental service…")}
                   value={settings.about_en}
                   onChange={(e) => handleChange("about_en", e.target.value)}
                 />
@@ -344,17 +349,17 @@ export default function AdminSiteSettings() {
         <div className="form-actions step-actions">
           {step > 0 && (
             <button type="button" className="btn btn-secondary" onClick={goBack}>
-              <ChevronLeft size={16} /> Back
+              <ChevronLeft size={16} /> {t("Back")}
             </button>
           )}
 
           {!isLastStep ? (
             <button type="button" className="btn btn-primary" onClick={goNext}>
-              Next <ChevronRight size={16} />
+              {t("Next")} <ChevronRight size={16} />
             </button>
           ) : (
             <button type="submit" className="btn btn-primary" disabled={saving}>
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? t("Saving...") : t("Save Changes")}
             </button>
           )}
         </div>

@@ -1,3 +1,4 @@
+import AdminTerms from "./pages/admin/AdminTerms.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<AdminAuth initialMode="login" />} />
+      <Route path="/terms" element={<AdminTerms />} />
       <Route path="/signup" element={<AdminAuth initialMode="signup" />} />
       <Route path="/forgot-password" element={<AdminForgotPassword />} />
       <Route path="/verify-email" element={<AdminVerifyEmail />} />

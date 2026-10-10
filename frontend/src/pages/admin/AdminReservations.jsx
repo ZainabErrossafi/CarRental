@@ -1,3 +1,6 @@
+import { useI18n } from "../../context/I18nContext";
+import Pagination from "../../components/Pagination.jsx";
+import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
 import { Check, X, CheckCheck, User, Phone, Mail, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -33,6 +36,7 @@ function EyeIcon(props) {
 }
 
 export default function AdminReservations() {
+  const { t } = useI18n();
   const confirm = useConfirm();
   const navigate = useNavigate();
   const [reservations, setReservations] = useState([]);
@@ -47,6 +51,8 @@ export default function AdminReservations() {
     if (tab === "All") return reservations;
     return reservations.filter((r) => r.status === tab.toLowerCase());
   }, [reservations, tab]);
+
+  const pagination = usePagination(filtered, tab);
 
   const applyUpdate = (updated) => {
     setReservations((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
@@ -75,49 +81,49 @@ export default function AdminReservations() {
   return (
     <div>
       <div className="page-header">
-        <h1>Reservations</h1>
+        <h1>{t("Reservations")}</h1>
         <div className="page-header-actions">
           <button className="btn-pill" onClick={() => navigate("/admin/reservations/new")}>
             <Plus size={16} strokeWidth={2.5} />
-            New Reservation
+            {t("New Reservation")}
           </button>
         </div>
       </div>
 
       <div className="pill-tabs">
-        {STATUS_TABS.map((t) => (
+        {STATUS_TABS.map((tabLabel) => (
           <button
-            key={t}
-            className={`pill-tab ${tab === t ? "active" : ""}`}
-            onClick={() => setTab(t)}
+            key={tabLabel}
+            className={`pill-tab ${tab === tabLabel ? "active" : ""}`}
+            onClick={() => setTab(tabLabel)}
           >
-            {t}
+            {t(tabLabel)}
           </button>
         ))}
       </div>
 
       <div className="table-card">
         <div className="table-card-header">
-          {tab === "All" ? "All Reservations" : `${tab} Reservations`}
+          {tab === "All" ? t("All Reservations") : t("{value0} Reservations", { value0: t(tab) })}
           <span className="count-pill">{filtered.length}</span>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th>Reference</th>
-              <th>Vehicle</th>
-              <th>Driver</th>
-              <th>Pickup → Return</th>
-              <th>Duration</th>
-              <th>Total Price</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{t("Reference")}</th>
+              <th>{t("Vehicle")}</th>
+              <th>{t("Driver")}</th>
+              <th>{t("Pickup → Return")}</th>
+              <th>{t("Duration")}</th>
+              <th>{t("Total Price")}</th>
+              <th>{t("Status")}</th>
+              <th>{t("Actions")}</th>
             </tr>
           </thead>
 
           <tbody>
-            {filtered.map((r) => (
+            {pagination.pageItems.map((r) => (
               <tr key={r.id}>
                 <td>
                   <strong>{r.reference}</strong>
@@ -141,26 +147,26 @@ export default function AdminReservations() {
 
                 <td>{r.pickup_date} → {r.return_date}</td>
 
-                <td>{durationDays(r)} day{durationDays(r) > 1 ? "s" : ""}</td>
+                <td>{t(durationDays(r) === 1 ? "{count} day" : "{count} days", { count: durationDays(r) })}</td>
 
-                <td>{r.total_price} MAD</td>
+                <td>{r.total_price} {t("MAD")}</td>
 
                 <td>
-                  <span className={`badge badge-${r.status}`}>{r.status}</span>
+                  <span className={`badge badge-${r.status}`}>{t(r.status)}</span>
                 </td>
 
                 <td>
                   <div className="row-actions">
-                    <button onClick={() => setViewing(r)} title="View details">
+                    <button onClick={() => setViewing(r)} title={t("View details")}>
                       <EyeIcon size={15} />
                     </button>
 
                     {r.status === "pending" && (
                       <>
-                        <button onClick={() => handleConfirm(r.id)} title="Confirm">
+                        <button onClick={() => handleConfirm(r.id)} title={t("Confirm")}>
                           <Check size={15} />
                         </button>
-                        <button onClick={() => handleCancel(r.id)} title="Cancel" className="danger">
+                        <button onClick={() => handleCancel(r.id)} title={t("Cancel")} className="danger">
                           <X size={15} />
                         </button>
                       </>
@@ -168,17 +174,17 @@ export default function AdminReservations() {
 
                     {r.status === "confirmed" && (
                       <>
-                        <button onClick={() => handleComplete(r.id)} title="Complete">
+                        <button onClick={() => handleComplete(r.id)} title={t("Complete")}>
                           <CheckCheck size={15} />
                         </button>
-                        <button onClick={() => handleCancel(r.id)} title="Cancel" className="danger">
+                        <button onClick={() => handleCancel(r.id)} title={t("Cancel")} className="danger">
                           <X size={15} />
                         </button>
                       </>
                     )}
 
                     {(r.status === "completed" || r.status === "cancelled") && (
-                      <span style={{ color: "var(--muted)", fontSize: "0.78rem" }}>No actions</span>
+                      <span style={{ color: "var(--muted)", fontSize: "0.78rem" }}>{t("No actions")}</span>
                     )}
                   </div>
                 </td>
@@ -188,12 +194,13 @@ export default function AdminReservations() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={8} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
-                  No reservations in this view.
+                  {t("No reservations in this view.")}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        <Pagination {...pagination} />
       </div>
 
       {viewing && (
@@ -202,7 +209,7 @@ export default function AdminReservations() {
             <div className="modal-header">
               <div>
                 <h3>{viewing.reference}</h3>
-                <span className={`badge badge-${viewing.status}`}>{viewing.status}</span>
+                <span className={`badge badge-${viewing.status}`}>{t(viewing.status)}</span>
               </div>
               <button className="modal-close" onClick={() => setViewing(null)}>
                 <X size={18} />
@@ -211,80 +218,80 @@ export default function AdminReservations() {
 
             <div className="modal-body">
               <div className="detail-row">
-                <span className="detail-label">Vehicle</span>
+                <span className="detail-label">{t("Vehicle")}</span>
                 <span className="detail-value">{viewing.vehicle}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Driver</span>
+                <span className="detail-label">{t("Driver")}</span>
                 <span className="detail-value">{viewing.driver_name}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Phone</span>
+                <span className="detail-label">{t("Phone")}</span>
                 <span className="detail-value">{viewing.phone}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Email</span>
+                <span className="detail-label">{t("Email")}</span>
                 <span className="detail-value">{viewing.email}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Pickup Location</span>
-                <span className="detail-value">{viewing.pickup_location || "N/A"}</span>
+                <span className="detail-label">{t("Pickup Location")}</span>
+                <span className="detail-value">{viewing.pickup_location || t("N/A")}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Dropoff Location</span>
-                <span className="detail-value">{viewing.dropoff_location || "N/A"}</span>
+                <span className="detail-label">{t("Dropoff Location")}</span>
+                <span className="detail-value">{viewing.dropoff_location || t("N/A")}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Pickup Date</span>
+                <span className="detail-label">{t("Pickup Date")}</span>
                 <span className="detail-value">{viewing.pickup_date}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Return Date</span>
+                <span className="detail-label">{t("Return Date")}</span>
                 <span className="detail-value">{viewing.return_date}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Duration</span>
+                <span className="detail-label">{t("Duration")}</span>
                 <span className="detail-value">
-                  {durationDays(viewing)} day{durationDays(viewing) > 1 ? "s" : ""}
+                  {t(durationDays(viewing) === 1 ? "{count} day" : "{count} days", { count: durationDays(viewing) })}
                 </span>
               </div>
               
               <div className="detail-row">
-                <span className="detail-label">Extras</span>
+                <span className="detail-label">{t("Extras")}</span>
                 <span className="detail-value">
                   {viewing.extras && viewing.extras.length > 0 
                     ? viewing.extras.map(e => e.name || e).join(", ") 
-                    : "None"}
+                    : t("None")}
                 </span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Total Price</span>
-                <span className="detail-value"><strong>{viewing.total_price} MAD</strong></span>
+                <span className="detail-label">{t("Total Price")}</span>
+                <span className="detail-value"><strong>{viewing.total_price} {t("MAD")}</strong></span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Created At</span>
+                <span className="detail-label">{t("Created At")}</span>
                 <span className="detail-value">{viewing.created_at}</span>
               </div>
 
               <div className="detail-row">
-                <span className="detail-label">Updated At</span>
+                <span className="detail-label">{t("Updated At")}</span>
                 <span className="detail-value">{viewing.updated_at}</span>
               </div>
             </div>
 
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setViewing(null)}>
-                Close
+                {t("Close")}
               </button>
             </div>
           </div>

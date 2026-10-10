@@ -1,3 +1,5 @@
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
+import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
@@ -6,11 +8,12 @@ import { useAuth } from "../../context/AuthContext";
 const CODE_LENGTH = 4;
 
 export default function AdminVerifyEmail() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const { verifyEmail } = useAuth();
   const signupEmail = location.state?.email;
-  const email = signupEmail || "your email";
+  const email = signupEmail || t("your email");
 
   const [digits, setDigits] = useState(Array(CODE_LENGTH).fill(""));
   const [error, setError] = useState(null);
@@ -77,16 +80,17 @@ export default function AdminVerifyEmail() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <div className="auth-language-switcher"><LanguageSwitcher /></div>
         <div className="auth-icon-circle">
           <Mail size={20} />
         </div>
 
-        <h1 className="auth-title">Check your email</h1>
+        <h1 className="auth-title">{t("Check your email")}</h1>
         <p className="auth-subtitle">
-          We sent a verification code to <strong>{email}</strong>
+          {t("We sent a verification code to")} <strong>{email}</strong>
         </p>
 
-        {error && <div className="alert alert-error mb-4">⚠️ {error}</div>}
+        {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
         <form onSubmit={handleSubmit} className="auth-form" style={{ alignItems: "center" }}>
           <div className="otp-inputs" onPaste={handlePaste}>
@@ -110,21 +114,21 @@ export default function AdminVerifyEmail() {
             className="gcard-submit"
             disabled={!isComplete || loading}
           >
-            {loading ? "Verifying..." : "Verify email"}
+            {loading ? t("Verifying...") : t("Verify email")}
           </button>
         </form>
 
         <p className="auth-footer">
-          Didn't receive the email?{" "}
+          {t("Didn't receive the email?")}{" "}
           <button type="button" className="auth-link" onClick={handleResend}>
-            Click to resend
+            {t("Click to resend")}
           </button>
         </p>
 
         <p className="auth-footer">
           <Link to="/login" className="auth-link" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
             <ArrowLeft size={15} />
-            Back to log in
+            {t("Back to log in")}
           </Link>
         </p>
       </div>
