@@ -24,7 +24,8 @@ import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 const NAV_SECTIONS = [
   {
     label: "Overview",
-    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true }],
+    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
+      { to: "/admin/reports", label: "Reports & Data", icon: BarChart2 }],
   },
   {
     label: "Fleet",
