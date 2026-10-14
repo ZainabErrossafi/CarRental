@@ -49,8 +49,8 @@ export default function AdminReports() {
     setBusy(true); setErrors([]); setMessage('');
     try {
       if (isPreview) {
-        const records = parseReport(await file.text(), file.name, dataset);
-        const plan = prepareImport(dataset, records, await LOADERS[dataset]());
+        const records = parseReport(await file.text(), file.name, dataset, t);
+        const plan = prepareImport(dataset, records, await LOADERS[dataset](), t);
         if (plan.errors.length) { setErrors(plan.errors); setPreview(null); setMessage(t('Fix the listed rows before importing.')); }
         else { setPreview(plan); setMessage(t('File checked. The server validates each record when saved.')); }
       } else {
@@ -62,7 +62,7 @@ export default function AdminReports() {
             saved++;
           } catch (error) {
             setErrors([{ row: operation.row, errors: error.response?.data || error.message }]);
-            setMessage(`${saved} records saved. Import stopped at row ${operation.row}. Remaining rows were not saved. Export current data before retrying to avoid duplicates.`);
+            setMessage(t('{saved} records saved. Import stopped at row {row}. Remaining rows were not saved. Export current data before retrying to avoid duplicates.', { saved, row: operation.row }));
             setPreview(null);
             return;
           }
