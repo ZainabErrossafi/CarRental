@@ -1,3 +1,4 @@
+import AdminReports from "./pages/admin/AdminReports.jsx";
 import AdminTerms from "./pages/admin/AdminTerms.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
@@ -38,6 +39,7 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
+        <Route path="reports" element={<AdminReports />} />
         <Route path="vehicles" element={<AdminVehicles />} />
         <Route path="vehicles/:id/edit" element={<AdminVehicleEdit />} />
         <Route path="vehicles/new" element={<AdminVehicleAdd />} />
