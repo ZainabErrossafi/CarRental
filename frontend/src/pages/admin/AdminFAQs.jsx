@@ -22,7 +22,7 @@ export default function AdminFaqs() {
   const [faqs, setFaqs] = useState([]);
   const [tab, setTab] = useState("All");
   const [query, setQuery] = useState("");
-  const [editing, setEditing] = useState(null); // null | "new" | faq object
+  const [editing, setEditing] = useState(null); 
   const [form, setForm] = useState(EMPTY_FAQ);
   const [saving, setSaving] = useState(false);
 
