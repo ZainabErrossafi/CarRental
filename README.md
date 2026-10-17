@@ -1,1 +1,1 @@
-Farid pushi
+Farid pushi && rah poshiiiiit
