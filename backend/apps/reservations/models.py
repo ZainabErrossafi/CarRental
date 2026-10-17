@@ -32,7 +32,8 @@ class Reservation(models.Model):
 
     def duration_days(self):
         delta = self.return_date - self.pickup_date
-        return delta.days
+        days = delta.days + (1 if delta.seconds > 0 else 0)
+        return max(days, 1)
     
     def calculate_total(self):
         vehicle_cost = self.vehicle.daily_rate * self.duration_days()
@@ -52,11 +53,29 @@ class Reservation(models.Model):
         self.save()
         self._notify('reservation_confirmed', 'Reservation confirmed', f"Your reservation {self.reference} has been confirmed.")
 
-    def cancel(self):
+    def cancel(self, by=None):
         self.status = ReservationStatus.CANCELLED
         self.save()
         self._notify('reservation_cancelled', 'Reservation cancelled', f"Your reservation {self.reference} has been cancelled.")
+        if by is not None and not by.is_admin():
+            self.notify_admins('reservation_cancelled', 'Reservation cancelled by client', f"Reservation {self.reference} was cancelled by the client.")
 
+    def notify_admins(self, notif_type, title, message):
+        from apps.notifications.models import Notification
+        from apps.users.models import User, Role
+        admins = User.objects.filter(role=Role.ADMIN, is_active=True).exclude(pk=self.user_id)
+        Notification.objects.bulk_create([
+            Notification(
+                user=admin,
+                type=notif_type,
+                title=title,
+                message=message,
+                related_id=self.id,
+                related_type='reservation',
+            )
+            for admin in admins
+        ])
+        
     def complete(self):
         self.status = ReservationStatus.COMPLETED
         self.save()
