@@ -1,7 +1,7 @@
 import { useI18n } from "../../context/I18nContext";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarCheck,
@@ -17,17 +17,19 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import {
-  getNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   deleteNotification,
 } from "../../services/adminApi";
 import { useConfirm } from "../../context/Confirmcontext";
 
+import { useNotifications } from "../../context/NotificationsContext";
+
 const TABS = ["All", "Unread", "Read"];
 
 // One icon + color tone per NotificationType in the data model.
 const TYPE_META = {
+  reservation_created: { icon: CalendarCheck, tone: "blue", label: "New reservation" },
   reservation_confirmed: { icon: CalendarCheck, tone: "green", label: "Reservation confirmed" },
   reservation_cancelled: { icon: CalendarX, tone: "red", label: "Reservation cancelled" },
   pickup_reminder: { icon: Clock, tone: "blue", label: "Pickup reminder" },
@@ -49,13 +51,9 @@ export default function AdminNotifications() {
   const { t, lang } = useI18n();
   const confirm = useConfirm();
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState([]);
+  const { notifications, setNotifications, refreshNotifications } = useNotifications();
   const [tab, setTab] = useState("All");
   const [typeFilter, setTypeFilter] = useState("all");
-
-  useEffect(() => {
-    getNotifications().then(setNotifications);
-  }, []);
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -78,7 +76,9 @@ export default function AdminNotifications() {
 
   const handleMarkAllRead = async () => {
     if (!(await confirm("Are you sure you want to mark all notifications as read?", { confirmLabel: "Mark all read" }))) return;
-    setNotifications(await markAllNotificationsAsRead());
+    await markAllNotificationsAsRead();
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    await refreshNotifications();
   };
 
   const handleDelete = async (id) => {
@@ -89,7 +89,7 @@ export default function AdminNotifications() {
 
   const handleOpenRelated = async (n) => {
     if (!n.is_read) await handleMarkRead(n.id);
-    if (n.related_type === "Reservation") navigate("/admin/reservations");
+    if (n.related_type?.toLowerCase() === "reservation") navigate("/admin/reservations");
   };
 
   return (
