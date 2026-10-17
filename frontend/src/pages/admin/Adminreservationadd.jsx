@@ -1,3 +1,4 @@
+import SearchableSelect from "../../components/SearchableSelect";
 import { useI18n } from "../../context/I18nContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +11,7 @@ import {
 } from "../../services/adminApi";
 
 const EMPTY_RESERVATION = {
-  user_id: "", // Optional, if booking for a registered user
+  user_id: null, // Start without a selected user or guest option
   vehicle_id: "",
   pickup_location_id: "",
   dropoff_location_id: "",
@@ -55,7 +56,12 @@ export default function AdminReservationAdd() {
   }, []);
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === "pickup_date" && (!value || (prev.return_date && prev.return_date < value))
+        ? { return_date: "" } : {}),
+    }));
   };
 
   const handleExtraToggle = (extraId) => {
@@ -121,7 +127,8 @@ export default function AdminReservationAdd() {
       // Append calculated total_price to the submission payload
       const payload = {
         ...form,
-        total_price: estimatedTotal
+        user_id: form.user_id ?? "",
+        total_price: estimatedTotal.toFixed(2)
       };
       
       await createReservation(payload);
@@ -155,18 +162,19 @@ export default function AdminReservationAdd() {
             <div className="form-grid">
               <div className="form-field full-width">
                 <label htmlFor="user_id">{t("Registered User")}</label>
-                <select
+                <SearchableSelect
                   id="user_id"
                   value={form.user_id}
-                  onChange={(e) => handleChange("user_id", e.target.value)}
-                >
-                  <option value="">{t("Guest (No Account)")}</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.first_name} {u.last_name} ({u.email})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => handleChange("user_id", value)}
+                  placeholder={t("Registered User")}
+                  options={[
+                    { value: "", label: t("Guest (No Account)") },
+                    ...users.map((user) => ({
+                      value: user.id,
+                      label: `${user.first_name} ${user.last_name} (${user.email})`,
+                    })),
+                  ]}
+                />
               </div>
             </div>
           </div>
@@ -178,20 +186,17 @@ export default function AdminReservationAdd() {
               
               <div className="form-field full-width">
                 <label htmlFor="vehicle_id">{t("Vehicle")}</label>
-                <select
+                <SearchableSelect
                   id="vehicle_id"
-                  className="select-lg"
                   value={form.vehicle_id}
-                  onChange={(e) => handleChange("vehicle_id", e.target.value)}
+                  onChange={(value) => handleChange("vehicle_id", value)}
+                  placeholder={t("Select an available vehicle")}
+                  options={vehicles.map((vehicle) => ({
+                    value: vehicle.id,
+                    label: `${vehicle.brand} ${vehicle.model} — ${vehicle.dailyRate} ${t("MAD/day")}`,
+                  }))}
                   required
-                >
-                  <option value="" disabled>{t("Select an available vehicle")}</option>
-                  {vehicles.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.brand} {v.model} — {v.dailyRate} {t("MAD/day")}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="form-field">
@@ -240,6 +245,8 @@ export default function AdminReservationAdd() {
                 <input
                   id="return_date"
                   type="date"
+                  disabled={!form.pickup_date}
+                  min={form.pickup_date || undefined}
                   value={form.return_date}
                   onChange={(e) => handleChange("return_date", e.target.value)}
                   required
@@ -277,7 +284,7 @@ export default function AdminReservationAdd() {
                <div className="form-field full-width">
                   <div className="estimate-box">
                     <span>{t("Reservation for {count} days", { count: estimatedDays })}</span>
-                    <strong>{estimatedTotal} {t("MAD total")}</strong>
+                    <strong>{estimatedTotal.toFixed(2)} {t("MAD total")}</strong>
                   </div>
                 </div>
             </div>

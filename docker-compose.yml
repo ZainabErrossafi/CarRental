@@ -74,6 +74,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/templates/default.conf.template:ro
       - ./nginx/certs:/etc/nginx/certs:ro
+      - ./backend/media:/var/www/media:ro
     depends_on:
       - frontend
       - backend

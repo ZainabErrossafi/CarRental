@@ -22,7 +22,7 @@ const norm = (s) =>
 // Build one flat, searchable list from every page's data.
 async function loadIndex() {
   const [vehicles, locations, catalog, reservations, reviews, users, faqs, notifs] =
-    await Promise.all([
+    await Promise.allSettled([
       getVehicles(),
       getLocations(),
       getCatalog(),
@@ -31,7 +31,10 @@ async function loadIndex() {
       getUsers(),
       getFaqs(),
       getNotifications(),
-    ]);
+    ]).then((results) => results.map((result, index) =>
+      result.status === "fulfilled" ? result.value : index === 2
+        ? { brands: [], categories: [], features: [], extras: [] } : []
+    ));
 
   const items = [];
   const add = (type, title, subtitle, to, extra = "") =>

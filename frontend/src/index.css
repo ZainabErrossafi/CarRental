@@ -4046,3 +4046,25 @@ gap: 0.5rem;
 .reports-errors pre { white-space: pre-wrap; font-size: 12px; }
 @media (max-width: 900px) { .reports-grid { grid-template-columns: 1fr; } }
 @media (max-width: 540px) { .reports-heading { align-items: flex-start; } .reports-heading-badge { display: none; } .reports-heading h1 { font-size: 25px; } .reports-dataset-bar { flex-wrap: wrap; padding: 16px; } .reports-dataset-bar select { width: 100%; } .reports-card { padding: 22px; } .reports-import-meta { flex-wrap: wrap; } }
+
+/* Searchable reservation dropdowns use the same appearance as other form fields. */
+.searchable-select .MuiOutlinedInput-root {
+  min-height: 46px;
+  border-radius: 10px;
+  background: var(--off-white);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--navy);
+}
+.searchable-select .MuiOutlinedInput-notchedOutline { border-color: var(--border); }
+.searchable-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--orange);
+}
+.vehicle-details-card .form-field .searchable-select input.MuiAutocomplete-input {
+  min-height: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}

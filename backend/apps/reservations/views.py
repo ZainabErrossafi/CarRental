@@ -10,7 +10,9 @@ import uuid
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    queryset = Reservation.objects.all()
+    queryset = Reservation.objects.select_related(
+        'vehicle__brand', 'pickup_location', 'dropoff_location',
+    ).prefetch_related('reservation_extras__extra')
     serializer_class = ReservationSerializer
 
     filterset_fields = ['status', 'vehicle', 'user']
@@ -28,9 +30,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         reference = f"RES-{uuid.uuid4().hex[:8].upper()}"
-        reservation = serializer.save(user=self.request.user, reference=reference, total_price=0)
-        reservation.total_price = reservation.calculate_total()
-        reservation.save()
+        if self.request.user.is_admin():
+            serializer.save(reference=reference)
+        else:
+            serializer.save(user=self.request.user, reference=reference)
 
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):

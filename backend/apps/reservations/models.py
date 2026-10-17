@@ -13,7 +13,7 @@ class Reservation(models.Model):
     reference = models.CharField(max_length=20, unique=True)
     status = models.CharField(max_length=10, choices=ReservationStatus.choices, default=ReservationStatus.PENDING)
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reservations')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reservations', null=True, blank=True)
     vehicle = models.ForeignKey('vehicles.Vehicle', on_delete=models.CASCADE, related_name='reservations')
     pickup_location = models.ForeignKey('locations.Location', on_delete=models.PROTECT, related_name='pickups')
     dropoff_location = models.ForeignKey('locations.Location', on_delete=models.PROTECT, related_name='dropoffs')
@@ -42,7 +42,7 @@ class Reservation(models.Model):
             extra = reservation_extra.extra
             if extra.price_per_day:
                 extras_cost += extra.price_per_day * self.duration_days() * reservation_extra.quantity
-            elif extra.flat_price:
+            if extra.flat_price:
                 extras_cost += extra.flat_price * reservation_extra.quantity
 
         return vehicle_cost + extras_cost
@@ -63,6 +63,8 @@ class Reservation(models.Model):
         self._notify('review_request', 'How was your rental?', f"Leave a review for your reservation {self.reference}.")
 
     def _notify(self, notif_type, title, message):
+        if self.user_id is None:
+            return
         from apps.notifications.models import Notification
         Notification.objects.create(
             user=self.user,

@@ -7,6 +7,11 @@ import { getVehicles, deleteVehicle } from "../../services/adminApi";
 import { useConfirm } from "../../context/Confirmcontext";
 import { useI18n } from "../../context/I18nContext";
 
+const dailyRate = (vehicle) => {
+  const rate = Number(vehicle.dailyRate);
+  return Number.isFinite(rate) && rate >= 0 ? rate : 0;
+};
+
 const TABLE_TABS = ["View all", "Available", "Maintenance", "Hidden"];
 
 const SPARK_A = [4, 6, 5, 8, 7, 10, 9, 12, 11, 14];
@@ -39,7 +44,7 @@ export default function AdminDashboard() {
 
   const pagination = usePagination(filtered, JSON.stringify([filterTab, tableTab, query]));
 
-  const totalRate = vehicles.reduce((sum, v) => sum + v.dailyRate, 0) || 1;
+  const totalRate = vehicles.reduce((sum, vehicle) => sum + dailyRate(vehicle), 0);
 
   const handleEdit = (id) => {
     navigate(`/admin/vehicles/${id}/edit`);
@@ -60,7 +65,7 @@ export default function AdminDashboard() {
 
       <div className="stats-grid">
         <StatCard label={t("Total vehicles")} value={vehicles.length || "—"} delta="2.4%" spark={SPARK_A} />
-        <StatCard label={t("Avg. daily rate")} value={t("{value0} MAD", { value0: Math.round(totalRate / (vehicles.length || 1)) })} delta="8.6%" spark={SPARK_B} />
+        <StatCard label={t("Avg. daily rate")} value={t("{value0} MAD", { value0: (totalRate / (vehicles.length || 1)).toFixed(2) })} delta="8.6%" spark={SPARK_B} />
         <StatCard label={t("Active reservations")} value="9" delta="6.0%" spark={SPARK_C} />
       </div>
 
@@ -105,7 +110,7 @@ export default function AdminDashboard() {
           </thead>
           <tbody>
             {pagination.pageItems.map((v) => {
-              const share = Math.round((v.dailyRate / totalRate) * 100);
+              const share = totalRate > 0 ? Math.round((dailyRate(v) / totalRate) * 100) : 0;
               return (
                 <tr key={v.id}>
                   <td><input type="checkbox" /></td>

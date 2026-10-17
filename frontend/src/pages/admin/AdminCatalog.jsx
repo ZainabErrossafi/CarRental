@@ -139,7 +139,7 @@ export default function AdminCatalog() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    getCatalog().then(setCatalog);
+    getCatalog().then(setCatalog).catch((err) => setError(err.message));
   }, []);
 
   const items = catalog?.[tab] ?? [];
@@ -155,7 +155,7 @@ export default function AdminCatalog() {
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 
-  if (!catalog) return <p>{t("Loading...")}</p>;
+  if (!catalog) return error ? <div role="alert" className="alert alert-error">{t(error)}</div> : <p>{t("Loading...")}</p>;
 
   const meta = KINDS[tab];
 
@@ -238,7 +238,6 @@ export default function AdminCatalog() {
 
   return (
     <div>
-      <p className="local-editor-note">{t("Catalog changes are saved in this browser only. They are not backend rental options.")}</p>
       {error && <div role="alert" className="alert alert-error">{t(error)}</div>}
       <div className="page-header">
         <h1>{t("Vehicle Catalog")}</h1>
@@ -512,7 +511,7 @@ export default function AdminCatalog() {
                   <label className="vehicle-featured-control">
                     <span className="vehicle-featured-copy">
                       <span className="vehicle-featured-title">{t("Active")}</span>
-                      <span className="field-hint">{t("Show this item in your local catalog.")}</span>
+                      <span className="field-hint">{t("Active")}</span>
                     </span>
                     <input
                       className="vehicle-featured-input"

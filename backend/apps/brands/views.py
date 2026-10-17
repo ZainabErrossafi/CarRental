@@ -5,6 +5,6 @@ from .serializers import BrandSerializer
 
 
 class BrandViewSet(viewsets.ModelViewSet):
-    queryset = Brand.objects.all()
+    queryset = Brand.objects.order_by("id")
     serializer_class = BrandSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]

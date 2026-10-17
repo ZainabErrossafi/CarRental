@@ -285,7 +285,7 @@ export default function AdminLocations() {
                     type="checkbox"
                     role="switch"
                     checked={!!form.active}
-                      onChange={(e) => setField("active", e.target.checked)}
+                    onChange={(e) => setForm((prev) => ({ ...prev, active: e.target.checked }))}
                   />
                   <span className="vehicle-featured-switch" aria-hidden="true" />
                 </label>
