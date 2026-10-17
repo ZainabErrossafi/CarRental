@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
-const proxy = { "/api": { target: "http://127.0.0.1:8000", changeOrigin: true } };
+const proxy = Object.fromEntries(["/api", "/media"].map((path) => [path, { target: "http://127.0.0.1:8000", changeOrigin: true }]));
 
 export default defineConfig({
   plugins: [react()],

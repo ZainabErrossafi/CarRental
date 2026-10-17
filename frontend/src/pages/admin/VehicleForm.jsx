@@ -1,56 +1,26 @@
 import { useI18n } from "../../context/I18nContext";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 
-const STEPS = ["Vehicle Details", "Photo & Description"];
+import { getCatalog } from "../../services/adminApi";
 
-const CATEGORY_OPTIONS = [
-  {
-    group: "Standard & Daily",
-    options: [
-      { value: "Economy", label: "Economy (e.g. Dacia Logan, Renault Clio)" },
-      { value: "Compact", label: "Compact (e.g. Golf, Peugeot 208)" },
-      { value: "Sedan", label: "Sedan (e.g. Passat, Mercedes C-Class)" },
-    ],
-  },
-  {
-    group: "SUVs & Off-Road",
-    options: [
-      { value: "Compact SUV", label: "Compact SUV (e.g. Duster, T-Roc)" },
-      { value: "Full-Size SUV", label: "Full-Size SUV (e.g. Touareg, Prado)" },
-      { value: "4x4 / Off-Road", label: "4x4 / Off-Road (e.g. Wrangler, Defender)" },
-    ],
-  },
-  {
-    group: "Luxury & Specialty",
-    options: [
-      { value: "Executive", label: "Executive (e.g. BMW 5 Series, Audi A6)" },
-      { value: "Luxury", label: "Luxury / Premium (e.g. Range Rover, S-Class)" },
-      { value: "Convertible", label: "Convertible / Sports" },
-    ],
-  },
-  {
-    group: "Vans & Group Travel",
-    options: [
-      { value: "Minivan", label: "Minivan (7-9 Seats)" },
-      { value: "Commercial Van", label: "Cargo / Commercial Van" },
-    ],
-  },
-];
+const STEPS = ["Vehicle Details", "Photo & Description"];
 
 export const EMPTY_VEHICLE = {
   brand: "",
   model: "",
   year: new Date().getFullYear(),
-  category: "Economy",
+  category: "",
+  brand_id: "",
+  category_id: "",
   status: "available",
   dailyRate: "",
   deposit: "",
   daily_mileage_limit: "",
   min_driver_age: 21,
   min_license_years: 1,
-  transmission: "Manual",
-  fuel: "Diesel",
+  transmission: "manual",
+  fuel: "diesel",
   seats: 5,
   doors: 4,
   luggage: 0,
@@ -75,12 +45,23 @@ export default function VehicleForm({
   const { t } = useI18n();
   const [step, setStep] = useState(0);
   const formRef = useRef(null);
+  const [catalog, setCatalog] = useState(null);
+  const [catalogError, setCatalogError] = useState(null);
+  useEffect(() => {
+    let cancelled = false;
+    getCatalog().then((data) => { if (!cancelled) setCatalog(data); })
+      .catch((error) => { if (!cancelled) setCatalogError(error.message); });
+    return () => { cancelled = true; };
+  }, []);
+
 
   const isLastStep = !multiStep || step === STEPS.length - 1;
   // show(0) -> step 1, show(1) -> step 2. Everything shows when multiStep is off.
   const show = (n) => !multiStep || step === n;
 
-  const goNext = () => {
+  const goNext = (event) => {
+    // Cancel the click's default action before rendering the submit button.
+    event?.preventDefault();
     if (formRef.current && !formRef.current.reportValidity()) return;
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -98,6 +79,7 @@ export default function VehicleForm({
       goNext();
       return;
     }
+    if (!catalog || catalogError) { e.preventDefault(); return; }
     onSubmit(e);
   };
 
@@ -117,6 +99,7 @@ export default function VehicleForm({
         </div>
       )}
 
+      {catalogError && <div role="alert" className="alert alert-error">{t(catalogError)}</div>}
       <form ref={formRef} onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
 
@@ -132,14 +115,11 @@ export default function VehicleForm({
                 <div className="form-grid">
                   <div className="form-field">
                     <label htmlFor="brand">{t("Brand / Make")}</label>
-                    <input
-                      id="brand"
-                      type="text"
-                      placeholder={t("e.g. Toyota")}
-                      value={form.brand}
-                      onChange={(e) => onChange("brand", e.target.value)}
-                      required
-                    />
+                    <select id="brand" value={form.brand_id ?? ''}
+                      onChange={(e) => onChange("brand_id", e.target.value)} required>
+                      <option value="">{t("Brands")}</option>
+                      {catalog?.brands.map((brand) => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
+                    </select>
                   </div>
 
                   <div className="form-field">
@@ -159,8 +139,9 @@ export default function VehicleForm({
                     <input
                       id="year"
                       type="number"
-                      min="2000"
-                      max={new Date().getFullYear() + 1}
+                      step="any"
+                      min="0"
+
                       value={form.year}
                       onChange={(e) => onChange("year", Number(e.target.value))}
                       required
@@ -173,18 +154,13 @@ export default function VehicleForm({
                       id="category"
                       className="select-lg"
                       aria-describedby="vehicle-category-hint"
-                      value={form.category}
-                      onChange={(e) => onChange("category", e.target.value)}
+                      value={form.category_id ?? ""}
+                      onChange={(e) => onChange("category_id", e.target.value)}
                       required
                     >
-                      {CATEGORY_OPTIONS.map((group) => (
-                        <optgroup key={group.group} label={t(group.group)}>
-                          {group.options.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {t(opt.label)}
-                            </option>
-                          ))}
-                        </optgroup>
+                      <option value="">{t("Categories")}</option>
+                      {catalog?.categories.map((category) => (
+                        <option key={category.id} value={category.id}>{category.name}</option>
                       ))}
                     </select>
                     <span id="vehicle-category-hint" className="field-hint">
@@ -226,8 +202,8 @@ export default function VehicleForm({
                       value={form.transmission}
                       onChange={(e) => onChange("transmission", e.target.value)}
                     >
-                      <option value="Manual">{t("Manual")}</option>
-                      <option value="Automatic">{t("Automatic")}</option>
+                      <option value="manual">{t("Manual")}</option>
+                      <option value="automatic">{t("Automatic")}</option>
                     </select>
                   </div>
 
@@ -238,10 +214,10 @@ export default function VehicleForm({
                       value={form.fuel}
                       onChange={(e) => onChange("fuel", e.target.value)}
                     >
-                      <option value="Diesel">{t("Diesel")}</option>
-                      <option value="Gasoline">{t("Gasoline (Essence)")}</option>
-                      <option value="Hybrid">{t("Hybrid")}</option>
-                      <option value="Electric">{t("Electric")}</option>
+                      <option value="diesel">{t("Diesel")}</option>
+                      <option value="petrol">{t("Gasoline (Essence)")}</option>
+                      <option value="hybrid">{t("Hybrid")}</option>
+                      <option value="electric">{t("Electric")}</option>
                     </select>
                   </div>
 
@@ -250,8 +226,9 @@ export default function VehicleForm({
                     <input
                       id="seats"
                       type="number"
-                      min="2"
-                      max="15"
+                      step="any"
+                      min="0"
+
                       value={form.seats}
                       onChange={(e) => onChange("seats", Number(e.target.value))}
                     />
@@ -262,8 +239,9 @@ export default function VehicleForm({
                     <input
                       id="doors"
                       type="number"
-                      min="2"
-                      max="6"
+                      step="any"
+                      min="0"
+
                       value={form.doors}
                       onChange={(e) => onChange("doors", Number(e.target.value))}
                     />
@@ -274,6 +252,7 @@ export default function VehicleForm({
                     <input
                       id="luggage"
                       type="number"
+                      step="any"
                       min="0"
                       value={form.luggage}
                       onChange={(e) => onChange("luggage", Number(e.target.value))}
@@ -315,8 +294,9 @@ export default function VehicleForm({
                         id="dailyRate"
                         placeholder={t("e.g. 350")}
                         type="number"
+                        step="any"
                         min="0"
-                        step="10"
+
                         value={form.dailyRate}
                         onChange={(e) => onChange("dailyRate", Number(e.target.value))}
                         required
@@ -332,8 +312,9 @@ export default function VehicleForm({
                         id="deposit"
                         placeholder={t("e.g. 2000")}
                         type="number"
+                        step="any"
                         min="0"
-                        step="50"
+
                         value={form.deposit}
                         onChange={(e) => onChange("deposit", Number(e.target.value))}
                       />
@@ -347,8 +328,9 @@ export default function VehicleForm({
                       <input
                         id="daily_mileage_limit"
                         type="number"
+                        step="any"
                         min="0"
-                        step="10"
+
                         value={form.daily_mileage_limit}
                         onChange={(e) =>
                           onChange("daily_mileage_limit", Number(e.target.value))
@@ -364,8 +346,9 @@ export default function VehicleForm({
                       <input
                         id="min_driver_age"
                         type="number"
-                        min="18"
-                        max="99"
+                        step="any"
+                        min="0"
+
                         value={form.min_driver_age}
                         onChange={(e) => onChange("min_driver_age", Number(e.target.value))}
                       />
@@ -379,8 +362,9 @@ export default function VehicleForm({
                       <input
                         id="min_license_years"
                         type="number"
+                        step="any"
                         min="0"
-                        max="30"
+
                         value={form.min_license_years}
                         onChange={(e) =>
                           onChange("min_license_years", Number(e.target.value))
@@ -520,11 +504,11 @@ export default function VehicleForm({
           )}
 
           {!isLastStep ? (
-            <button type="button" className="btn btn-primary" onClick={goNext}>
+            <button key="next" type="button" className="btn btn-primary" onClick={goNext}>
               {t("Next")} <ChevronRight size={16} />
             </button>
           ) : (
-            <button type="submit" className="btn btn-primary" disabled={saving}>
+            <button key="save" type="submit" className="btn btn-primary" disabled={saving || !catalog || !!catalogError}>
               {t(saving ? savingLabel : submitLabel)}
             </button>
           )}

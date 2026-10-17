@@ -6,24 +6,26 @@ export const getAdminStats = async () => {
   return data;
 };
 
+import { vehicleFromApi, vehiclePayload } from './vehicleData';
+
 // VEHICLES
 export const getVehicles = async () => {
-  return getList('vehicles/');
+  return (await getList('vehicles/')).map(vehicleFromApi);
 };
 
 export const getVehicle = async (id) => {
   const { data } = await api.get(`vehicles/${id}/`);
-  return data;
+  return vehicleFromApi(data);
 };
 
 export const createVehicle = async (vehicleData) => {
-  const { data } = await api.post('vehicles/', vehicleData);
-  return data;
+  const { data } = await api.post('vehicles/', await vehiclePayload(vehicleData));
+  return vehicleFromApi(data);
 };
 
 export const updateVehicle = async (id, vehicleData) => {
-  const { data } = await api.patch(`vehicles/${id}/`, vehicleData);
-  return data;
+  const { data } = await api.patch(`vehicles/${id}/`, await vehiclePayload(vehicleData));
+  return vehicleFromApi(data);
 };
 
 export const deleteVehicle = async (id) => {
@@ -56,11 +58,27 @@ export const deleteLocation = async (id) => {
   return data;
 };
 
-// Catalog and site settings are browser-local editors.
-export { getCatalog, createCatalogItem, updateCatalogItem,
-  deleteCatalogItem, getSiteSettings, updateSiteSettings } from './localAdminData';
-
-// Reservation extras must be backend records, not browser-local catalog IDs.
+// CATALOG
+const catalogKinds = ['brands', 'categories', 'features', 'extras'];
+const catalogPath = (kind, id) => {
+  if (!catalogKinds.includes(kind)) throw new Error('Unknown catalog type.');
+  return `${kind}/${id == null ? '' : `${id}/`}`;
+};
+export const getCatalog = async () => Object.fromEntries(await Promise.all(
+  catalogKinds.map(async (kind) => [kind, await getList(catalogPath(kind))]),
+));
+export const createCatalogItem = async (kind, fields) => {
+  const { data } = await api.post(catalogPath(kind), fields);
+  return data;
+};
+export const updateCatalogItem = async (kind, id, fields) => {
+  const { data } = await api.patch(catalogPath(kind, id), fields);
+  return data;
+};
+export const deleteCatalogItem = async (kind, id) => {
+  await api.delete(catalogPath(kind, id));
+};
+export { getSiteSettings, updateSiteSettings } from './localAdminData';
 export const getExtras = async () => getList('extras/');
 
 // RESERVATIONS
@@ -69,7 +87,14 @@ export const getReservations = async () => {
 };
 
 export const createReservation = async (reservationData) => {
-  const { data } = await api.post('reservations/', reservationData);
+  const { user_id, vehicle_id, pickup_location_id, dropoff_location_id, total_price, ...fields } = reservationData;
+  const { data } = await api.post('reservations/', {
+    ...fields,
+    user_id: user_id ? Number(user_id) : null,
+    vehicle: Number(vehicle_id),
+    pickup_location: Number(pickup_location_id),
+    dropoff_location: Number(dropoff_location_id),
+  });
   return data;
 };
 

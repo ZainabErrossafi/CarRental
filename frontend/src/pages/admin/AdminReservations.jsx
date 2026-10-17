@@ -1,8 +1,9 @@
+import { formatReservationDate, printReservationInvoice } from "../../services/reservationInvoice";
 import { useI18n } from "../../context/I18nContext";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
-import { Check, X, CheckCheck, User, Phone, Mail, Plus } from "lucide-react";
+import { Check, X, CheckCheck, User, Phone, Mail, Plus, Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   getReservations,
@@ -42,6 +43,12 @@ export default function AdminReservations() {
   const [reservations, setReservations] = useState([]);
   const [tab, setTab] = useState("All");
   const [viewing, setViewing] = useState(null);
+  const [printError, setPrintError] = useState(null);
+  const handlePrint = () => {
+    setPrintError(null);
+    try { printReservationInvoice(viewing, t); }
+    catch (error) { setPrintError(error.message); }
+  };
 
   useEffect(() => {
     getReservations().then(setReservations);
@@ -129,7 +136,7 @@ export default function AdminReservations() {
                   <strong>{r.reference}</strong>
                 </td>
 
-                <td>{r.vehicle}</td>
+                <td>{r.vehicle_name || r.vehicle}</td>
 
                 <td>
                   <div className="driver-cell">
@@ -145,7 +152,7 @@ export default function AdminReservations() {
                   </div>
                 </td>
 
-                <td>{r.pickup_date} → {r.return_date}</td>
+                <td>{formatReservationDate(r.pickup_date)} → {formatReservationDate(r.return_date)}</td>
 
                 <td>{t(durationDays(r) === 1 ? "{count} day" : "{count} days", { count: durationDays(r) })}</td>
 
@@ -219,7 +226,7 @@ export default function AdminReservations() {
             <div className="modal-body">
               <div className="detail-row">
                 <span className="detail-label">{t("Vehicle")}</span>
-                <span className="detail-value">{viewing.vehicle}</span>
+                <span className="detail-value">{viewing.vehicle_name || viewing.vehicle}</span>
               </div>
 
               <div className="detail-row">
@@ -239,22 +246,22 @@ export default function AdminReservations() {
 
               <div className="detail-row">
                 <span className="detail-label">{t("Pickup Location")}</span>
-                <span className="detail-value">{viewing.pickup_location || t("N/A")}</span>
+                <span className="detail-value">{viewing.pickup_location_name || viewing.pickup_location || t("N/A")}</span>
               </div>
 
               <div className="detail-row">
                 <span className="detail-label">{t("Dropoff Location")}</span>
-                <span className="detail-value">{viewing.dropoff_location || t("N/A")}</span>
+                <span className="detail-value">{viewing.dropoff_location_name || viewing.dropoff_location || t("N/A")}</span>
               </div>
 
               <div className="detail-row">
                 <span className="detail-label">{t("Pickup Date")}</span>
-                <span className="detail-value">{viewing.pickup_date}</span>
+                <span className="detail-value">{formatReservationDate(viewing.pickup_date)}</span>
               </div>
 
               <div className="detail-row">
                 <span className="detail-label">{t("Return Date")}</span>
-                <span className="detail-value">{viewing.return_date}</span>
+                <span className="detail-value">{formatReservationDate(viewing.return_date)}</span>
               </div>
 
               <div className="detail-row">
@@ -267,8 +274,8 @@ export default function AdminReservations() {
               <div className="detail-row">
                 <span className="detail-label">{t("Extras")}</span>
                 <span className="detail-value">
-                  {viewing.extras && viewing.extras.length > 0 
-                    ? viewing.extras.map(e => e.name || e).join(", ") 
+                  {viewing.extra_details?.length
+                    ? viewing.extra_details.map((extra) => `${extra.name} × ${extra.quantity}`).join(", ")
                     : t("None")}
                 </span>
               </div>
@@ -280,16 +287,20 @@ export default function AdminReservations() {
 
               <div className="detail-row">
                 <span className="detail-label">{t("Created At")}</span>
-                <span className="detail-value">{viewing.created_at}</span>
+                <span className="detail-value">{formatReservationDate(viewing.created_at)}</span>
               </div>
 
               <div className="detail-row">
                 <span className="detail-label">{t("Updated At")}</span>
-                <span className="detail-value">{viewing.updated_at}</span>
+                <span className="detail-value">{formatReservationDate(viewing.updated_at)}</span>
               </div>
             </div>
 
-            <div className="modal-footer">
+            {printError && <div role="alert" className="alert alert-error">{printError}</div>}
+            <div className="modal-footer" style={{ gap: "0.75rem" }}>
+              <button type="button" className="btn btn-primary" onClick={handlePrint}>
+                <Printer size={16} /> {t("Print Invoice")}
+              </button>
               <button className="btn btn-secondary" onClick={() => setViewing(null)}>
                 {t("Close")}
               </button>

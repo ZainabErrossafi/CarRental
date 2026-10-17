@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:api": "node --test src/services/vehicleData.test.js",
     "test:i18n": "node --test src/i18n/translations.test.js"
   },
   "dependencies": {

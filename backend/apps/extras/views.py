@@ -5,6 +5,6 @@ from .serializers import ExtraSerializer
 
 
 class ExtraViewSet(viewsets.ModelViewSet):
-    queryset = Extra.objects.all()
+    queryset = Extra.objects.order_by("id")
     serializer_class = ExtraSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
