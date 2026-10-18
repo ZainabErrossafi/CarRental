@@ -4132,3 +4132,99 @@ gap: 0.5rem;
   .dashboard-analytics { color: #222; }
   .analytics-filters { padding: 8px; }
 }
+
+/* Keep vehicle form controls within their cards, including long selected names. */
+.vehicle-form,
+.vehicle-form .form-sections,
+.vehicle-form .form-card,
+.vehicle-form .form-grid,
+.vehicle-form .form-field,
+.vehicle-form .input-group {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.vehicle-form .form-field select {
+  min-width: 0;
+  max-width: 100%;
+  text-overflow: ellipsis;
+}
+
+.vehicle-form .vehicle-featured-copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .admin-edit-container {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .vehicle-form .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vehicle-form .form-field > input,
+  .vehicle-form .form-field > select,
+  .vehicle-form textarea {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .vehicle-form .vehicle-featured-control {
+    min-width: 0;
+    gap: 0.75rem;
+  }
+
+  .vehicle-form .field-hint,
+  .vehicle-form .vehicle-identity-heading p,
+  .vehicle-form .vehicle-description-heading p {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Render vehicle menus inside the page instead of browser-native popup windows. */
+.vehicle-form .searchable-select {
+  width: 100%;
+  min-width: 0;
+}
+.vehicle-form .searchable-select .MuiAutocomplete-popper {
+  max-width: 100%;
+  z-index: 20;
+}
+.vehicle-form .searchable-select .MuiAutocomplete-option {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.vehicle-form .form-field .searchable-select input.MuiAutocomplete-input {
+  width: 0;
+  min-width: 0;
+  min-height: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.vehicle-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 0.75rem;
+}
+.vehicle-feature-option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--off-white);
+  cursor: pointer;
+}
+.vehicle-feature-option input { flex: 0 0 auto; accent-color: var(--orange); }
+.vehicle-feature-option span { overflow-wrap: anywhere; font-size: 0.875rem; }

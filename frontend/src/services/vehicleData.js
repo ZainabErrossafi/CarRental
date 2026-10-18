@@ -1,6 +1,7 @@
 // Keep the API's nested relations compatible with fleet, search and booking screens.
 export const vehicleFromApi = (vehicle) => ({
   ...vehicle,
+  feature_ids: vehicle.features?.map((feature) => feature.id) ?? vehicle.feature_ids ?? [],
   brand_id: vehicle.brand?.id ?? vehicle.brand_id,
   category_id: vehicle.category?.id ?? vehicle.category_id,
   brand: vehicle.brand?.name ?? vehicle.brand ?? '',
@@ -11,7 +12,7 @@ export const vehicleFromApi = (vehicle) => ({
 });
 
 export const vehiclePayload = async (vehicle) => {
-  const fields = ['brand_id', 'category_id', 'model', 'year', 'status', 'is_featured',
+  const fields = ['feature_ids', 'brand_id', 'category_id', 'model', 'year', 'status', 'is_featured',
     'transmission', 'fuel', 'seats', 'doors', 'luggage', 'air_conditioning', 'deposit',
     'min_driver_age', 'min_license_years', 'description_en', 'description_fr', 'description_ar'];
   const payload = Object.fromEntries(fields.filter((key) => vehicle[key] !== undefined)
@@ -23,7 +24,11 @@ export const vehiclePayload = async (vehicle) => {
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
       // An empty multipart field is accepted as null for the mileage limit.
-      form.append(key, value ?? '');
+      if (Array.isArray(value)) {
+        value.forEach((id) => form.append(key, id));
+      } else {
+        form.append(key, value ?? '');
+      }
     });
     form.append('main_image', blob, `vehicle.${blob.type.split('/')[1] || 'jpg'}`);
     return form;

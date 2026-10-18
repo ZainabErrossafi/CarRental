@@ -3,8 +3,8 @@ import { formatReservationDate } from "../../services/reservationInvoice";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Plus, Trash2, X } from "lucide-react";
-import { getUsers, getReservations, createUser, deleteUser } from "../../services/adminApi";
+import { Eye, Pencil, Plus, Trash2, X } from "lucide-react";
+import { getUsers, getReservations, createUser, updateUser, deleteUser } from "../../services/adminApi";
 
 import { useConfirm } from "../../context/Confirmcontext";
 
@@ -32,6 +32,7 @@ export default function AdminUsers() {
   const [viewing, setViewing] = useState(null);
 
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_USER);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -52,30 +53,48 @@ export default function AdminUsers() {
   };
 
   const closeCreate = () => {
-    if (!saving) setCreating(false);
+    if (!saving) {
+      setCreating(false);
+      setEditing(null);
+    }
   };
 
-  const handleCreate = async (event) => {
+  const openEdit = (user) => {
+    setForm(Object.fromEntries(Object.entries(EMPTY_USER).map(([key, value]) =>
+      [key, key === "password" ? "" : user[key] ?? value]
+    )));
+    setError("");
+    setEditing(user);
+  };
+
+  const handleSave = async (event) => {
     event.preventDefault();
     if (saving) return;
     setSaving(true);
     setError("");
     try {
-      const user = await createUser({
+      const payload = {
         ...form,
         username: form.username.trim(),
         email: form.email.trim(),
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         phone: form.phone.trim(),
-      });
-      setUsers((previous) => [user, ...previous]);
+      };
+      if (editing) delete payload.password;
+      const user = editing
+        ? await updateUser(editing.id, payload)
+        : await createUser(payload);
+      setUsers((previous) => editing
+        ? previous.map((item) => item.id === editing.id ? user : item)
+        : [user, ...previous]);
       setTab("All");
       setQuery("");
       setCreating(false);
+      setEditing(null);
       setForm(EMPTY_USER);
     } catch (err) {
-      setError(err.message || t("Could not create user. Please try again."));
+      setError(err.message || t(editing ? "Could not update user. Please try again." : "Could not create user. Please try again."));
     } finally {
       setSaving(false);
     }
@@ -264,6 +283,9 @@ export default function AdminUsers() {
                       >
                         <Eye size={15} />
                       </button>
+                      <button onClick={() => openEdit(u)} title={t("Edit User")} aria-label={t("Edit User")}>
+                        <Pencil size={15} />
+                      </button>
                       <button className="danger" onClick={() => handleDelete(u)} title={t("Delete User")} aria-label={t("Delete User")} disabled={deleting !== null}>
                         <Trash2 size={15} />
                       </button>
@@ -285,12 +307,12 @@ export default function AdminUsers() {
         <Pagination {...pagination} />
       </div>
 
-      {creating && (
+      {(creating || editing) && (
         <div className="modal-overlay" onClick={closeCreate} onKeyDown={(event) => { if (event.key === "Escape") closeCreate(); }}>
           <div className="modal-card modal-wide catalog-dialog" role="dialog" aria-modal="true" aria-labelledby="create-user-title" onClick={(event) => event.stopPropagation()}>
-            <form onSubmit={handleCreate}>
+            <form onSubmit={handleSave}>
               <div className="modal-header">
-                <h3 id="create-user-title">{t("Create User")}</h3>
+                <h3 id="create-user-title">{t(editing ? "Edit User" : "Create User")}</h3>
                 <button type="button" className="modal-close" onClick={closeCreate} disabled={saving} aria-label={t("Close")}><X size={18} /></button>
               </div>
               <div className="modal-body catalog-dialog-body">
@@ -302,7 +324,7 @@ export default function AdminUsers() {
                   ["first_name", "First name", "text", false, 150],
                   ["last_name", "Last name", "text", false, 150],
                   ["phone", "Phone", "tel", false, 20],
-                ].map(([name, label, type, required, maxLength]) => (
+                ].filter(([name]) => !editing || name !== "password").map(([name, label, type, required, maxLength]) => (
                   <div className="form-field" key={name}>
                     <label className="catalog-field-label" htmlFor={`user-${name}`}>{t(label)}</label>
                     <input id={`user-${name}`} type={type} value={form[name]} required={required} maxLength={maxLength} disabled={saving} autoFocus={name === "username"} autoComplete={name === "password" ? "new-password" : name === "username" ? "off" : undefined} onChange={(event) => setForm((previous) => ({ ...previous, [name]: event.target.value }))} />
@@ -323,7 +345,7 @@ export default function AdminUsers() {
               </div>
               <div className="modal-footer" style={{ gap: "0.6rem" }}>
                 <button type="button" className="btn btn-secondary" onClick={closeCreate} disabled={saving}>{t("Cancel")}</button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? t("Saving...") : t("Create User")}</button>
+                <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? t("Saving...") : t(editing ? "Save changes" : "Create User")}</button>
               </div>
             </form>
           </div>

@@ -2,6 +2,8 @@ import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import { X, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 
+import SearchableSelect from "../../components/SearchableSelect";
+
 import { getCatalog } from "../../services/adminApi";
 
 const STEPS = ["Vehicle Details", "Photo & Description"];
@@ -11,6 +13,7 @@ export const EMPTY_VEHICLE = {
   model: "",
   year: new Date().getFullYear(),
   category: "",
+  feature_ids: [],
   brand_id: "",
   category_id: "",
   status: "available",
@@ -42,7 +45,7 @@ export default function VehicleForm({
   savingLabel = "Saving...",
   multiStep = false,
 }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [step, setStep] = useState(0);
   const formRef = useRef(null);
   const [catalog, setCatalog] = useState(null);
@@ -115,11 +118,15 @@ export default function VehicleForm({
                 <div className="form-grid">
                   <div className="form-field">
                     <label htmlFor="brand">{t("Brand / Make")}</label>
-                    <select id="brand" value={form.brand_id ?? ''}
-                      onChange={(e) => onChange("brand_id", e.target.value)} required>
-                      <option value="">{t("Brands")}</option>
-                      {catalog?.brands.map((brand) => <option key={brand.id} value={brand.id}>{brand.name}</option>)}
-                    </select>
+                    <SearchableSelect
+                      id="brand"
+                      value={form.brand_id}
+                      onChange={(value) => onChange("brand_id", value ?? "")}
+                      options={catalog?.brands.map((item) => ({ value: item.id, label: item.name })) ?? []}
+                      placeholder={t("Brands")}
+                      disablePortal
+                      required
+                    />
                   </div>
 
                   <div className="form-field">
@@ -150,19 +157,15 @@ export default function VehicleForm({
 
                   <div className="form-field full-width">
                     <label htmlFor="category">{t("Vehicle category")}</label>
-                    <select
+                    <SearchableSelect
                       id="category"
-                      className="select-lg"
-                      aria-describedby="vehicle-category-hint"
-                      value={form.category_id ?? ""}
-                      onChange={(e) => onChange("category_id", e.target.value)}
+                      value={form.category_id}
+                      onChange={(value) => onChange("category_id", value ?? "")}
+                      options={catalog?.categories.map((item) => ({ value: item.id, label: item.name })) ?? []}
+                      placeholder={t("Categories")}
+                      disablePortal
                       required
-                    >
-                      <option value="">{t("Categories")}</option>
-                      {catalog?.categories.map((category) => (
-                        <option key={category.id} value={category.id}>{category.name}</option>
-                      ))}
-                    </select>
+                    />
                     <span id="vehicle-category-hint" className="field-hint">
                       {t("Choose the category customers will browse to find this vehicle.")}
                     </span>
@@ -197,28 +200,28 @@ export default function VehicleForm({
                 <div className="form-grid">
                   <div className="form-field">
                     <label htmlFor="transmission">{t("Transmission")}</label>
-                    <select
+                    <SearchableSelect
                       id="transmission"
                       value={form.transmission}
-                      onChange={(e) => onChange("transmission", e.target.value)}
-                    >
-                      <option value="manual">{t("Manual")}</option>
-                      <option value="automatic">{t("Automatic")}</option>
-                    </select>
+                      onChange={(value) => onChange("transmission", value ?? "")}
+                      options={[{ value: "manual", label: t("Manual") }, { value: "automatic", label: t("Automatic") }]}
+                      placeholder={t("Transmission")}
+                      disablePortal
+
+                    />
                   </div>
 
                   <div className="form-field">
                     <label htmlFor="fuel">{t("Fuel Type")}</label>
-                    <select
+                    <SearchableSelect
                       id="fuel"
                       value={form.fuel}
-                      onChange={(e) => onChange("fuel", e.target.value)}
-                    >
-                      <option value="diesel">{t("Diesel")}</option>
-                      <option value="petrol">{t("Gasoline (Essence)")}</option>
-                      <option value="hybrid">{t("Hybrid")}</option>
-                      <option value="electric">{t("Electric")}</option>
-                    </select>
+                      onChange={(value) => onChange("fuel", value ?? "")}
+                      options={[{ value: "diesel", label: t("Diesel") }, { value: "petrol", label: t("Gasoline (Essence)") }, { value: "hybrid", label: t("Hybrid") }, { value: "electric", label: t("Electric") }]}
+                      placeholder={t("Fuel Type")}
+                      disablePortal
+
+                    />
                   </div>
 
                   <div className="form-field">
@@ -278,6 +281,26 @@ export default function VehicleForm({
                     <span className="vehicle-featured-switch" aria-hidden="true" />
                   </label>
                 </div>
+              </div>
+
+              <div className="form-card vehicle-details-card">
+                <div className="vehicle-identity-heading">
+                  <h3 id="vehicle-features-heading">{t("Features")}</h3>
+                  <p>{t("Select the equipment included with this vehicle.")}</p>
+                </div>
+                <div className="vehicle-features-grid" role="group" aria-labelledby="vehicle-features-heading">
+                  {catalog?.features.map((feature) => (
+                    <label className="vehicle-feature-option" key={feature.id}>
+                      <input type="checkbox" disabled={saving}
+                        checked={(form.feature_ids ?? []).includes(feature.id)}
+                        onChange={(event) => onChange("feature_ids", event.target.checked
+                          ? [...(form.feature_ids ?? []), feature.id]
+                          : (form.feature_ids ?? []).filter((id) => id !== feature.id))} />
+                      <span>{feature[`name_${lang}`] || feature.name}</span>
+                    </label>
+                  ))}
+                </div>
+                {catalog && catalog.features.length === 0 && <p className="field-hint">{t("No features available. Add features in Catalog first.")}</p>}
               </div>
 
               {/* Pricing & Rental Rules */}
