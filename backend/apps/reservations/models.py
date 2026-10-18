@@ -63,7 +63,7 @@ class Reservation(models.Model):
     def notify_admins(self, notif_type, title, message):
         from apps.notifications.models import Notification
         from apps.users.models import User, Role
-        admins = User.objects.filter(role=Role.ADMIN, is_active=True).exclude(pk=self.user_id)
+        admins = User.objects.filter(role=Role.ADMIN, is_active=True)
         Notification.objects.bulk_create([
             Notification(
                 user=admin,
