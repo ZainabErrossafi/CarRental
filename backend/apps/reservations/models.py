@@ -47,7 +47,11 @@ class Reservation(models.Model):
                 extras_cost += extra.flat_price * reservation_extra.quantity
 
         return vehicle_cost + extras_cost
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 03b2f3a (fix: location delete, status transitions, price recalculation, date and password validation, check vehicle availability on create and update)
     def refresh_total(self):
         self.total_price = self.calculate_total()
         self.save(update_fields=['total_price', 'updated_at'])
@@ -119,6 +123,10 @@ class ReservationExtra(models.Model):
         reservation = self.reservation
         super().delete(*args, **kwargs)
         reservation.refresh_total()
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 03b2f3a (fix: location delete, status transitions, price recalculation, date and password validation, check vehicle availability on create and update)
     def __str__(self):
         return f"{self.extra} x{self.quantity} ({self.reservation.reference})"
