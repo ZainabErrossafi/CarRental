@@ -124,6 +124,15 @@ export const getUsers = async () => {
   return getList('users/');
 };
 
+export const createUser = async (userData) => {
+  const { data } = await api.post('users/', userData);
+  return data;
+};
+
+export const deleteUser = async (id) => {
+  await api.delete(`users/${id}/`);
+};
+
 export const updateUserRole = async (id, role) => {
   const { data } = await api.patch(`users/${id}/`, { role });
   return data;
