@@ -1,3 +1,10 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import Feature
+from .serializers import FeatureSerializer
 
-# Create your views here.
+
+class FeatureViewSet(viewsets.ModelViewSet):
+    queryset = Feature.objects.all()
+    serializer_class = FeatureSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]

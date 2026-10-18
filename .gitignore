@@ -5,3 +5,9 @@ db.sqlite3
 .env
 *.log
 .DS_Store
+frontend/node_modules
+frontend/dist/
+
+nginx/certs/
+
+backend/media/
