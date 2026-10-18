@@ -29,7 +29,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
+    @action(detail=True, methods=['post'])
     def deactivate(self, request, pk=None):
         user = self.get_object()
         if user == request.user:
@@ -39,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(user)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
+    @action(detail=True, methods=['post'])
     def activate(self, request, pk=None):
         user = self.get_object()
         user.is_active = True
