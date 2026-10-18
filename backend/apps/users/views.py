@@ -10,8 +10,7 @@ from .serializers import UserSerializer
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    http_method_names = ['get', 'post', 'patch', 'head', 'options']
-
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
     filterset_fields = ['role', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering_fields = ['username', 'date_joined']
@@ -33,6 +32,8 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[IsAdmin])
     def deactivate(self, request, pk=None):
         user = self.get_object()
+        if user == request.user:
+            return Response({'detail': 'You cannot deactivate your own account.'}, status=400)
         user.is_active = False
         user.save()
         serializer = self.get_serializer(user)
@@ -45,3 +46,14 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         serializer = self.get_serializer(user)
         return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user == request.user:
+            return Response({'detail': 'You cannot delete your own account.'}, status=400)
+        if user.reservations.exists():
+            return Response(
+                {'detail': 'This user has reservations. Deactivate the account instead.'},
+                status=409,
+            )
+        return super().destroy(request, *args, **kwargs)

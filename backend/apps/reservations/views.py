@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from apps.users.permissions import IsAdmin, IsAdminOrOwner
 from .models import Reservation, ReservationExtra, ReservationStatus
 from .serializers import ReservationSerializer, ReservationExtraSerializer
-
+from django.db import transaction
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
@@ -27,14 +27,26 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return [IsAdminOrOwner()]
         else:
             return [IsAdmin()]
-
+        
+    def get_permissions(self):
+        if self.action in ['create', 'list']:
+            return [IsAuthenticated()]
+        elif self.action in ['retrieve', 'cancel']:
+            return [IsAdminOrOwner()]
+        else:
+            return [IsAdmin()]
+        
     def perform_create(self, serializer):
-        reference = f"RES-{uuid.uuid4().hex[:8].upper()}"
-        reservation = serializer.save(user=self.request.user, reference=reference, total_price=0)
-        reservation.total_price = reservation.calculate_total()
-        reservation.save()
-        reservation.notify_admins('reservation_created', 'New reservation', f"Reservation {reservation.reference} is waiting for confirmation.")
-
+        with transaction.atomic():
+            reference = f"RES-{uuid.uuid4().hex[:8].upper()}"
+            reservation = serializer.save(user=self.request.user, reference=reference, total_price=0)
+            reservation.total_price = reservation.calculate_total()
+            reservation.save()
+            reservation.notify_admins(
+                'reservation_created',
+                'New reservation',
+                f"Reservation {reservation.reference} by {reservation.driver_name} is waiting for confirmation.",
+            )
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
         reservation = self.get_object()
