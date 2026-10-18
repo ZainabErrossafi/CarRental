@@ -46,7 +46,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         serializer = self.get_serializer(user)
         return Response(serializer.data)
-
+    
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
         if user == request.user:

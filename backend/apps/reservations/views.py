@@ -55,7 +55,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
         with transaction.atomic():
             reservation = serializer.save()
             reservation.refresh_total()
+<<<<<<< HEAD
 
+=======
+            
+>>>>>>> 03b2f3a (fix: location delete, status transitions, price recalculation, date and password validation, check vehicle availability on create and update)
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
         reservation = self.get_object()
@@ -82,7 +86,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation.complete()
         serializer = self.get_serializer(reservation)
         return Response(serializer.data)
-
+    
     @action(detail=False, methods=['get'], permission_classes=[IsAdmin])
     def stats(self, request):
         total = Reservation.objects.count()
