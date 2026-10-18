@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from apps.users.permissions import IsAdmin, IsAdminOrOwner
 from .models import Reservation, ReservationExtra, ReservationStatus
@@ -27,7 +28,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return [IsAdminOrOwner()]
         else:
             return [IsAdmin()]
-        
+
     def get_permissions(self):
         if self.action in ['create', 'list']:
             return [IsAuthenticated()]
@@ -35,7 +36,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
             return [IsAdminOrOwner()]
         else:
             return [IsAdmin()]
-        
+
     def perform_create(self, serializer):
         with transaction.atomic():
             reference = f"RES-{uuid.uuid4().hex[:8].upper()}"
@@ -47,9 +48,19 @@ class ReservationViewSet(viewsets.ModelViewSet):
                 'New reservation',
                 f"Reservation {reservation.reference} by {reservation.driver_name} is waiting for confirmation.",
             )
+
+    def perform_update(self, serializer):
+        if serializer.instance.status in [ReservationStatus.CANCELLED, ReservationStatus.COMPLETED]:
+            raise ValidationError({'detail': 'A cancelled or completed reservation cannot be modified.'})
+        with transaction.atomic():
+            reservation = serializer.save()
+            reservation.refresh_total()
+
     @action(detail=True, methods=['post'])
     def confirm(self, request, pk=None):
         reservation = self.get_object()
+        if reservation.status != ReservationStatus.PENDING:
+            return Response({'detail': 'Only pending reservations can be confirmed.'}, status=400)
         reservation.confirm()
         serializer = self.get_serializer(reservation)
         return Response(serializer.data)
@@ -62,10 +73,12 @@ class ReservationViewSet(viewsets.ModelViewSet):
         reservation.cancel(by=request.user)
         serializer = self.get_serializer(reservation)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         reservation = self.get_object()
+        if reservation.status != ReservationStatus.CONFIRMED:
+            return Response({'detail': 'Only confirmed reservations can be completed.'}, status=400)
         reservation.complete()
         serializer = self.get_serializer(reservation)
         return Response(serializer.data)
