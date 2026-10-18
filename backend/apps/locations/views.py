@@ -1,5 +1,8 @@
+from django.db.models import ProtectedError
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from apps.users.permissions import IsAdmin
 from .models import Location
 from .serializers import LocationSerializer
@@ -17,5 +20,13 @@ class LocationViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [IsAuthenticated()]
-        else:
-            return [IsAdmin()]
+        return [IsAdmin()]
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return Response(
+                {'detail': 'This location is used by reservations. Set it inactive instead.'},
+                status=409,
+            )

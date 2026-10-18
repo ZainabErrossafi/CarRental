@@ -48,6 +48,10 @@ class Reservation(models.Model):
 
         return vehicle_cost + extras_cost
     
+    def refresh_total(self):
+        self.total_price = self.calculate_total()
+        self.save(update_fields=['total_price', 'updated_at'])
+
     def confirm(self):
         self.status = ReservationStatus.CONFIRMED
         self.save()
@@ -105,5 +109,14 @@ class ReservationExtra(models.Model):
     class Meta:
         unique_together = ('reservation', 'extra')
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.reservation.refresh_total()
+
+    def delete(self, *args, **kwargs):
+        reservation = self.reservation
+        super().delete(*args, **kwargs)
+        reservation.refresh_total()
+        
     def __str__(self):
         return f"{self.extra} x{self.quantity} ({self.reservation.reference})"
