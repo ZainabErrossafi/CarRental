@@ -2,7 +2,7 @@ import { useI18n } from "../../context/I18nContext";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
-import { Pencil, Trash2, Archive, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import {
@@ -47,10 +47,6 @@ export default function AdminVehicles() {
 
   const handleAdd = () => {
     navigate("/admin/vehicles/new");
-  };
-
-  const handleArchive = (id) => {
-    console.log("Archive vehicle:", id);
   };
 
   const handleStatusChange = async (id, status) => {
@@ -128,10 +124,6 @@ export default function AdminVehicles() {
                   <div className="row-actions">
                     <button onClick={() => handleEdit(v.id)} title={t("Edit Vehicle")}>
                       <Pencil size={15} />
-                    </button>
-
-                    <button onClick={() => handleArchive(v.id)} title={t("Archive Vehicle")}>
-                      <Archive size={15} />
                     </button>
 
                     <button
