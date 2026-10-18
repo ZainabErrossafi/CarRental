@@ -22,6 +22,13 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "Delete User": "Supprimer l’utilisateur",
+    "Delete user \"{email}\"? This cannot be undone. Reservation history will be kept.": "Supprimer l’utilisateur « {email} » ? Cette action est irréversible. L’historique des réservations sera conservé.",
+    "Could not delete user. Please try again.": "Impossible de supprimer l’utilisateur. Veuillez réessayer.",
+    "Create User": "Créer un utilisateur",
+    "First name": "Prénom",
+    "Last name": "Nom",
+    "Could not create user. Please try again.": "Impossible de créer l’utilisateur. Veuillez réessayer.",
     "Analytics dashboard": "Tableau de bord analytique",
     "Track bookings and revenue across your fleet.": "Suivez les réservations et les revenus de votre flotte.",
     "Save as PDF": "Enregistrer en PDF",
@@ -599,6 +606,13 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "Delete User": "حذف المستخدم",
+    "Delete user \"{email}\"? This cannot be undone. Reservation history will be kept.": "هل تريد حذف المستخدم \"{email}\"؟ لا يمكن التراجع عن ذلك. سيتم الاحتفاظ بسجل الحجوزات.",
+    "Could not delete user. Please try again.": "تعذر حذف المستخدم. يرجى المحاولة مرة أخرى.",
+    "Create User": "إنشاء مستخدم",
+    "First name": "الاسم الأول",
+    "Last name": "اسم العائلة",
+    "Could not create user. Please try again.": "تعذر إنشاء المستخدم. يرجى المحاولة مرة أخرى.",
     "Analytics dashboard": "لوحة التحليلات",
     "Track bookings and revenue across your fleet.": "تابع الحجوزات والإيرادات لأسطولك.",
     "Save as PDF": "حفظ بصيغة PDF",
