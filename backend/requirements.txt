@@ -1,5 +1,5 @@
-asgiref==3.11.1
 Django==4.2.30
+<<<<<<< HEAD
 djangorestframework==3.16.1
 gunicorn==23.0.0
 packaging==26.3
@@ -10,3 +10,13 @@ sqlparse==0.5.5
 typing_extensions==4.16.0
 gunicorn==23.0.0
 Pillow
+=======
+django-cors-headers==4.9.0
+djangorestframework
+djangorestframework-simplejwt
+django-filter
+gunicorn
+psycopg2-binary
+python-dotenv
+Pillow
+>>>>>>> frontend_admin
