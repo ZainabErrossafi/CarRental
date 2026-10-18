@@ -24,7 +24,13 @@ export const createVehicle = async (vehicleData) => {
 };
 
 export const updateVehicle = async (id, vehicleData) => {
-  const { data } = await api.patch(`vehicles/${id}/`, await vehiclePayload(vehicleData));
+  const payload = await vehiclePayload(vehicleData);
+  const { data } = await api.patch(`vehicles/${id}/`, payload);
+  // Multipart cannot represent an empty relation list; clear it explicitly.
+  if (payload instanceof FormData && vehicleData.feature_ids?.length === 0) {
+    const { data: updated } = await api.patch(`vehicles/${id}/`, { feature_ids: [] });
+    return vehicleFromApi(updated);
+  }
   return vehicleFromApi(data);
 };
 
@@ -126,6 +132,11 @@ export const getUsers = async () => {
 
 export const createUser = async (userData) => {
   const { data } = await api.post('users/', userData);
+  return data;
+};
+
+export const updateUser = async (id, userData) => {
+  const { data } = await api.patch(`users/${id}/`, userData);
   return data;
 };
 
