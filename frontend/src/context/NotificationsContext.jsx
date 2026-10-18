@@ -24,7 +24,7 @@ export function NotificationsProvider({ children }) {
       }
     };
     refresh();
-    const interval = window.setInterval(refresh, 10000);
+    const interval = window.setInterval(refresh, 1000);
     window.addEventListener("focus", refresh);
     document.addEventListener("visibilitychange", refresh);
     return () => {
