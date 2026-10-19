@@ -34,7 +34,7 @@ class Reservation(models.Model):
         delta = self.return_date - self.pickup_date
         days = delta.days + (1 if delta.seconds > 0 else 0)
         return max(days, 1)
-    
+
     def calculate_total(self):
         vehicle_cost = self.vehicle.daily_rate * self.duration_days()
 
@@ -47,7 +47,12 @@ class Reservation(models.Model):
                 extras_cost += extra.flat_price * reservation_extra.quantity
 
         return vehicle_cost + extras_cost
+
     
+    def refresh_total(self):
+        self.total_price = self.calculate_total()
+        self.save(update_fields=['total_price', 'updated_at'])
+
     def confirm(self):
         self.status = ReservationStatus.CONFIRMED
         self.save()
@@ -75,7 +80,7 @@ class Reservation(models.Model):
             )
             for admin in admins
         ])
-        
+
     def complete(self):
         self.status = ReservationStatus.COMPLETED
         self.save()
@@ -93,12 +98,12 @@ class Reservation(models.Model):
             related_id=self.id,
             related_type='reservation',
         )
-          
+
     def __str__(self):
         return self.reference
 
 
-    
+
 class ReservationExtra(models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name='reservation_extras')
     extra = models.ForeignKey('extras.Extra', on_delete=models.PROTECT, related_name='reservation_extras')
@@ -107,5 +112,15 @@ class ReservationExtra(models.Model):
     class Meta:
         unique_together = ('reservation', 'extra')
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self.reservation.refresh_total()
+
+    def delete(self, *args, **kwargs):
+        reservation = self.reservation
+        super().delete(*args, **kwargs)
+        reservation.refresh_total()
+
+        
     def __str__(self):
         return f"{self.extra} x{self.quantity} ({self.reservation.reference})"

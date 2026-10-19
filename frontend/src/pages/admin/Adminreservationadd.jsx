@@ -163,6 +163,7 @@ export default function AdminReservationAdd() {
               <div className="form-field full-width">
                 <label htmlFor="user_id">{t("Registered User")}</label>
                 <SearchableSelect
+                  disablePortal
                   id="user_id"
                   value={form.user_id}
                   onChange={(value) => handleChange("user_id", value)}
@@ -187,6 +188,7 @@ export default function AdminReservationAdd() {
               <div className="form-field full-width">
                 <label htmlFor="vehicle_id">{t("Vehicle")}</label>
                 <SearchableSelect
+                  disablePortal
                   id="vehicle_id"
                   value={form.vehicle_id}
                   onChange={(value) => handleChange("vehicle_id", value)}
@@ -201,32 +203,34 @@ export default function AdminReservationAdd() {
 
               <div className="form-field">
                 <label htmlFor="pickup_location_id">{t("Pickup Location")}</label>
-                <select
+                <SearchableSelect
+                  disablePortal
                   id="pickup_location_id"
                   value={form.pickup_location_id}
-                  onChange={(e) => handleChange("pickup_location_id", e.target.value)}
+                  onChange={(value) => handleChange("pickup_location_id", value ?? "")}
+                  placeholder={t("Select Location")}
+                  options={locations.map((loc) => ({
+                    value: loc.id,
+                    label: `${loc.name} - ${loc.city}`,
+                  }))}
                   required
-                >
-                  <option value="" disabled>{t("Select Location")}</option>
-                  {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="form-field">
                 <label htmlFor="dropoff_location_id">{t("Dropoff Location")}</label>
-                <select
+                <SearchableSelect
+                  disablePortal
                   id="dropoff_location_id"
                   value={form.dropoff_location_id}
-                  onChange={(e) => handleChange("dropoff_location_id", e.target.value)}
+                  onChange={(value) => handleChange("dropoff_location_id", value ?? "")}
+                  placeholder={t("Select Location")}
+                  options={locations.map((loc) => ({
+                    value: loc.id,
+                    label: `${loc.name} - ${loc.city}`,
+                  }))}
                   required
-                >
-                  <option value="" disabled>{t("Select Location")}</option>
-                  {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="form-field">

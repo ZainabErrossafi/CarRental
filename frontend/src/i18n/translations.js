@@ -22,6 +22,11 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "Select the equipment included with this vehicle.": "Sélectionnez les équipements inclus dans ce véhicule.",
+    "No features available. Add features in Catalog first.": "Aucun équipement disponible. Ajoutez des équipements dans le catalogue.",
+    "Edit User": "Modifier l’utilisateur",
+    "Save changes": "Enregistrer les modifications",
+    "Could not update user. Please try again.": "Impossible de modifier l’utilisateur. Veuillez réessayer.",
     "Delete User": "Supprimer l’utilisateur",
     "Delete user \"{email}\"? This cannot be undone. Reservation history will be kept.": "Supprimer l’utilisateur « {email} » ? Cette action est irréversible. L’historique des réservations sera conservé.",
     "Could not delete user. Please try again.": "Impossible de supprimer l’utilisateur. Veuillez réessayer.",
@@ -606,6 +611,11 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "Select the equipment included with this vehicle.": "حدد التجهيزات المتوفرة في هذه السيارة.",
+    "No features available. Add features in Catalog first.": "لا توجد تجهيزات متاحة. أضف التجهيزات في الكتالوج أولاً.",
+    "Edit User": "تعديل المستخدم",
+    "Save changes": "حفظ التغييرات",
+    "Could not update user. Please try again.": "تعذر تحديث المستخدم. يرجى المحاولة مرة أخرى.",
     "Delete User": "حذف المستخدم",
     "Delete user \"{email}\"? This cannot be undone. Reservation history will be kept.": "هل تريد حذف المستخدم \"{email}\"؟ لا يمكن التراجع عن ذلك. سيتم الاحتفاظ بسجل الحجوزات.",
     "Could not delete user. Please try again.": "تعذر حذف المستخدم. يرجى المحاولة مرة أخرى.",
