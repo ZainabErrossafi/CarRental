@@ -1,8 +1,5 @@
 from rest_framework import serializers
-<<<<<<< HEAD
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-=======
->>>>>>> 03b2f3a (fix: location delete, status transitions, price recalculation, date and password validation, check vehicle availability on create and update)
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from .models import User
 
@@ -35,7 +32,6 @@ class UserSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
-<<<<<<< HEAD
 
     def validate_password(self, value):
         django_validate_password(value)
@@ -60,9 +56,3 @@ class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
         if user.role != 'admin':
             raise AuthenticationFailed('An administrator account is required.')
         return data
-=======
-    
-    def validate_password(self, value):
-        django_validate_password(value)
-        return value
->>>>>>> 03b2f3a (fix: location delete, status transitions, price recalculation, date and password validation, check vehicle availability on create and update)
