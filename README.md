@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-Farid pushi && rah poshiiiiit
-=======
 # .env
 DB_HOST=postgres
 DB_PORT=5432
@@ -16,5 +13,5 @@ DATABASE_URL=
 MAPS_API_KEY=
 
 VITE_API_URL=/api
-# //////////////
->>>>>>> 6e85b25ce334f51659e0529fe870d81ff99a7839
+
+## -----------------------

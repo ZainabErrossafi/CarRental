@@ -1,4 +1,4 @@
-.PHONY: up down build restart logs ps clean migrate certs
+.PHONY: up down build restart logs ps clean migrate certs db-sync-password
 
 up: certs
 	docker compose up --build -d
@@ -22,6 +22,10 @@ clean:
 
 migrate:
 	docker compose exec backend python manage.py migrate
+
+db-sync-password:
+	docker compose exec -T postgres sh -c 'psql --no-psqlrc --set=ON_ERROR_STOP=1 --username="$$POSTGRES_USER" --dbname=postgres' < scripts/sync-db-password.sql
+
 create_user:
 	docker compose exec backend python manage.py createsuperuser
 certs:

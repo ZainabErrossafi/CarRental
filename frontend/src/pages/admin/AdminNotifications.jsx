@@ -13,13 +13,11 @@ import {
   Bell,
   Check,
   CheckCheck,
-  Trash2,
   ArrowUpRight,
 } from "lucide-react";
 import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
-  deleteNotification,
 } from "../../services/adminApi";
 import { useConfirm } from "../../context/Confirmcontext";
 
@@ -79,12 +77,6 @@ export default function AdminNotifications() {
     await markAllNotificationsAsRead();
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     await refreshNotifications();
-  };
-
-  const handleDelete = async (id) => {
-    if (!(await confirm("Are you sure you want to delete this notification?", { danger: true, confirmLabel: "Delete" }))) return;
-    await deleteNotification(id);
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   const handleOpenRelated = async (n) => {
@@ -205,9 +197,6 @@ export default function AdminNotifications() {
                       <Check size={15} />
                     </button>
                   )}
-                  <button onClick={() => handleDelete(n.id)} title={t("Delete")} className="danger">
-                    <Trash2 size={15} />
-                  </button>
                 </div>
               </div>
             );
