@@ -7,6 +7,18 @@ from .models import User
 from .serializers import UserSerializer
 
 
+#//////////////////////////////oussama
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
+
+class GoogleLoginView(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://localhost:3000/auth/callback"  # URL لي فالفرونت إند ولا 127.0.0.1:8000
+    client_class = OAuth2Client
+#////////////////////////////////////////////
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
