@@ -3263,6 +3263,56 @@ gap: 0.5rem;
   width: 100%;
 }
 
+.gcard-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.1rem 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.gcard-divider::before,
+.gcard-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border, #e5e7eb);
+}
+
+.gcard-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--navy);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.gcard-google:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.gcard-google:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+.gcard-google:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
 .gcard.signin .gcard-forms form.signin,
 .gcard.signup .gcard-forms form.signup {
   display: flex;
