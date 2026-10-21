@@ -59,7 +59,7 @@ api.interceptors.response.use(
     if (typeof body?.detail === 'string') error.message = body.detail;
     else if (body && typeof body === 'object') {
       error.message = Object.entries(body).map(([field, messages]) =>
-        `${field}: ${Array.isArray(messages) ? messages.join(' ') : JSON.stringify(messages)}`
+        `${field === 'non_field_errors' ? '' : `${field}: `}${Array.isArray(messages) ? messages.join(' ') : JSON.stringify(messages)}`
       ).join('\n');
     }
     else if (!error.response) error.message = 'Cannot reach the backend. Check that the Django server is running.';
