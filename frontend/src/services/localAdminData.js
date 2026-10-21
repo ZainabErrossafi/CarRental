@@ -21,6 +21,7 @@ const write = (key, value) => {
   } catch {
     throw new Error('Could not save in this browser. Storage may be full; try a smaller image.');
   }
+  if (key === CATALOG_KEY) window.dispatchEvent(new Event('rently:catalog-updated'));
   return value;
 };
 const validateKind = (kind) => {
