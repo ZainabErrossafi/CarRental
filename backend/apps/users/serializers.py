@@ -1,0 +1,58 @@
+from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth.password_validation import validate_password as django_validate_password
+from .models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'password']
+
+    def validate(self, data):
+        request = self.context.get('request')
+        if request and not request.user.is_admin():
+            data.pop('role', None)
+            data.pop('is_active', None)
+        return data
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        if not password:
+            raise serializers.ValidationError({'password': 'This field is required.'})
+        return User.objects.create_user(**validated_data, password=password)
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop('password', None)
+        if password:
+            instance.set_password(password)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
+    def validate_password(self, value):
+        django_validate_password(value)
+        return value
+
+
+class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField(write_only=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop(self.username_field, None)
+
+    def validate(self, attrs):
+        from rest_framework.exceptions import AuthenticationFailed
+
+        matches = User.objects.filter(email__iexact=attrs['email'].strip())
+        if matches.count() != 1:
+            raise AuthenticationFailed('Invalid email or password.')
+        user = matches.first()
+        data = super().validate({self.username_field: user.username, 'password': attrs['password']})
+        if user.role != 'admin':
+            raise AuthenticationFailed('An administrator account is required.')
+        return data

@@ -1,8 +1,11 @@
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
+import { useI18n } from "../../context/I18nContext";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, KeyRound, Check } from "lucide-react";
 
 export default function AdminForgotPassword() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
@@ -22,27 +25,28 @@ export default function AdminForgotPassword() {
   return (
     <div className="auth-page">
       <div className="auth-card">
+        <div className="auth-language-switcher"><LanguageSwitcher /></div>
         <div className="auth-logo">
           <div className="logo-dot" />
         </div>
 
         <h1 className="auth-title">
-          {sent ? "Check your email" : "Forgot password?"}
+          {sent ? t("Check your email") : t("Forgot password?")}
         </h1>
         <p className="auth-subtitle">
           {sent
-            ? `We've sent password reset instructions to ${email}.`
-            : "No worries, we'll send you reset instructions."}
+            ? t("We've sent password reset instructions to {value0}.", { value0: email })
+            : t("No worries, we'll send you reset instructions.")}
         </p>
 
         {!sent && (
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-field">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t("Email")}</label>
               <input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("Enter your email")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -50,7 +54,7 @@ export default function AdminForgotPassword() {
             </div>
 
             <button type="submit" className="gcard-submit" disabled={loading}>
-              {loading ? "Sending..." : "Reset password"}
+              {loading ? t("Sending...") : t("Reset password")}
             </button>
           </form>
         )}
@@ -62,14 +66,14 @@ export default function AdminForgotPassword() {
             onClick={() => setSent(false)}
           >
             <KeyRound size={16} />
-            Try another email
+            {t("Try another email")}
           </button>
         )}
 
         <p className="auth-footer">
           <Link to="/login" className="auth-link" style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem" }}>
             <ArrowLeft size={15} />
-            Back to log in
+            {t("Back to log in")}
           </Link>
         </p>
       </div>

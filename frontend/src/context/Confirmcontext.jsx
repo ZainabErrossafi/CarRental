@@ -1,9 +1,11 @@
+import { useI18n } from "./I18nContext";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 
 const ConfirmContext = createContext(null);
 
 export function ConfirmProvider({ children }) {
+  const { t } = useI18n();
   const [dialog, setDialog] = useState(null); // { message, confirmLabel, cancelLabel, danger }
   const resolver = useRef(null);
 
@@ -37,17 +39,17 @@ export function ConfirmProvider({ children }) {
             <div className={`confirm-icon ${dialog.danger ? "danger" : ""}`}>
               <AlertTriangle size={20} />
             </div>
-            <p className="confirm-message">{dialog.message}</p>
+            <p className="confirm-message">{t(dialog.message)}</p>
             <div className="confirm-actions">
               <button className="btn btn-secondary" onClick={() => handle(false)}>
-                {dialog.cancelLabel}
+                {t(dialog.cancelLabel)}
               </button>
               <button
                 className={`btn ${dialog.danger ? "btn-danger" : "btn-primary"}`}
                 onClick={() => handle(true)}
                 autoFocus
               >
-                {dialog.confirmLabel}
+                {t(dialog.confirmLabel)}
               </button>
             </div>
           </div>

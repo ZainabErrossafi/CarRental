@@ -1,3 +1,5 @@
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
+import { useI18n } from "../../context/I18nContext";
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
@@ -8,7 +10,7 @@ import {
   UserPlus,
   User,
   Mail,
-  Download,
+  ArrowUpRight,
   Lock,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -28,6 +30,7 @@ function PasswordRequirement({ met, label }) {
 const HERO_IMAGE = heroCarImage;
 
 export default function AdminAuth({ initialMode = "login" }) {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
   const { login, signup } = useAuth();
@@ -108,7 +111,7 @@ export default function AdminAuth({ initialMode = "login" }) {
               onClick={() => switchView("signin")}
             >
               <LogIn size={18} strokeWidth={2} />
-              <span>Sign In</span>
+              <span>{t("Sign In")}</span>
             </button>
           </li>
 
@@ -119,7 +122,7 @@ export default function AdminAuth({ initialMode = "login" }) {
               onClick={() => switchView("signup")}
             >
               <UserPlus size={18} strokeWidth={2} />
-              <span>Sign Up</span>
+              <span>{t("Sign Up")}</span>
             </button>
           </li>
 
@@ -133,53 +136,54 @@ export default function AdminAuth({ initialMode = "login" }) {
 
           <div className="gcard-hero-inner">
             <div className="gcard-hero-content signin">
-              <h2>Welcome back</h2>
-              <p>Please enter your credentials</p>
-              <a href="#" className="gcard-hero-terms">
-                Terms &amp; Conditions
-                <Download size={14} />
-              </a>
+              <h2>{t("Welcome back")}</h2>
+              <p>{t("Please enter your credentials")}</p>
+              <Link to="/terms" className="gcard-hero-terms">
+                {t("Terms & Conditions")}
+                <ArrowUpRight size={14} />
+              </Link>
             </div>
 
             <div className="gcard-hero-content signup">
-              <h2>Join us today</h2>
-              <p>Creating an account is quick</p>
-              <a href="#" className="gcard-hero-terms">
-                Terms &amp; Conditions
-                <Download size={14} />
-              </a>
+              <h2>{t("Join us today")}</h2>
+              <p>{t("Creating an account is quick")}</p>
+              <Link to="/terms" className="gcard-hero-terms">
+                {t("Terms & Conditions")}
+                <ArrowUpRight size={14} />
+              </Link>
             </div>
           </div>
         </div>
 
         {/* Form panel */}
         <div className="gcard-form">
+          <div className="auth-language-switcher"><LanguageSwitcher /></div>
           <div className="gcard-form-top">
             {view === "signin" ? (
               <span>
-                Don't have an account?{" "}
-                <button type="button" onClick={() => switchView("signup")}>Sign Up</button>
+                {t("Don't have an account?")}{" "}
+                <button type="button" onClick={() => switchView("signup")}>{t("Sign Up")}</button>
               </span>
             ) : (
               <span>
-                Already have an account?{" "}
-                <button type="button" onClick={() => switchView("signin")}>Sign In</button>
+                {t("Already have an account?")}{" "}
+                <button type="button" onClick={() => switchView("signin")}>{t("Sign In")}</button>
               </span>
             )}
           </div>
 
-          {error && <div className="alert alert-error gcard-error">⚠️ {error}</div>}
+          {error && <div className="alert alert-error gcard-error">⚠️ {t(error)}</div>}
 
           <div className="gcard-forms">
             {/* Formulaire de Connexion */}
             <form className="signin" onSubmit={handleSubmit}>
               <div className="gfield">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t("Email")}</label>
                 <div className="gfield-input">
                   <input
                     id="email"
                     type="email"
-                    placeholder="youremail@gmail.com"
+                    placeholder={t("youremail@gmail.com")}
                     value={form.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     required
@@ -189,12 +193,12 @@ export default function AdminAuth({ initialMode = "login" }) {
               </div>
 
               <div className="gfield">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">{t("Password")}</label>
                 <div className="gfield-input">
                   <input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t("Enter your password")}
                     value={form.password}
                     onChange={(e) => handleChange("password", e.target.value)}
                     required
@@ -213,24 +217,24 @@ export default function AdminAuth({ initialMode = "login" }) {
               {/* Forgot Password Link */}
               <div className="gfield-forgot">
                 <Link to="/forgot-password" className="forgot-password-link">
-                  Forgot password?
+                  {t("Forgot password?")}
                 </Link>
               </div>
 
               <button type="submit" className="gcard-submit" disabled={loading}>
-                {loading ? "Please wait..." : "Sign In"}
+                {loading ? t("Please wait...") : t("Sign In")}
               </button>
             </form>
 
             {/* Formulaire d'Inscription */}
             <form className="signup" onSubmit={handleSubmit}>
               <div className="gfield">
-                <label htmlFor="name">Username</label>
+                <label htmlFor="name">{t("Username")}</label>
                 <div className="gfield-input">
                   <input
                     id="name"
                     type="text"
-                    placeholder="myusername"
+                    placeholder={t("myusername")}
                     value={form.name}
                     onChange={(e) => handleChange("name", e.target.value)}
                     required
@@ -240,12 +244,12 @@ export default function AdminAuth({ initialMode = "login" }) {
               </div>
 
               <div className="gfield">
-                <label htmlFor="signup_email">Email</label>
+                <label htmlFor="signup_email">{t("Email")}</label>
                 <div className="gfield-input">
                   <input
                     id="signup_email"
                     type="email"
-                    placeholder="youremail@gmail.com"
+                    placeholder={t("youremail@gmail.com")}
                     value={form.email}
                     onChange={(e) => handleChange("email", e.target.value)}
                     required
@@ -255,12 +259,12 @@ export default function AdminAuth({ initialMode = "login" }) {
               </div>
 
               <div className="gfield">
-                <label htmlFor="signup_password">Password</label>
+                <label htmlFor="signup_password">{t("Password")}</label>
                 <div className="gfield-input">
                   <input
                     id="signup_password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder={t("Create a password")}
                     value={form.password}
                     onChange={(e) => handleChange("password", e.target.value)}
                     required
@@ -278,12 +282,12 @@ export default function AdminAuth({ initialMode = "login" }) {
 
               {/* Champ Confirm Password */}
               <div className="gfield">
-                <label htmlFor="confirm_password">Confirm Password</label>
+                <label htmlFor="confirm_password">{t("Confirm Password")}</label>
                 <div className="gfield-input">
                   <input
                     id="confirm_password"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder={t("Confirm your password")}
                     value={form.confirmPassword}
                     onChange={(e) => handleChange("confirmPassword", e.target.value)}
                     required
@@ -299,17 +303,18 @@ export default function AdminAuth({ initialMode = "login" }) {
                 </div>
 
                 <div className="password-requirements">
-                  <PasswordRequirement met={passwordChecks.length} label="At least 8 characters" />
-                  <PasswordRequirement met={passwordChecks.uppercase && passwordChecks.lowercase} label="Uppercase and lowercase letters" />
-                  <PasswordRequirement met={passwordChecks.number && passwordChecks.special} label="One number and one special character" />
+                  <PasswordRequirement met={passwordChecks.length} label={t("At least 8 characters")} />
+                  <PasswordRequirement met={passwordChecks.uppercase && passwordChecks.lowercase} label={t("Uppercase and lowercase letters")} />
+                  <PasswordRequirement met={passwordChecks.number && passwordChecks.special} label={t("One number and one special character")} />
                 </div>
               </div>
 
               <button type="submit" className="gcard-submit" disabled={loading}>
-                {loading ? "Please wait..." : "Sign Up"}
+                {loading ? t("Please wait...") : t("Sign Up")}
               </button>
             </form>
           </div>
+          <Link to="/terms" className="auth-terms-link">{t("Terms & Conditions")}</Link>
         </div>
       </div>
     </div>

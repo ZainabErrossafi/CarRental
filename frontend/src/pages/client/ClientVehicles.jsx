@@ -11,12 +11,12 @@ export default function ClientVehicles() {
   return (
     <section>
       <h1>Our vehicles</h1>
-      <label className="client-search" htmlFor="vehicle-search">
+      <label className="tw:grid tw:max-w-[400px] tw:gap-2" htmlFor="vehicle-search">
         Search by name
-        <input id="vehicle-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Try Dacia or Renault" />
+        <input className="tw:rounded-lg tw:border tw:border-solid tw:border-[#897973] tw:p-3 tw:[font:inherit]" id="vehicle-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Try Dacia or Renault" />
       </label>
       <p role="status">{filteredVehicles.length} vehicles found</p>
-      <div className="client-grid">
+      <div className="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] tw:gap-6">
         {filteredVehicles.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />)}
       </div>
       {filteredVehicles.length === 0 && <p>No vehicles match. Try another name.</p>}

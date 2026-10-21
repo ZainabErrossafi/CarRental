@@ -1,3 +1,5 @@
+import SearchableSelect from "../../components/SearchableSelect";
+import { useI18n } from "../../context/I18nContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -9,7 +11,7 @@ import {
 } from "../../services/adminApi";
 
 const EMPTY_RESERVATION = {
-  user_id: "", // Optional, if booking for a registered user
+  user_id: null, // Start without a selected user or guest option
   vehicle_id: "",
   pickup_location_id: "",
   dropoff_location_id: "",
@@ -22,6 +24,7 @@ const EMPTY_RESERVATION = {
 };
 
 export default function AdminReservationAdd() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   
   // Data states
@@ -48,12 +51,17 @@ export default function AdminReservationAdd() {
       setUsers(uData);
       setAvailableExtras(eData.filter((e) => e.active !== false)); // Assuming active flag
     }).catch(err => {
-      console.error("Failed to fetch initial form data", err);
+      setError(err.message || "Could not load reservation options.");
     });
   }, []);
 
   const handleChange = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === "pickup_date" && (!value || (prev.return_date && prev.return_date < value))
+        ? { return_date: "" } : {}),
+    }));
   };
 
   const handleExtraToggle = (extraId) => {
@@ -119,7 +127,8 @@ export default function AdminReservationAdd() {
       // Append calculated total_price to the submission payload
       const payload = {
         ...form,
-        total_price: estimatedTotal
+        user_id: form.user_id ?? "",
+        total_price: estimatedTotal.toFixed(2)
       };
       
       await createReservation(payload);
@@ -135,95 +144,97 @@ export default function AdminReservationAdd() {
       <div className="page-header">
         <div>
           <button className="btn-back" onClick={() => navigate("/admin/reservations")}>
-            ← Back to Reservations
+            {t("← Back to Reservations")}
           </button>
-          <h1>New Reservation</h1>
-          <p className="subtitle">Book a vehicle on behalf of a client</p>
+          <h1>{t("New Reservation")}</h1>
+          <p className="subtitle">{t("Book a vehicle on behalf of a client")}</p>
         </div>
       </div>
 
-      {error && <div className="alert alert-error mb-4">⚠️ {error}</div>}
+      {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
       <form onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
 
           {/* User Details */}
-          <div className="form-card">
-            <h3>Client Selection (Optional)</h3>
+          <div className="form-card vehicle-details-card">
+            <div className="vehicle-identity-heading"><h3>{t("Customer")}</h3><p>{t("Select an existing customer or enter guest details below.")}</p></div>
             <div className="form-grid">
               <div className="form-field full-width">
-                <label htmlFor="user_id">Registered User</label>
-                <select
+                <label htmlFor="user_id">{t("Registered User")}</label>
+                <SearchableSelect
+                  disablePortal
                   id="user_id"
                   value={form.user_id}
-                  onChange={(e) => handleChange("user_id", e.target.value)}
-                >
-                  <option value="">Guest (No Account)</option>
-                  {users.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.first_name} {u.last_name} ({u.email})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => handleChange("user_id", value)}
+                  placeholder={t("Registered User")}
+                  options={[
+                    { value: "", label: t("Guest (No Account)") },
+                    ...users.map((user) => ({
+                      value: user.id,
+                      label: `${user.first_name} ${user.last_name} (${user.email})`,
+                    })),
+                  ]}
+                />
               </div>
             </div>
           </div>
 
           {/* Vehicle & Dates */}
-          <div className="form-card">
-            <h3>Reservation Details</h3>
+          <div className="form-card vehicle-details-card">
+            <div className="vehicle-identity-heading"><h3>{t("Reservation details")}</h3><p>{t("Choose a vehicle, locations, and rental dates.")}</p></div>
             <div className="form-grid">
               
               <div className="form-field full-width">
-                <label htmlFor="vehicle_id">Vehicle</label>
-                <select
+                <label htmlFor="vehicle_id">{t("Vehicle")}</label>
+                <SearchableSelect
+                  disablePortal
                   id="vehicle_id"
-                  className="select-lg"
                   value={form.vehicle_id}
-                  onChange={(e) => handleChange("vehicle_id", e.target.value)}
+                  onChange={(value) => handleChange("vehicle_id", value)}
+                  placeholder={t("Select an available vehicle")}
+                  options={vehicles.map((vehicle) => ({
+                    value: vehicle.id,
+                    label: `${vehicle.brand} ${vehicle.model} — ${vehicle.dailyRate} ${t("MAD/day")}`,
+                  }))}
                   required
-                >
-                  <option value="" disabled>Select an available vehicle</option>
-                  {vehicles.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.brand} {v.model} — {v.dailyRate} MAD/day
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="form-field">
-                <label htmlFor="pickup_location_id">Pickup Location</label>
-                <select
+                <label htmlFor="pickup_location_id">{t("Pickup Location")}</label>
+                <SearchableSelect
+                  disablePortal
                   id="pickup_location_id"
                   value={form.pickup_location_id}
-                  onChange={(e) => handleChange("pickup_location_id", e.target.value)}
+                  onChange={(value) => handleChange("pickup_location_id", value ?? "")}
+                  placeholder={t("Select Location")}
+                  options={locations.map((loc) => ({
+                    value: loc.id,
+                    label: `${loc.name} - ${loc.city}`,
+                  }))}
                   required
-                >
-                  <option value="" disabled>Select Location</option>
-                  {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="form-field">
-                <label htmlFor="dropoff_location_id">Dropoff Location</label>
-                <select
+                <label htmlFor="dropoff_location_id">{t("Dropoff Location")}</label>
+                <SearchableSelect
+                  disablePortal
                   id="dropoff_location_id"
                   value={form.dropoff_location_id}
-                  onChange={(e) => handleChange("dropoff_location_id", e.target.value)}
+                  onChange={(value) => handleChange("dropoff_location_id", value ?? "")}
+                  placeholder={t("Select Location")}
+                  options={locations.map((loc) => ({
+                    value: loc.id,
+                    label: `${loc.name} - ${loc.city}`,
+                  }))}
                   required
-                >
-                  <option value="" disabled>Select Location</option>
-                  {locations.map((loc) => (
-                    <option key={loc.id} value={loc.id}>{loc.name} - {loc.city}</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="form-field">
-                <label htmlFor="pickup_date">Pickup Date</label>
+                <label htmlFor="pickup_date">{t("Pickup Date")}</label>
                 <input
                   id="pickup_date"
                   type="date"
@@ -234,10 +245,12 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="return_date">Return Date</label>
+                <label htmlFor="return_date">{t("Return Date")}</label>
                 <input
                   id="return_date"
                   type="date"
+                  disabled={!form.pickup_date}
+                  min={form.pickup_date || undefined}
                   value={form.return_date}
                   onChange={(e) => handleChange("return_date", e.target.value)}
                   required
@@ -249,11 +262,11 @@ export default function AdminReservationAdd() {
 
           {/* Extras */}
           {availableExtras.length > 0 && (
-            <div className="form-card">
-              <h3>Extras & Add-ons</h3>
+            <div className="form-card vehicle-details-card">
+              <h3>{t("Extras & Add-ons")}</h3>
               <div className="form-grid">
                 {availableExtras.map((extra) => (
-                  <div key={extra.id} className="form-field checkbox-field">
+                  <div key={extra.id} className="reservation-extra-option">
                     <label>
                       <input
                         type="checkbox"
@@ -261,7 +274,7 @@ export default function AdminReservationAdd() {
                         onChange={() => handleExtraToggle(extra.id)}
                       />
                       {extra.name} 
-                      ({extra.price_per_day ? `${extra.price_per_day} MAD/day` : `${extra.flat_price} MAD flat`})
+                      ({extra.price_per_day ? t("{value0} MAD/day", { value0: extra.price_per_day }) : t("{value0} MAD flat", { value0: extra.flat_price })})
                     </label>
                   </div>
                 ))}
@@ -271,22 +284,22 @@ export default function AdminReservationAdd() {
 
           {/* Pricing Summary */}
           {estimatedDays > 0 && selectedVehicle && (
-            <div className="form-card">
+            <div className="form-card vehicle-details-card">
                <div className="form-field full-width">
                   <div className="estimate-box">
-                    <span>{estimatedDays} day{estimatedDays > 1 ? "s" : ""} reservation</span>
-                    <strong>{estimatedTotal} MAD total</strong>
+                    <span>{t("Reservation for {count} days", { count: estimatedDays })}</span>
+                    <strong>{estimatedTotal.toFixed(2)} {t("MAD total")}</strong>
                   </div>
                 </div>
             </div>
           )}
 
           {/* Driver Details */}
-          <div className="form-card">
-            <h3>Driver Details</h3>
+          <div className="form-card vehicle-details-card">
+            <div className="vehicle-identity-heading"><h3>{t("Driver details")}</h3><p>{t("Add the contact details for the person driving the vehicle.")}</p></div>
             <div className="form-grid">
               <div className="form-field">
-                <label htmlFor="driver_name">Driver Name</label>
+                <label htmlFor="driver_name">{t("Driver Name")}</label>
                 <input
                   id="driver_name"
                   type="text"
@@ -297,7 +310,7 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t("Phone")}</label>
                 <input
                   id="phone"
                   type="tel"
@@ -309,7 +322,7 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field full-width">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t("Email")}</label>
                 <input
                   id="email"
                   type="email"
@@ -330,10 +343,10 @@ export default function AdminReservationAdd() {
             onClick={() => navigate("/admin/reservations")}
             disabled={saving}
           >
-            Cancel
+            {t("Cancel")}
           </button>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? "Creating..." : "Create Reservation"}
+            {saving ? t("Creating...") : t("Create Reservation")}
           </button>
         </div>
       </form>

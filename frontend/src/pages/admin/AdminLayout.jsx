@@ -21,10 +21,13 @@ import { useI18n } from "../../context/I18nContext";
 import GlobalSearch from "../../components/GlobalSearch.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 
+import { NotificationsProvider, useNotifications } from "../../context/NotificationsContext";
+
 const NAV_SECTIONS = [
   {
     label: "Overview",
-    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true }],
+    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
+      { to: "/admin/reports", label: "Reports & Data", icon: BarChart2 }],
   },
   {
     label: "Fleet",
@@ -58,6 +61,12 @@ const NAV_SECTIONS = [
 const ALL_PAGES = NAV_SECTIONS.flatMap((s) => s.items);
 
 export default function AdminLayout() {
+  return <NotificationsProvider><AdminLayoutContent /></NotificationsProvider>;
+}
+
+function AdminLayoutContent() {
+  const { notifications } = useNotifications();
+  const unreadCount = notifications.filter((item) => !item.is_read).length;
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -123,7 +132,7 @@ export default function AdminLayout() {
         >
           <Search size={15} />
           {t("Search")}
-          <kbd>⌘K</kbd>
+          <kbd>{t("⌘K")}</kbd>
         </button>
 
         <nav>
@@ -136,6 +145,11 @@ export default function AdminLayout() {
                   <NavLink key={item.to} to={item.to} end={item.end}>
                     <Icon size={16} />
                     {t(item.label)}
+                    {item.to === "/admin/notifications" && unreadCount > 0 && (
+                      <span className="sidebar-notification-badge" role="status" aria-label={t("{count} unread notifications", { count: unreadCount })}>
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
                   </NavLink>
                 );
               })}

@@ -1,3 +1,6 @@
+import { useI18n } from "../../context/I18nContext";
+import Pagination from "../../components/Pagination.jsx";
+import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useMemo, useState } from "react";
 import {
   Plus,
@@ -81,6 +84,14 @@ const ICONS = {
   tag: Tag,
 };
 
+const ICON_LABELS = {
+  car: "Car", sportscar: "Sports car", truck: "Truck", gem: "Luxury",
+  snowflake: "Air conditioning", navigation: "Navigation", bluetooth: "Bluetooth",
+  baby: "Child seat", userplus: "Additional driver", fuel: "Fuel", gauge: "Mileage",
+  users: "Passengers", briefcase: "Luggage", shield: "Insurance", wifi: "Wi-Fi",
+  sun: "Sunroof", music: "Audio", zap: "Electric", key: "Key", pin: "Location", tag: "Tag",
+};
+
 // Categories only offer these three icons (Economy / SUV / Luxury style).
 const CATEGORY_ICON_KEYS = ["car", "truck", "sportscar"];
 
@@ -116,6 +127,7 @@ function IconBadge({ name }) {
 }
 
 export default function AdminCatalog() {
+  const { t } = useI18n();
   const confirm = useConfirm();
   const [catalog, setCatalog] = useState(null);
   const [tab, setTab] = useState("brands");
@@ -124,9 +136,10 @@ export default function AdminCatalog() {
   const [form, setForm] = useState(EMPTY_FORMS.brands);
   const [slugTouched, setSlugTouched] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    getCatalog().then(setCatalog);
+    getCatalog().then(setCatalog).catch((err) => setError(err.message));
   }, []);
 
   const items = catalog?.[tab] ?? [];
@@ -140,7 +153,9 @@ export default function AdminCatalog() {
     );
   }, [items, query]);
 
-  if (!catalog) return <p>Loading...</p>;
+  const pagination = usePagination(filtered, JSON.stringify([tab, query]));
+
+  if (!catalog) return error ? <div role="alert" className="alert alert-error">{t(error)}</div> : <p>{t("Loading...")}</p>;
 
   const meta = KINDS[tab];
 
@@ -180,7 +195,8 @@ export default function AdminCatalog() {
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
-
+    setError(null);
+    try {
     if (editing === "new") {
       const created = await createCatalogItem(tab, form);
       setCatalog((prev) => ({ ...prev, [tab]: [...prev[tab], created] }));
@@ -193,32 +209,42 @@ export default function AdminCatalog() {
     }
 
     closeModal();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleDelete = async (item) => {
-    if (!(await confirm(`Are you sure you want to delete "${item.name}"?`, { danger: true, confirmLabel: "Delete" }))) return;
+    if (!(await confirm(t('Are you sure you want to delete "{name}"?', { name: item.name }), { danger: true, confirmLabel: "Delete" }))) return;
+    try {
     await deleteCatalogItem(tab, item.id);
     setCatalog((prev) => ({ ...prev, [tab]: prev[tab].filter((i) => i.id !== item.id) }));
+    } catch (err) { setError(err.message); }
   };
 
   const handleToggleActive = async (item) => {
+    try {
     const updated = await updateCatalogItem(tab, item.id, { active: !item.active });
     setCatalog((prev) => ({
       ...prev,
       [tab]: prev[tab].map((i) => (i.id === updated.id ? updated : i)),
     }));
+    } catch (err) { setError(err.message); }
   };
 
   const colCount = { brands: 3, categories: 4, features: 2, extras: 6 }[tab];
 
   return (
     <div>
+      {error && <div role="alert" className="alert alert-error">{t(error)}</div>}
       <div className="page-header">
-        <h1>Vehicle Catalog</h1>
+        <h1>{t("Vehicle Catalog")}</h1>
         <div className="page-header-actions">
           <button className="btn-pill" onClick={openNew}>
             <Plus size={16} strokeWidth={2.5} />
-            Add {meta.singular}
+            {t("Add {value0}", { value0: t(meta.singular) })}
           </button>
         </div>
       </div>
@@ -230,7 +256,7 @@ export default function AdminCatalog() {
             className={`pill-tab ${tab === key ? "active" : ""}`}
             onClick={() => switchTab(key)}
           >
-            {k.label}
+            {t(k.label)}
             <span className="tab-count">{catalog[key].length}</span>
           </button>
         ))}
@@ -238,13 +264,13 @@ export default function AdminCatalog() {
 
       <div className="table-card">
         <div className="table-card-header">
-          {meta.label}
+          {t(meta.label)}
           <span className="count-pill">{filtered.length}</span>
 
-          <div className="search-box" style={{ marginLeft: "auto" }}>
+          <div className="search-box" style={{ marginInlineStart: "auto" }}>
             <Search size={14} />
             <input
-              placeholder={`Search ${meta.label.toLowerCase()}`}
+              placeholder={t("Search {value0}", { value0: t(meta.label).toLowerCase() })}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               style={{ border: "none", outline: "none", background: "none", width: "140px" }}
@@ -257,37 +283,37 @@ export default function AdminCatalog() {
             <tr>
               {tab === "brands" && (
                 <>
-                  <th>Name</th>
-                  <th>Slug</th>
+                  <th>{t("Name")}</th>
+                  <th>{t("Slug")}</th>
                 </>
               )}
               {tab === "categories" && (
                 <>
-                  <th style={{ width: "60px" }}>Order</th>
-                  <th>Name</th>
-                  <th>Status</th>
+                  <th style={{ width: "60px" }}>{t("Order")}</th>
+                  <th>{t("Name")}</th>
+                  <th>{t("Status")}</th>
                 </>
               )}
               {tab === "features" && (
                 <>
-                  <th>Name</th>
+                  <th>{t("Name")}</th>
                 </>
               )}
               {tab === "extras" && (
                 <>
-                  <th>Name</th>
-                  <th>Price / day</th>
-                  <th>Flat price</th>
-                  <th>Max qty</th>
-                  <th>Status</th>
+                  <th>{t("Name")}</th>
+                  <th>{t("Price / day")}</th>
+                  <th>{t("Flat price")}</th>
+                  <th>{t("Max qty")}</th>
+                  <th>{t("Status")}</th>
                 </>
               )}
-              <th>Actions</th>
+              <th>{t("Actions")}</th>
             </tr>
           </thead>
 
           <tbody>
-            {filtered.map((item) => (
+            {pagination.pageItems.map((item) => (
               <tr key={item.id}>
                 {tab === "brands" && (
                   <>
@@ -328,8 +354,8 @@ export default function AdminCatalog() {
                         <strong>{item.name}</strong>
                       </div>
                     </td>
-                    <td>{item.price_per_day ? `${item.price_per_day} MAD` : "—"}</td>
-                    <td>{item.flat_price ? `${item.flat_price} MAD` : "—"}</td>
+                    <td>{item.price_per_day ? t("{value0} MAD", { value0: item.price_per_day }) : "—"}</td>
+                    <td>{item.flat_price ? t("{value0} MAD", { value0: item.flat_price }) : "—"}</td>
                     <td>{item.max_qty}</td>
                     <td><ActiveToggle item={item} onToggle={handleToggleActive} /></td>
                   </>
@@ -337,12 +363,12 @@ export default function AdminCatalog() {
 
                 <td>
                   <div className="row-actions">
-                    <button onClick={() => openEdit(item)} title={`Edit ${meta.singular.toLowerCase()}`}>
+                    <button onClick={() => openEdit(item)} title={t("Edit {value0}", { value0: t(meta.singular).toLowerCase() })}>
                       <Pencil size={15} />
                     </button>
                     <button
                       onClick={() => handleDelete(item)}
-                      title={`Delete ${meta.singular.toLowerCase()}`}
+                      title={t("Delete {value0}", { value0: t(meta.singular).toLowerCase() })}
                       className="danger"
                     >
                       <Trash2 size={15} />
@@ -355,37 +381,45 @@ export default function AdminCatalog() {
             {filtered.length === 0 && (
               <tr>
                 <td colSpan={colCount} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
-                  {query ? `No ${meta.label.toLowerCase()} match your search.` : `No ${meta.label.toLowerCase()} yet.`}
+                  {query ? t("No {value0} match your search.", { value0: t(meta.label).toLowerCase() }) : t("No {value0} yet.", { value0: t(meta.label).toLowerCase() })}
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+        <Pagination {...pagination} />
       </div>
 
       {editing && (
         <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-card modal-wide" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-card modal-wide catalog-dialog vehicle-details-card"
+            role="dialog" aria-modal="true" aria-labelledby="catalog-dialog-title" onClick={(e) => e.stopPropagation()}>
             <form onSubmit={handleSave}>
               <div className="modal-header">
-                <h3>{editing === "new" ? `Add ${meta.singular}` : `Edit ${meta.singular}`}</h3>
-                <button type="button" className="modal-close" onClick={closeModal}>
+                <div className="catalog-dialog-heading">
+                  <h3 id="catalog-dialog-title">{editing === "new" ? t("Add {value0}", { value0: t(meta.singular) }) : t("Edit {value0}", { value0: t(meta.singular) })}</h3>
+                  <p>{t("Organize your fleet catalog with clear, consistent details.")}</p>
+                </div>
+                <button type="button" className="modal-close" aria-label={t("Close dialog")} onClick={closeModal}>
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="modal-body" style={{ gap: "1rem", padding: "1.25rem 1.5rem" }}>
+              <div className="modal-body catalog-dialog-body">
+                {error && <div role="alert" className="alert alert-error">{t(error)}</div>}
                 {tab !== "brands" && (
                   <div className="form-field">
-                    <label>Icon</label>
-                    <div className="icon-picker">
+                    <span className="catalog-field-label" id="catalog-icon-label">{t("Choose an icon")}</span>
+                    <div className="icon-picker" role="group" aria-labelledby="catalog-icon-label">
                       {Object.entries(ICONS)
                         .filter(([key]) => tab !== "categories" || CATEGORY_ICON_KEYS.includes(key))
                         .map(([key, Icon]) => (
                           <button
                             type="button"
                             key={key}
-                            title={key}
+                            title={t(ICON_LABELS[key])}
+                            aria-label={t(ICON_LABELS[key])}
+                            aria-pressed={form.icon === key}
                             className={form.icon === key ? "selected" : ""}
                             onClick={() => setField("icon", key)}
                           >
@@ -398,10 +432,12 @@ export default function AdminCatalog() {
 
                 <div className="form-field">
                   <label htmlFor="c_name">
-                    {tab === "brands" ? "Name" : "Name (English)"}
+                    {t("Name")}
                   </label>
                   <input
                     id="c_name"
+                    placeholder={tab === "brands" ? t("e.g. Toyota") : tab === "categories" ? t("e.g. Economy") : tab === "extras" ? t("e.g. Child seat") : t("e.g. Bluetooth")}
+                    autoFocus
                     type="text"
                     value={form.name}
                     onChange={(e) => handleNameChange(e.target.value)}
@@ -411,7 +447,7 @@ export default function AdminCatalog() {
 
                 {tab === "brands" && (
                   <div className="form-field">
-                    <label htmlFor="c_slug">Slug</label>
+                    <label htmlFor="c_slug">{t("Slug")}</label>
                     <input
                       id="c_slug"
                       type="text"
@@ -422,14 +458,14 @@ export default function AdminCatalog() {
                       }}
                       required
                     />
-                    <span className="field-hint">Used in URLs, e.g. /brands/{form.slug || "toyota"}</span>
+                    <span className="field-hint">{t("URL-friendly name, e.g.")} {form.slug || t("toyota")}</span>
                   </div>
                 )}
 
                 {tab === "extras" && (
-                  <div className="form-grid" style={{ marginTop: 0, maxWidth: "none" }}>
+                  <div className="form-grid catalog-pricing-grid">
                     <div className="form-field">
-                      <label htmlFor="c_ppd">Price per day</label>
+                      <label htmlFor="c_ppd">{t("Price per day")}</label>
                       <div className="input-group">
                         <input
                           id="c_ppd"
@@ -439,12 +475,12 @@ export default function AdminCatalog() {
                           value={form.price_per_day}
                           onChange={(e) => setField("price_per_day", Number(e.target.value))}
                         />
-                        <span className="input-suffix">MAD/day</span>
+                        <span className="input-suffix">{t("MAD/day")}</span>
                       </div>
                     </div>
 
                     <div className="form-field">
-                      <label htmlFor="c_flat">Flat price</label>
+                      <label htmlFor="c_flat">{t("Flat price")}</label>
                       <div className="input-group">
                         <input
                           id="c_flat"
@@ -454,12 +490,12 @@ export default function AdminCatalog() {
                           value={form.flat_price}
                           onChange={(e) => setField("flat_price", Number(e.target.value))}
                         />
-                        <span className="input-suffix">MAD</span>
+                        <span className="input-suffix">{t("MAD")}</span>
                       </div>
                     </div>
 
                     <div className="form-field">
-                      <label htmlFor="c_max">Max quantity</label>
+                      <label htmlFor="c_max">{t("Max quantity")}</label>
                       <input
                         id="c_max"
                         type="number"
@@ -472,23 +508,29 @@ export default function AdminCatalog() {
                 )}
 
                 {(tab === "categories" || tab === "extras") && (
-                  <label className="checkbox-label">
+                  <label className="vehicle-featured-control">
+                    <span className="vehicle-featured-copy">
+                      <span className="vehicle-featured-title">{t("Active")}</span>
+                      <span className="field-hint">{t("Active")}</span>
+                    </span>
                     <input
+                      className="vehicle-featured-input"
                       type="checkbox"
-                      checked={form.active}
+                      role="switch"
+                      checked={!!form.active}
                       onChange={(e) => setField("active", e.target.checked)}
                     />
-                    Active (available on the public site)
+                    <span className="vehicle-featured-switch" aria-hidden="true" />
                   </label>
                 )}
               </div>
 
               <div className="modal-footer" style={{ gap: "0.6rem" }}>
                 <button type="button" className="btn btn-secondary" onClick={closeModal} disabled={saving}>
-                  Cancel
+                  {t("Cancel")}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? "Saving..." : editing === "new" ? `Add ${meta.singular}` : "Save Changes"}
+                  {saving ? t("Saving...") : editing === "new" ? t("Add {value0}", { value0: t(meta.singular) }) : t("Save Changes")}
                 </button>
               </div>
             </form>
@@ -500,11 +542,12 @@ export default function AdminCatalog() {
 }
 
 function ActiveToggle({ item, onToggle }) {
+  const { t } = useI18n();
   return (
     <button
       className={`toggle ${item.active ? "on" : ""}`}
       onClick={() => onToggle(item)}
-      title={item.active ? "Click to deactivate" : "Click to activate"}
+      title={item.active ? t("Click to deactivate") : t("Click to activate")}
     >
       <span className="toggle-knob" />
     </button>
