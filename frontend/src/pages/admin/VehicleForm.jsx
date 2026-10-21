@@ -1,3 +1,5 @@
+import UploadProgress from "../../components/UploadProgress";
+import useImageReader from "../../hooks/useImageReader";
 import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import { X, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
@@ -41,12 +43,18 @@ export default function VehicleForm({
   onSubmit,
   onCancel,
   saving,
+  uploadProgress,
+  uploadCompleteLabel = "Creating vehicle…",
   submitLabel = "Save Changes",
   savingLabel = "Saving...",
   multiStep = false,
 }) {
   const { t, lang } = useI18n();
   const [step, setStep] = useState(0);
+  const [imageError, setImageError] = useState(null);
+  const { readImage, progress: imageProgress } = useImageReader(
+    (image) => onChange("main_image", image), setImageError,
+  );
   const formRef = useRef(null);
   const [catalog, setCatalog] = useState(null);
   const [catalogError, setCatalogError] = useState(null);
@@ -76,6 +84,7 @@ export default function VehicleForm({
   };
 
   const handleSubmit = (e) => {
+    if (saving || imageProgress !== null) { e.preventDefault(); return; }
     // Pressing Enter on step 1 should go to the next step, not save
     if (!isLastStep) {
       e.preventDefault();
@@ -401,7 +410,6 @@ export default function VehicleForm({
             </>
           )}
 
-          {/* ================= STEP 2 ================= */}
           {show(1) && (
             <>
               {/* Media */}
@@ -414,6 +422,8 @@ export default function VehicleForm({
                   <div className="form-field full-width">
                     <label htmlFor="main_image_file">{t("Main image")}</label>
 
+                    {imageError && <div className="alert alert-error" role="alert">{t(imageError)}</div>}
+                    {imageProgress !== null && <UploadProgress value={imageProgress} label="Reading image…" />}
                     <div className="image-upload">
                       {form.main_image ? (
                         <div className="image-upload-preview">
@@ -425,6 +435,7 @@ export default function VehicleForm({
                           <button
                             type="button"
                             className="image-upload-remove"
+                            disabled={saving || imageProgress !== null}
                             onClick={() => onChange("main_image", "")}
                           >
                             <X size={14} />
@@ -435,6 +446,7 @@ export default function VehicleForm({
                         <button
                           type="button"
                           className="image-upload-dropzone"
+                          disabled={saving || imageProgress !== null}
                           onClick={() =>
                             document.getElementById("main_image_file").click()
                           }
@@ -451,6 +463,7 @@ export default function VehicleForm({
                       <input
                         id="main_image_file"
                         type="file"
+                        disabled={saving || imageProgress !== null}
                         accept="image/png, image/jpeg, image/webp"
                         className="image-upload-input"
                         onChange={(e) => {
@@ -458,14 +471,13 @@ export default function VehicleForm({
                           if (!file) return;
 
                           if (file.size > 5 * 1024 * 1024) {
-                            alert(t("Image is too large. Please choose a file under 5MB."));
+                            setImageError("Image is too large. Please choose a file under 5MB.");
                             e.target.value = "";
                             return;
                           }
 
-                          const reader = new FileReader();
-                          reader.onload = () => onChange("main_image", reader.result);
-                          reader.readAsDataURL(file);
+                          setImageError(null);
+                          readImage(file);
                           e.target.value = "";
                         }}
                       />
@@ -504,6 +516,13 @@ export default function VehicleForm({
 
         </div>
 
+        {saving && uploadProgress !== undefined && (
+          <UploadProgress
+            value={uploadProgress}
+            label={uploadProgress === 100 ? uploadCompleteLabel : "Uploading vehicle…"}
+          />
+        )}
+
         {/* Footer Actions */}
         <div className="form-actions step-actions">
           {step === 0 ? (
@@ -531,7 +550,7 @@ export default function VehicleForm({
               {t("Next")} <ChevronRight size={16} />
             </button>
           ) : (
-            <button key="save" type="submit" className="btn btn-primary" disabled={saving || !catalog || !!catalogError}>
+            <button key="save" type="submit" className="btn btn-primary" disabled={saving || imageProgress !== null || !catalog || !!catalogError}>
               {t(saving ? savingLabel : submitLabel)}
             </button>
           )}

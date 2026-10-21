@@ -1,3 +1,5 @@
+import UploadProgress from "../../components/UploadProgress";
+import useImageReader from "../../hooks/useImageReader";
 import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -20,8 +22,12 @@ export default function AdminSiteSettings() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
+  const [imageError, setImageError] = useState(null);
   const [step, setStep] = useState(0);
   const formRef = useRef(null);
+  const { readImage, progress: imageProgress } = useImageReader(
+    (image) => handleChange("hero_image", image), setImageError,
+  );
 
   const isLastStep = step === STEPS.length - 1;
 
@@ -37,12 +43,11 @@ export default function AdminSiteSettings() {
   const handleImageUpload = (file) => {
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      alert(t("Image is too large. Please choose a file under 5MB."));
+      setImageError("Image is too large. Please choose a file under 5MB.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => handleChange("hero_image", reader.result);
-    reader.readAsDataURL(file);
+    setImageError(null);
+    readImage(file);
   };
 
   const goNext = () => {
@@ -59,6 +64,7 @@ export default function AdminSiteSettings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving || imageProgress !== null) return;
 
     // Pressing Enter on step 1 should go to the next step, not save
     if (!isLastStep) {
@@ -270,6 +276,7 @@ export default function AdminSiteSettings() {
                         <button
                           type="button"
                           className="image-upload-remove"
+                          disabled={saving || imageProgress !== null}
                           onClick={() => handleChange("hero_image", "")}
                         >
                           <X size={14} />
@@ -280,6 +287,7 @@ export default function AdminSiteSettings() {
                       <button
                         type="button"
                         className="image-upload-dropzone"
+                        disabled={saving || imageProgress !== null}
                         onClick={() => document.getElementById("hero_image_file").click()}
                       >
                         <ImagePlus size={22} />
@@ -290,9 +298,12 @@ export default function AdminSiteSettings() {
                         <span className="settings-hero-upload-action">{t("Browse files")}</span>
                       </button>
                     )}
+                    {imageError && <div className="alert alert-error" role="alert">{t(imageError)}</div>}
+                    {imageProgress !== null && <UploadProgress value={imageProgress} label="Reading image…" />}
                     <input
                       id="hero_image_file"
                       type="file"
+                      disabled={saving || imageProgress !== null}
                       accept="image/png, image/jpeg, image/webp"
                       className="image-upload-input"
                       onChange={(e) => {
@@ -358,7 +369,7 @@ export default function AdminSiteSettings() {
               {t("Next")} <ChevronRight size={16} />
             </button>
           ) : (
-            <button type="submit" className="btn btn-primary" disabled={saving}>
+            <button type="submit" className="btn btn-primary" disabled={saving || imageProgress !== null}>
               {saving ? t("Saving...") : t("Save Changes")}
             </button>
           )}

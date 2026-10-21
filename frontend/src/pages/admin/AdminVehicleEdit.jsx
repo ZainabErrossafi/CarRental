@@ -12,6 +12,7 @@ export default function AdminVehicleEdit() {
   const [form, setForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -45,15 +46,20 @@ export default function AdminVehicleEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving) return;
+    setUploadProgress(null);
     setSaving(true);
     setError(null);
 
     try {
-      await updateVehicle(id, form);
+      await updateVehicle(id, form, (event) => {
+        if (event.total > 0) setUploadProgress(Math.min(100, Math.round(event.loaded / event.total * 100)));
+      });
       navigate("/admin/vehicles");
     } catch (err) {
       setError(err.message || "Failed to save changes. Please try again.");
       setSaving(false);
+      setUploadProgress(null);
     }
   };
 
@@ -107,6 +113,8 @@ export default function AdminVehicleEdit() {
         onSubmit={handleSubmit}
         onCancel={() => navigate("/admin/vehicles")}
         saving={saving}
+        uploadProgress={uploadProgress}
+        uploadCompleteLabel="Saving Changes..."
         submitLabel={t("Save Changes")}
         savingLabel={t("Saving Changes...")}
       />
