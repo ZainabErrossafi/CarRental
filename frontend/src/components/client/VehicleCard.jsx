@@ -10,7 +10,7 @@ export default function VehicleCard({ vehicle }) {
   const category = typeof vehicle.category === "object" ? vehicle.category.name : vehicle.category;
   const price = vehicle.pricePerDay ?? vehicle.dailyRate ?? vehicle.daily_rate;
   return (
-    <article className="fleet-card">
+    <Link to={`/vehicles/${vehicle.id}`} className="fleet-card fleet-card-clickable" aria-label={`View details for ${name}`}>
       <div className="fleet-card-photo">
         {image && failedImage !== image ? <img src={image} alt={vehicle.imageIllustrative ? "Illustrative vehicle photograph" : name} loading="lazy" onError={() => setFailedImage(image)} /> : <div className="fleet-card-placeholder"><Car size={56} strokeWidth={1.2} aria-hidden="true" /><span>Photo coming soon</span></div>}
         {category && <span className="fleet-card-category">{category}</span>}
@@ -23,10 +23,10 @@ export default function VehicleCard({ vehicle }) {
           <span><Settings2 size={17} aria-hidden="true" />{vehicle.transmission}</span>
         </div>
         <div className="fleet-card-bottom">
-          <div className="fleet-card-price"><span>From</span><p><strong>{price}</strong> MAD <small>/ day</small></p></div>
-          <Link className="fleet-card-button" to={`/vehicles/${vehicle.id}`}>View details <ArrowUpRight size={17} aria-hidden="true" /><span className="tw:sr-only"> for {name}</span></Link>
+          <div className="fleet-card-price"><span>Daily rental</span><p><strong>{price}</strong> MAD <small>/ day</small></p></div>
+          <span className="fleet-card-button" aria-hidden="true"><ArrowUpRight size={20} /></span>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
