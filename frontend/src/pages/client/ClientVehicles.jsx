@@ -62,7 +62,7 @@ export default function ClientVehicles() {
 
   return (
     <section className="fleet-page">
-      <div className="fleet-page-heading"><p>FIND YOUR NEXT DRIVE</p><h1>Our vehicles</h1><span>Choose the car that fits your journey.</span></div>
+      <div className="fleet-page-heading fleet-page-heading-simple"><h1>Our vehicles</h1></div>
       {params.get("departure_agency") && <div className="fleet-trip-summary" aria-label="Résumé du trajet">
         <div className="fleet-trip-route">
           {["departure", "return"].map((kind, index) => <div className="fleet-trip-stop" key={kind}>

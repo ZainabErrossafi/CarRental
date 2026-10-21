@@ -81,8 +81,9 @@ export default function AdminAuth({ initialMode = "login" }) {
     setLoading(true);
     try {
       if (view === "signin") {
-        await login({ email: form.email, password: form.password });
-        const redirectTo = location.state?.from?.pathname || "/admin";
+        const signedInUser = await login({ email: form.email, password: form.password });
+        const requestedPath = location.state?.from?.pathname;
+        const redirectTo = signedInUser.role !== "admin" && (/^\/vehicles\/[^/]+$/.test(requestedPath || "") || requestedPath === "/my-reservations") ? requestedPath : "/";
         navigate(redirectTo, { replace: true });
       } else {
         await signup({ name: form.name, email: form.email, password: form.password });
