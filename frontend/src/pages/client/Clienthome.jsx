@@ -1,10 +1,40 @@
 import RentalSearch from "../../components/client/RentalSearch.jsx";
 import CategoryCard, { rentalCategories } from "../../components/client/CategoryCard.jsx";
 import heroImage from "../../assets/home-hero-rently.png";
+import { useEffect, useState } from "react";
+import { getList } from "../../services/api.js";
 
 const transitionColor = "#a89b94";
 
 export default function ClientHome() {
+  const [categories, setCategories] = useState([]);
+  const [categoryError, setCategoryError] = useState("");
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      try {
+      const items = await getList("categories/");
+      if (!active) return;
+      setCategoryError("");
+      setCategories(Array.from({ length: 3 }, (_, index) => {
+        const item = items[index];
+        if (!item) return { ...rentalCategories[index], id: `locked-${index}`, name: "Coming soon", label: "LOCKED", active: false, tagline: "More choices on the way.", description: "This category is not available yet." };
+        const style = rentalCategories.find((sample) => sample.name.toLowerCase() === item.name.toLowerCase()) || rentalCategories[index % rentalCategories.length];
+        return { ...style, ...item, label: item.name, tagline: item.tagline || "Your next journey starts here.", description: item.description || `Discover our ${item.name} collection.` };
+      }));
+      } catch { if (active) setCategoryError("Categories are temporarily unavailable. Please try again shortly."); }
+    };
+    refresh();
+    window.addEventListener("storage", refresh);
+    window.addEventListener("focus", refresh);
+    window.addEventListener("rently:catalog-updated", refresh);
+    return () => {
+      active = false;
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("rently:catalog-updated", refresh);
+    };
+  }, []);
   return (
     <>
       <section
@@ -31,8 +61,9 @@ export default function ClientHome() {
           <p>THE RENTLY COLLECTION</p>
           <h2 id="fleet-heading">Your journey.<br /><em>Your kind of car.</em></h2>
         </div>
-        <div className="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] tw:gap-6">
-          {rentalCategories.map((category, index) => <CategoryCard key={category.name} category={category} index={index} />)}
+        <div className="rental-category-grid">
+          {categoryError && <p role="status">{categoryError}</p>}
+          {categories.map((category, index) => <CategoryCard key={category.id || category.name} category={category} index={index} />)}
         </div>
       </section>
       </div>

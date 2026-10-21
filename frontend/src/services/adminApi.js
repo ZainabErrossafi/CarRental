@@ -75,14 +75,17 @@ export const getCatalog = async () => Object.fromEntries(await Promise.all(
 ));
 export const createCatalogItem = async (kind, fields) => {
   const { data } = await api.post(catalogPath(kind), fields);
+  window.dispatchEvent(new Event("rently:catalog-updated"));
   return data;
 };
 export const updateCatalogItem = async (kind, id, fields) => {
   const { data } = await api.patch(catalogPath(kind, id), fields);
+  window.dispatchEvent(new Event("rently:catalog-updated"));
   return data;
 };
 export const deleteCatalogItem = async (kind, id) => {
   await api.delete(catalogPath(kind, id));
+  window.dispatchEvent(new Event("rently:catalog-updated"));
 };
 export { getSiteSettings, updateSiteSettings } from './localAdminData';
 export const getExtras = async () => getList('extras/');

@@ -218,6 +218,12 @@
   font-family: "Plus Jakarta Sans", sans-serif;
   transition: transform .2s ease, box-shadow .2s ease;
 }
+.rental-category-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.rental-category-grid > [role="status"] { grid-column: 1 / -1; }
+.rental-category-card { min-width: 0; }
+.rental-category-locked { filter: grayscale(1); opacity: .58; cursor: not-allowed; }
+.rental-category-locked:hover { transform: none; box-shadow: none; }
+@media (max-width: 700px) { .rental-category-grid { grid-template-columns: 1fr; } }
 .rental-category-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 16px 32px #02173112;
@@ -229,7 +235,7 @@
 .rental-category-art { position: relative; }
 .rental-category-art { overflow: hidden; background: #e5e2dd; }
 .rental-category-symbol {
-  aspect-ratio: 16 / 10;
+  height: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -240,8 +246,8 @@
 .rental-category-emblem {
   display: grid;
   place-items: center;
-  width: 94px;
-  height: 94px;
+  width: 76px;
+  height: 76px;
   border: 1px solid currentColor;
   border-radius: 50%;
 }
