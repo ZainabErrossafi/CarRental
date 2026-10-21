@@ -1,13 +1,32 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Users, Settings2, ArrowUpRight, Car } from "lucide-react";
 
 export default function VehicleCard({ vehicle }) {
+  const [failedImage, setFailedImage] = useState(null);
+  const image = vehicle.main_image || vehicle.image;
+  const brand = typeof vehicle.brand === "object" ? vehicle.brand.name : vehicle.brand;
+  const name = vehicle.name || [brand, vehicle.model].filter(Boolean).join(" ");
+  const category = typeof vehicle.category === "object" ? vehicle.category.name : vehicle.category;
+  const price = vehicle.pricePerDay ?? vehicle.dailyRate ?? vehicle.daily_rate;
   return (
-    <article className="tw:rounded-2xl tw:border tw:border-solid tw:border-[#e8e2de] tw:bg-white tw:p-7 tw:text-[#021731]">
-      <p className="tw:font-semibold tw:text-[#a73700]">{vehicle.category}</p>
-      <h3>{vehicle.name}</h3>
-      <p>{vehicle.seats} seats · {vehicle.transmission}</p>
-      <p><strong>{vehicle.pricePerDay} MAD</strong> / day</p>
-      <Link className="tw:mt-3 tw:inline-block tw:rounded-lg tw:bg-[#021731] tw:px-5 tw:py-3 tw:text-white" to={`/vehicles/${vehicle.id}`}>View vehicle</Link>
+    <article className="fleet-card">
+      <div className="fleet-card-photo">
+        {image && failedImage !== image ? <img src={image} alt={vehicle.imageIllustrative ? "Illustrative vehicle photograph" : name} loading="lazy" onError={() => setFailedImage(image)} /> : <div className="fleet-card-placeholder"><Car size={56} strokeWidth={1.2} aria-hidden="true" /><span>Photo coming soon</span></div>}
+        {category && <span className="fleet-card-category">{category}</span>}
+      </div>
+      <div className="fleet-card-body">
+        <p className="fleet-card-brand">{brand || name.split(" ")[0]}</p>
+        <h3>{name}</h3>
+        <div className="fleet-card-specs">
+          <span><Users size={17} aria-hidden="true" />{vehicle.seats} seats</span>
+          <span><Settings2 size={17} aria-hidden="true" />{vehicle.transmission}</span>
+        </div>
+        <div className="fleet-card-bottom">
+          <div className="fleet-card-price"><span>From</span><p><strong>{price}</strong> MAD <small>/ day</small></p></div>
+          <Link className="fleet-card-button" to={`/vehicles/${vehicle.id}`}>View details <ArrowUpRight size={17} aria-hidden="true" /><span className="tw:sr-only"> for {name}</span></Link>
+        </div>
+      </div>
     </article>
   );
 }

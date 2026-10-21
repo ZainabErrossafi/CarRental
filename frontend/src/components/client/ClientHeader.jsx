@@ -43,7 +43,7 @@ export default function ClientHeader({ overlay = false }) {
   };
 
   return (
-    <header ref={headerRef} className={`tw:top-0 tw:z-20 tw:w-full tw:px-3 tw:py-3 tw:sm:px-6 ${overlay ? "tw:absolute tw:inset-x-0" : "tw:sticky"}`}>
+    <header ref={headerRef} className={`tw:top-0 tw:z-20 tw:w-full tw:px-3 tw:py-3 tw:sm:px-6 ${overlay ? "tw:absolute tw:inset-x-0" : "tw:relative"}`}>
       <nav aria-label="Main navigation" className="tw:relative tw:mx-auto tw:flex tw:w-full tw:box-border tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:bg-transparent tw:px-4 tw:py-2 tw:font-sans">
         <NavLink to="/" onClick={closeMenus} className={`tw:flex tw:items-center tw:gap-3 ${overlay ? "tw:text-white" : "tw:text-[#021731]"}`}>
           <span aria-hidden="true" className="tw:relative tw:block tw:h-9 tw:w-11 tw:shrink-0 tw:overflow-hidden tw:rounded-lg tw:bg-[#fdfaf5]">
