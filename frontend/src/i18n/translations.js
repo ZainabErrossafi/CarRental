@@ -22,6 +22,18 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "or": "ou",
+    "Sign in with Google": "Se connecter avec Google",
+    "Google sign-in is not connected yet. Please use your email and password.": "La connexion Google n’est pas encore disponible. Veuillez utiliser votre e-mail et votre mot de passe.",
+    "Uploading…": "Envoi…",
+    "Reading image…": "Lecture de l’image…",
+    "Validating file…": "Validation du fichier…",
+    "Importing records…": "Importation des enregistrements…",
+    "Could not read image. Please try again.": "Impossible de lire l’image. Veuillez réessayer.",
+
+    "Uploading vehicle…": "Envoi du véhicule…",
+    "Creating vehicle…": "Création du véhicule…",
+    "Vehicle upload progress": "Progression de l’envoi du véhicule",
     "Select the equipment included with this vehicle.": "Sélectionnez les équipements inclus dans ce véhicule.",
     "No features available. Add features in Catalog first.": "Aucun équipement disponible. Ajoutez des équipements dans le catalogue.",
     "Edit User": "Modifier l’utilisateur",
@@ -611,6 +623,18 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "or": "أو",
+    "Sign in with Google": "تسجيل الدخول باستخدام Google",
+    "Google sign-in is not connected yet. Please use your email and password.": "تسجيل الدخول باستخدام Google غير متاح بعد. يرجى استخدام بريدك الإلكتروني وكلمة المرور.",
+    "Uploading…": "جارٍ الرفع…",
+    "Reading image…": "جارٍ قراءة الصورة…",
+    "Validating file…": "جارٍ التحقق من الملف…",
+    "Importing records…": "جارٍ استيراد السجلات…",
+    "Could not read image. Please try again.": "تعذرت قراءة الصورة. يرجى المحاولة مجددًا.",
+
+    "Uploading vehicle…": "جارٍ رفع المركبة…",
+    "Creating vehicle…": "جارٍ إنشاء المركبة…",
+    "Vehicle upload progress": "تقدم رفع المركبة",
     "Select the equipment included with this vehicle.": "حدد التجهيزات المتوفرة في هذه السيارة.",
     "No features available. Add features in Catalog first.": "لا توجد تجهيزات متاحة. أضف التجهيزات في الكتالوج أولاً.",
     "Edit User": "تعديل المستخدم",
