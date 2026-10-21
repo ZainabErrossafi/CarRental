@@ -4,15 +4,23 @@ import VehicleCard from "../../components/client/VehicleCard.jsx";
 import vehicles from "../../data/vehicles.js";
 
 export default function ClientVehicles() {
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState("");
+  const selectedCategory = params.get("category") || "";
+  const setSearchParamsWithoutCategory = () => {
+    const nextParams = new URLSearchParams(params);
+    nextParams.delete("category");
+    setParams(nextParams);
+  };
   const filteredVehicles = vehicles.filter((vehicle) =>
-    vehicle.name.toLowerCase().includes(search.trim().toLowerCase())
+    vehicle.name.toLowerCase().includes(search.trim().toLowerCase()) &&
+    (!selectedCategory || vehicle.category === selectedCategory)
   );
 
   return (
     <section>
       <h1>Our vehicles</h1>
+      {selectedCategory && <p>Category: <strong>{selectedCategory}</strong> · <button type="button" onClick={() => setSearchParamsWithoutCategory()}>Show all categories</button></p>}
       {params.get("departure_agency") && (
         <div className="tw:mb-6 tw:rounded-xl tw:border tw:border-solid tw:border-[#e1e4eb] tw:bg-white tw:p-4 tw:text-[#021731] tw:font-sans tw:text-sm">
           <p><strong>Départ :</strong> {params.get("departure_agency")} · {params.get("departure_date")} à {params.get("departure_time")}</p>

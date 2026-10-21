@@ -51,4 +51,8 @@ export const deleteCatalogItem = async (kind, id) => {
   write(CATALOG_KEY, catalog);
 };
 export const getSiteSettings = async () => read(SETTINGS_KEY, emptySettings);
-export const updateSiteSettings = async (settings) => write(SETTINGS_KEY, settings);
+export const updateSiteSettings = async (settings) => {
+  const saved = write(SETTINGS_KEY, settings);
+  window.dispatchEvent(new Event('rently:settings-updated'));
+  return saved;
+};
