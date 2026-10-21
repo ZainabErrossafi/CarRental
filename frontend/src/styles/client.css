@@ -4,3 +4,95 @@
 @import "tailwindcss/utilities.css" layer(utilities) important source(none);
 @source "../components/client";
 @source "../pages/client";
+
+.client-site-background {
+  position: relative;
+  isolation: isolate;
+  background: #fdfaf5;
+}
+
+.client-page-gradient {
+  background: linear-gradient(180deg, #0b2b4c 0%, #29455f 25%, #9b958e 55%, #e5b88e 80%, #ffc58c 100%);
+}
+
+.client-brand-pattern {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(12, minmax(64px, 1fr));
+  align-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.client-brand-name {
+  padding: 12px 4px;
+  color: #897973;
+  opacity: 0.12;
+  font-family: "Poppins", sans-serif;
+  font-size: clamp(10px, 1.3vw, 20px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(var(--brand-rotation));
+}
+
+.client-page-gradient .client-brand-name {
+  color: color-mix(in srgb, #ffc58c calc(100% - var(--brand-progress)), #0b2b4c var(--brand-progress));
+  opacity: 0.16;
+}
+
+@media (max-width: 640px) {
+  .client-brand-pattern {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(12, minmax(64px, 1fr));
+  }
+  .client-brand-name:nth-child(n + 37) { display: none; }
+  .client-page-gradient .client-brand-name {
+    color: color-mix(in srgb, #ffc58c, #0b2b4c);
+  }
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/plus-jakarta-sans-regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../assets/fonts/plus-jakarta-sans-bold.ttf") format("truetype");
+}
+
+.client-hero-type {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/poppins-regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("../assets/fonts/poppins-extrabold.ttf") format("truetype");
+}
+
+.client-hero-copy {
+  font-family: "Poppins", sans-serif;
+}

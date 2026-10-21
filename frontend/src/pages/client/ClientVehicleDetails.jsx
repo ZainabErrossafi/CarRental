@@ -12,7 +12,7 @@ export default function ClientVehicleDetails() {
   return (
     <section>
       <Link to="/vehicles">← Back to vehicles</Link>
-      <div className="tw:rounded-2xl tw:border tw:border-solid tw:border-[#e8e2de] tw:bg-white tw:p-7 tw:mt-6 tw:[&_dt]:mt-3 tw:[&_dt]:font-semibold tw:[&_dd]:ml-0">
+      <div className="tw:rounded-2xl tw:border tw:border-solid tw:border-[#e8e2de] tw:bg-white tw:text-[#021731] tw:p-7 tw:mt-6 tw:[&_dt]:mt-3 tw:[&_dt]:font-semibold tw:[&_dd]:ml-0">
         <p className="tw:font-semibold tw:text-[#a73700]">{vehicle.category}</p>
         <h1>{vehicle.name}</h1>
         <p>{vehicle.description}</p>
