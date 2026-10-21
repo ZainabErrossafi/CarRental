@@ -1,3 +1,9 @@
 from django.contrib import admin
+from .models import Brand
 
-# Register your models here.
+
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    list_display = ("id", "name", "slug")
+    search_fields = ("name",)
+    prepopulated_fields = {"slug": ("name",)}

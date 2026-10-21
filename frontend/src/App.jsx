@@ -1,3 +1,5 @@
+import AdminReports from "./pages/admin/AdminReports.jsx";
+import AdminTerms from "./pages/admin/AdminTerms.jsx";
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
@@ -21,27 +23,19 @@ import ClientLayout from "./pages/client/ClientLayout.jsx";
 import ClientHome from "./pages/client/Clienthome.jsx";
 import ClientVehicles from "./pages/client/ClientVehicles.jsx";
 import ClientVehicleDetails from "./pages/client/ClientVehicleDetails.jsx";
-
-function ComingSoon({ label }) {
-  return (
-    <div>
-      <div className="page-header"><h1>{label}</h1></div>
-      <div className="table-card" style={{ padding: "3rem", textAlign: "center", color: "#667085" }}>
-        This page isn't built yet.
-      </div>
-    </div>
-  );
-}
+import ClientFaqs from "./pages/client/ClientFaqs.jsx";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<AdminAuth initialMode="login" />} />
+      <Route path="/terms" element={<AdminTerms />} />
       <Route path="/signup" element={<AdminAuth initialMode="signup" />} />
       <Route path="/forgot-password" element={<AdminForgotPassword />} />
       <Route path="/verify-email" element={<AdminVerifyEmail />} />
       <Route path="/" element={<ClientLayout />}>
         <Route index element={<ClientHome />} />
+        <Route path="faqs" element={<ClientFaqs />} />
         <Route path="vehicles" element={<ClientVehicles />} />
         <Route path="vehicles/:id" element={<ClientVehicleDetails />} />
       </Route>
@@ -54,6 +48,7 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
+        <Route path="reports" element={<AdminReports />} />
         <Route path="vehicles" element={<AdminVehicles />} />
         <Route path="vehicles/:id/edit" element={<AdminVehicleEdit />} />
         <Route path="vehicles/new" element={<AdminVehicleAdd />} />
@@ -66,7 +61,6 @@ export default function App() {
         <Route path="site-settings" element={<AdminSiteSettings label="Site Settings" />} />
         <Route path="faqs" element={<AdminFaqs label="FAQs" />} />
         <Route path="notifications" element={<AdminNotifications label="Notifications" />} />
-        <Route path="analytics" element={<ComingSoon label="Analytics" />} />
       </Route>
       <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>

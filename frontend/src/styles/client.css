@@ -1,27 +1,6 @@
-/* Scope client styles to keep them separate from the admin interface. */
-.client-app { min-height: 100vh; background: #fdfaf5; color: #021731; font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction: column; }
-.client-app a { color: inherit; }
-.client-app .client-header, .client-app .client-main, .client-app .client-footer { width: min(1100px, 100% - 40px); margin: 0 auto; }
-.client-app .client-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 0; border-bottom: 1px solid #e8e2de; }
-.client-app .client-brand { font-size: 28px; font-weight: bold; text-decoration: none; }
-.client-app .client-brand span { color: #c83e00; }
-.client-app nav { display: flex; gap: 24px; }
-.client-app nav a { text-decoration: none; }
-.client-app nav a.active { text-decoration: underline; text-underline-offset: 6px; }
-.client-app .client-main { flex: 1; padding: 32px 0 64px; }
-.client-app h1 { font-size: clamp(30px, 5vw, 52px); line-height: 1.15; margin: 16px 0; }
-.client-app h2 { font-size: 24px; line-height: 1.3; }
-.client-app .client-hero { max-width: 720px; padding: 40px 0 64px; }
-.client-app .client-eyebrow { color: #b63800; font-weight: bold; }
-.client-app .client-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-.client-app .client-card { background: white; padding: 24px; border: 1px solid #e8e2de; border-radius: 12px; }
-.client-app .client-button { display: inline-block; background: #c83e00; color: white; border-radius: 6px; padding: 12px 20px; text-decoration: none; font-weight: bold; }
-.client-app .client-button:hover { background: #a33300; }
-.client-app .client-search { display: grid; gap: 8px; max-width: 440px; margin: 24px 0; font-weight: bold; }
-.client-app input { width: 100%; padding: 12px; border: 1px solid #897973; border-radius: 6px; background: white; color: #021731; font: inherit; }
-.client-app :focus-visible { outline: 3px solid #021731; outline-offset: 4px; }
-.client-app .client-detail { margin-top: 24px; max-width: 720px; }
-.client-app dt { font-weight: bold; }
-.client-app dd { margin: 0 0 16px; }
-.client-app .client-footer { border-top: 1px solid #e8e2de; padding: 24px 0; font-size: 14px; }
-@media (max-width: 760px) { .client-app .client-grid { grid-template-columns: 1fr; } .client-app .client-header { flex-wrap: wrap; } }
+/* Prefixed utilities only: omit Preflight to preserve existing admin styles. */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(tw);
+@import "tailwindcss/utilities.css" layer(utilities) important source(none);
+@source "../components/client";
+@source "../pages/client";
