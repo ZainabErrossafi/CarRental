@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function VehicleCard({ vehicle }) {
   return (
-    <article className="tw:rounded-2xl tw:border tw:border-solid tw:border-[#e8e2de] tw:bg-white tw:p-7">
+    <article className="tw:rounded-2xl tw:border tw:border-solid tw:border-[#e8e2de] tw:bg-white tw:p-7 tw:text-[#021731]">
       <p className="tw:font-semibold tw:text-[#a73700]">{vehicle.category}</p>
       <h3>{vehicle.name}</h3>
       <p>{vehicle.seats} seats · {vehicle.transmission}</p>
