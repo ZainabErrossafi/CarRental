@@ -4228,3 +4228,43 @@ gap: 0.5rem;
 }
 .vehicle-feature-option input { flex: 0 0 auto; accent-color: var(--orange); }
 .vehicle-feature-option span { overflow-wrap: anywhere; font-size: 0.875rem; }
+
+.vehicle-upload-progress {
+  margin-block: 20px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.vehicle-upload-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.vehicle-upload-progress progress {
+  display: block;
+  width: 100%;
+  height: 10px;
+  accent-color: var(--primary, #2563eb);
+}
+
+.reports-remove-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  color: #b42318;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reports-remove-file:hover:not(:disabled) { background: #fff1f0; }
+.reports-remove-file:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.reports-remove-file:disabled { opacity: 0.5; cursor: not-allowed; }

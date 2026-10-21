@@ -18,14 +18,14 @@ export const getVehicle = async (id) => {
   return vehicleFromApi(data);
 };
 
-export const createVehicle = async (vehicleData) => {
-  const { data } = await api.post('vehicles/', await vehiclePayload(vehicleData));
+export const createVehicle = async (vehicleData, onUploadProgress) => {
+  const { data } = await api.post('vehicles/', await vehiclePayload(vehicleData), { onUploadProgress });
   return vehicleFromApi(data);
 };
 
-export const updateVehicle = async (id, vehicleData) => {
+export const updateVehicle = async (id, vehicleData, onUploadProgress) => {
   const payload = await vehiclePayload(vehicleData);
-  const { data } = await api.patch(`vehicles/${id}/`, payload);
+  const { data } = await api.patch(`vehicles/${id}/`, payload, { onUploadProgress });
   // Multipart cannot represent an empty relation list; clear it explicitly.
   if (payload instanceof FormData && vehicleData.feature_ids?.length === 0) {
     const { data: updated } = await api.patch(`vehicles/${id}/`, { feature_ids: [] });
