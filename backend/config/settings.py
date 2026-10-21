@@ -104,7 +104,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+# F-settings.py
+SOCIALACCOUNT_AUTO_SIGNUP = True
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"  # Hit Google deja m-verifiat l-email
+LOGIN_REDIRECT_URL = 'https://localhost:8443/'  # awla l-route dial l-home page / dashboard f-l-frontend
+# LOGIN_REDIRECT_URL = 'https://localhost:8443/dashbord'  # awla l-route dial l-home page / dashboard f-l-frontend
 
+LOGIN_REDIRECT_URL = '/api/auth/google/success/'
+###oussama
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

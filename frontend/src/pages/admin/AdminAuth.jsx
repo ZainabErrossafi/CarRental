@@ -231,7 +231,9 @@ export default function AdminAuth({ initialMode = "login" }) {
                 type="button"
                 className="gcard-google"
                 disabled={loading}
-                onClick={() => setError("Google sign-in is not connected yet. Please use your email and password.")}
+                onClick={() => {
+                  window.location.href = "https://localhost:8443/api/accounts/google/login/";
+                }}
               >
                 <FcGoogle size={20} aria-hidden="true" />
                 {t("Sign in with Google")}
