@@ -23,7 +23,7 @@ import ClientLayout from "./pages/client/ClientLayout.jsx";
 import ClientHome from "./pages/client/Clienthome.jsx";
 import ClientVehicles from "./pages/client/ClientVehicles.jsx";
 import ClientVehicleDetails from "./pages/client/ClientVehicleDetails.jsx";
-
+import ClientFaqs from "./pages/client/ClientFaqs.jsx";
 
 export default function App() {
   return (
@@ -35,6 +35,7 @@ export default function App() {
       <Route path="/verify-email" element={<AdminVerifyEmail />} />
       <Route path="/" element={<ClientLayout />}>
         <Route index element={<ClientHome />} />
+        <Route path="faqs" element={<ClientFaqs />} />
         <Route path="vehicles" element={<ClientVehicles />} />
         <Route path="vehicles/:id" element={<ClientVehicleDetails />} />
       </Route>
