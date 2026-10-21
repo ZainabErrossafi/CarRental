@@ -1,6 +1,5 @@
 import RentalSearch from "../../components/client/RentalSearch.jsx";
-import VehicleCard from "../../components/client/VehicleCard.jsx";
-import vehicles from "../../data/vehicles.js";
+import CategoryCard, { rentalCategories } from "../../components/client/CategoryCard.jsx";
 import heroImage from "../../assets/home-hero-rently.png";
 
 const transitionColor = "#a89b94";
@@ -10,7 +9,7 @@ export default function ClientHome() {
     <>
       <section
         aria-labelledby="home-title"
-        className="tw:relative tw:isolate tw:flex tw:min-h-[640px] tw:flex-col tw:items-center tw:px-6 tw:pb-20 tw:pt-28 tw:text-center tw:text-white tw:md:min-h-[min(820px,100svh)] tw:md:pt-28"
+        className="tw:relative tw:isolate tw:flex tw:box-border tw:min-h-[100svh] tw:flex-col tw:items-center tw:px-6 tw:pb-20 tw:pt-28 tw:text-center tw:text-white tw:md:pt-28"
       >
         <div
           aria-hidden="true"
@@ -26,14 +25,18 @@ export default function ClientHome() {
         </div>
         <RentalSearch />
       </section>
-      <div style={{ background: `linear-gradient(to bottom, ${transitionColor} 0px, rgba(168, 155, 148, 0.85) 35px, rgba(168, 155, 148, 0.5) 90px, rgba(168, 155, 148, 0.15) 160px, rgba(168, 155, 148, 0) 240px)` }}>
+      <div className="client-page-gradient" style={{ backgroundImage: `linear-gradient(to bottom, ${transitionColor} 0px, rgba(168, 155, 148, 0.85) 35px, rgba(168, 155, 148, 0.5) 90px, rgba(168, 155, 148, 0.15) 160px, transparent 240px), radial-gradient(ellipse at 100% 0%, rgba(255, 197, 140, 0.3), transparent 48%), radial-gradient(ellipse at 0% 45%, rgba(175, 199, 216, 0.2), transparent 52%), linear-gradient(180deg, #fdfaf5 0%, #f4f6f7 65%, #fdfaf5 100%)` }}>
       <section aria-labelledby="fleet-heading" className="tw:mx-auto tw:w-[90%] tw:max-w-[1120px] tw:py-12">
-        <h2 id="fleet-heading" className="tw:mb-6 tw:mt-0 tw:text-3xl tw:font-bold">Explore the fleet</h2>
+        <div className="rental-category-heading">
+          <p>THE RENTLY COLLECTION</p>
+          <h2 id="fleet-heading">Your journey.<br /><em>Your kind of car.</em></h2>
+        </div>
         <div className="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] tw:gap-6">
-          {vehicles.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />)}
+          {rentalCategories.map((category, index) => <CategoryCard key={category.name} category={category} index={index} />)}
         </div>
       </section>
       </div>
+
     </>
   );
 }
