@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from .permissions import IsAdmin, IsAdminOrOwner
 from .models import User
 from .serializers import UserSerializer
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import redirect
 
 #//////////////////////////////oussama
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -16,6 +17,24 @@ class GoogleLoginView(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = "http://localhost:3000/auth/callback"  # URL لي فالفرونت إند ولا 127.0.0.1:8000
     client_class = OAuth2Client
+
+
+def google_callback_redirect(request):
+    user = request.user
+    if user.is_authenticated:
+        refresh = RefreshToken.for_user(user)
+        
+        # كنزيدو الـ role داخل الـ JWT Payload
+        refresh['role'] = user.role
+        refresh['email'] = user.email
+
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+
+        # كنصيفطو الـ role مع الـ tokens فـ الـ URL للـ Frontend
+        return redirect(f"https://localhost:8443/?access={access_token}&refresh={refresh_token}&role={user.role}")
+    
+    return redirect("https://localhost:8443/login?error=auth_failed")
 #////////////////////////////////////////////
 
 
