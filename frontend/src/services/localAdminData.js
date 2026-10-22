@@ -21,6 +21,7 @@ const write = (key, value) => {
   } catch {
     throw new Error('Could not save in this browser. Storage may be full; try a smaller image.');
   }
+  if (key === CATALOG_KEY) window.dispatchEvent(new Event('rently:catalog-updated'));
   return value;
 };
 const validateKind = (kind) => {
@@ -51,4 +52,8 @@ export const deleteCatalogItem = async (kind, id) => {
   write(CATALOG_KEY, catalog);
 };
 export const getSiteSettings = async () => read(SETTINGS_KEY, emptySettings);
-export const updateSiteSettings = async (settings) => write(SETTINGS_KEY, settings);
+export const updateSiteSettings = async (settings) => {
+  const saved = write(SETTINGS_KEY, settings);
+  window.dispatchEvent(new Event('rently:settings-updated'));
+  return saved;
+};
