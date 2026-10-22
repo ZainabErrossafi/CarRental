@@ -11,10 +11,12 @@ import {
   User,
   Mail,
   ArrowUpRight,
+  ArrowLeft,
   Lock,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import heroCarImage from "../../assets/rently.png";
+import { FcGoogle } from "react-icons/fc";
 
 function PasswordRequirement({ met, label }) {
   return (
@@ -102,7 +104,7 @@ export default function AdminAuth({ initialMode = "login" }) {
         {/* Icon rail */}
         <ul className="gcard-nav">
           <li className="gcard-nav-brand">
-            <div className="gcard-nav-logo" />
+            <Link to="/" className="gcard-nav-logo" aria-label={t("Back to home")} />
           </li>
 
           <li>
@@ -158,7 +160,13 @@ export default function AdminAuth({ initialMode = "login" }) {
 
         {/* Form panel */}
         <div className="gcard-form">
-          <div className="auth-language-switcher"><LanguageSwitcher /></div>
+          <div className="gcard-toolbar">
+            <Link to="/" className="gcard-home-link">
+              <ArrowLeft size={16} aria-hidden="true" />
+              {t("Back to home")}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           <div className="gcard-form-top">
             {view === "signin" ? (
               <span>
@@ -224,6 +232,17 @@ export default function AdminAuth({ initialMode = "login" }) {
 
               <button type="submit" className="gcard-submit" disabled={loading}>
                 {loading ? t("Please wait...") : t("Sign In")}
+              </button>
+
+              <div className="gcard-divider"><span>{t("or")}</span></div>
+              <button
+                type="button"
+                className="gcard-google"
+                disabled={loading}
+                onClick={() => setError("Google sign-in is not connected yet. Please use your email and password.")}
+              >
+                <FcGoogle size={20} aria-hidden="true" />
+                {t("Sign in with Google")}
               </button>
             </form>
 

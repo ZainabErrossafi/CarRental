@@ -14,4 +14,9 @@ MAPS_API_KEY=
 
 VITE_API_URL=/api
 
+
+GOOGLE_CLIENT_ID="your-client-id-from-google-console"
+GOOGLE_CLIENT_SECRET="your-client-secret-from-google-console"
+
+
 ## -----------------------

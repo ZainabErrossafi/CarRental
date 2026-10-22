@@ -1,5 +1,6 @@
+import UploadProgress from '../../components/UploadProgress';
 import { useRef, useState } from 'react';
-import { Download, Upload, FileSpreadsheet, FileJson, Database, CheckCircle2, ArrowRight, FileUp, Info } from 'lucide-react';
+import { Download, Upload, FileSpreadsheet, FileJson, Database, CheckCircle2, ArrowRight, FileUp, Info, X } from 'lucide-react';
 import { getVehicles, getLocations, getReservations, getUsers, getReviews, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
 import { serializeReport, parseReport, prepareImport } from '../../services/reportFiles';
 import { useI18n } from '../../context/I18nContext';
@@ -17,6 +18,7 @@ export default function AdminReports() {
   const [preview, setPreview] = useState(null);
   const [dragging, setDragging] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [importProgress, setImportProgress] = useState(null);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState([]);
   const importable = ['vehicles', 'locations'].includes(dataset);
@@ -46,7 +48,9 @@ export default function AdminReports() {
     } finally { setBusy(false); }
   };
   const upload = async (isPreview) => {
+    if (busy) return;
     setBusy(true); setErrors([]); setMessage('');
+    setImportProgress({ value: isPreview ? null : 0, label: isPreview ? 'Validating file…' : 'Importing records…' });
     try {
       if (isPreview) {
         const records = parseReport(await file.text(), file.name, dataset, t);
@@ -60,6 +64,7 @@ export default function AdminReports() {
             if (operation.id) await WRITERS[dataset].update(encodeURIComponent(operation.id), operation.fields);
             else await WRITERS[dataset].create(operation.fields);
             saved++;
+            setImportProgress({ value: Math.round(saved / preview.operations.length * 100), label: 'Importing records…' });
           } catch (error) {
             setErrors([{ row: operation.row, errors: error.response?.data || error.message }]);
             setMessage(t('{saved} records saved. Import stopped at row {row}. Remaining rows were not saved. Export current data before retrying to avoid duplicates.', { saved, row: operation.row }));
@@ -72,7 +77,15 @@ export default function AdminReports() {
         setMessage(t('Import completed.'));
       }
     } catch (error) { fail(error); }
-    finally { setBusy(false); }
+    finally { setBusy(false); setImportProgress(null); }
+  };
+
+  const removeFile = () => {
+    if (busy) return;
+    setFile(null);
+    setDragging(false);
+    reset();
+    if (fileInput.current) fileInput.current.value = '';
   };
 
   const selectFile = (selected) => {
@@ -117,7 +130,9 @@ export default function AdminReports() {
               <span className="reports-upload-icon">{file ? <FileSpreadsheet size={26} /> : <FileUp size={26} />}</span>
               <strong>{file ? file.name : t('Click to upload or drag & drop')}</strong><span>{file ? `${(file.size / 1024).toFixed(1)} KB · ${t('Click to change file')}` : t('CSV or JSON · Up to 5 MB')}</span>
             </button>
+            {file && <button type="button" className="reports-remove-file" disabled={busy} onClick={removeFile}><X size={16} />{t('Remove')}</button>}
             <div className="reports-import-meta"><span>{t('Up to 1,000 records')}</span><span>{t('Preview before saving')}</span></div>
+            {importProgress && <UploadProgress value={importProgress.value} label={importProgress.label} />}
             {preview && <div className="reports-preview"><CheckCircle2 size={19} /><span><strong>{preview.created}</strong> {t('to create')}<span className="reports-divider">/</span><strong>{preview.updated}</strong> {t('to update')}</span></div>}
             <button className={preview ? 'reports-primary' : 'reports-secondary'} disabled={busy || !file} onClick={() => upload(!preview)}>{preview ? <Upload size={17} /> : <CheckCircle2 size={17} />}{t(preview ? 'Confirm import' : 'Validate file')}<ArrowRight size={17} /></button>
           </> : <div className="reports-unavailable"><Database size={30} /><strong>{t('Export available')}</strong><p>{t('Choose Vehicles or Locations to import records.')}</p></div>}

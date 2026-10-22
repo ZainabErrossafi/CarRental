@@ -1,16 +1,32 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .permissions import IsAdmin, IsAdminOrOwner
+
 from .models import User
+from .permissions import IsAdmin, IsAdminOrOwner
 from .serializers import UserSerializer
+
+
+#//////////////////////////////oussama
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
+
+class GoogleLoginView(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "http://localhost:3000/auth/callback"  # URL لي فالفرونت إند ولا 127.0.0.1:8000
+    client_class = OAuth2Client
+#////////////////////////////////////////////
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
+
     filterset_fields = ['role', 'is_active']
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering_fields = ['username', 'date_joined']
@@ -19,7 +35,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['retrieve', 'update', 'partial_update']:
             return [IsAdminOrOwner()]
-        elif self.action == 'me':
+        elif self.action in ['me', 'change_password']:
             return [IsAuthenticated()]
         else:
             return [IsAdmin()]
@@ -28,6 +44,20 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'], url_path='change-password')
+    def change_password(self, request):
+        old = request.data.get('old_password', '')
+        new = request.data.get('new_password', '')
+        if not request.user.check_password(old):
+            return Response({'detail': 'Old password is incorrect.'}, status=400)
+        try:
+            validate_password(new, user=request.user)
+        except DjangoValidationError as e:
+            return Response({'new_password': list(e.messages)}, status=400)
+        request.user.set_password(new)
+        request.user.save()
+        return Response({'detail': 'Password updated.'})
 
     @action(detail=True, methods=['post'])
     def deactivate(self, request, pk=None):
@@ -46,7 +76,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         serializer = self.get_serializer(user)
         return Response(serializer.data)
-    
+
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
         if user == request.user:
