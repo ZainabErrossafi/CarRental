@@ -58,8 +58,9 @@ export default function ClientHome() {
       <div className="client-page-gradient" style={{ backgroundImage: `linear-gradient(to bottom, ${transitionColor} 0px, rgba(168, 155, 148, 0.85) 35px, rgba(168, 155, 148, 0.5) 90px, rgba(168, 155, 148, 0.15) 160px, transparent 240px), radial-gradient(ellipse at 100% 0%, rgba(255, 197, 140, 0.3), transparent 48%), radial-gradient(ellipse at 0% 45%, rgba(175, 199, 216, 0.2), transparent 52%), linear-gradient(180deg, #fdfaf5 0%, #f4f6f7 65%, #fdfaf5 100%)` }}>
       <section aria-labelledby="fleet-heading" className="tw:mx-auto tw:w-[90%] tw:max-w-[1120px] tw:py-12">
         <div className="rental-category-heading">
-          <p>THE RENTLY COLLECTION</p>
-          <h2 id="fleet-heading">Your journey.<br /><em>Your kind of car.</em></h2>
+          <p>Our collection</p>
+          <h2 id="fleet-heading">Find your kind of car<span aria-hidden="true">.</span></h2>
+          <span>Choose the right car for your next journey.</span>
         </div>
         <div className="rental-category-grid">
           {categoryError && <p role="status">{categoryError}</p>}
