@@ -18,6 +18,9 @@ class ReservationSerializer(serializers.ModelSerializer):
     pickup_location_name = serializers.CharField(source='pickup_location.name', read_only=True)
     dropoff_location_name = serializers.CharField(source='dropoff_location.name', read_only=True)
     extra_details = serializers.SerializerMethodField()
+    features = serializers.SlugRelatedField(
+        source='vehicle.features', many=True, read_only=True, slug_field='name',
+    )
 
     user_id = serializers.PrimaryKeyRelatedField(
         source='user', queryset=get_user_model().objects.all(),

@@ -274,7 +274,10 @@ export default function AdminReservationAdd() {
                         onChange={() => handleExtraToggle(extra.id)}
                       />
                       {extra.name} 
-                      ({extra.price_per_day ? t("{value0} MAD/day", { value0: extra.price_per_day }) : t("{value0} MAD flat", { value0: extra.flat_price })})
+                      ({[
+                        Number(extra.price_per_day) > 0 && t("{value0} MAD/day", { value0: extra.price_per_day }),
+                        Number(extra.flat_price) > 0 && t("{value0} MAD flat", { value0: extra.flat_price }),
+                      ].filter(Boolean).join(" + ") || t("{value0} MAD flat", { value0: 0 })})
                     </label>
                   </div>
                 ))}
