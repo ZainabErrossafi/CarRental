@@ -22,6 +22,7 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "Back to home": "Retour à l’accueil",
     "or": "ou",
     "Sign in with Google": "Se connecter avec Google",
     "Google sign-in is not connected yet. Please use your email and password.": "La connexion Google n’est pas encore disponible. Veuillez utiliser votre e-mail et votre mot de passe.",
@@ -623,6 +624,7 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "Back to home": "العودة إلى الصفحة الرئيسية",
     "or": "أو",
     "Sign in with Google": "تسجيل الدخول باستخدام Google",
     "Google sign-in is not connected yet. Please use your email and password.": "تسجيل الدخول باستخدام Google غير متاح بعد. يرجى استخدام بريدك الإلكتروني وكلمة المرور.",

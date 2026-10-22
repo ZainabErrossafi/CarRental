@@ -3228,6 +3228,38 @@ gap: 0.5rem;
   margin-bottom: 2.5rem;
 }
 
+.gcard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.gcard-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--navy);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.gcard-home-link:hover {
+  color: var(--orange);
+}
+
+.gcard-home-link:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+
+[dir="rtl"] .gcard-home-link svg {
+  transform: scaleX(-1);
+}
+
 .gcard-form-top button {
   border: none;
   background: none;
