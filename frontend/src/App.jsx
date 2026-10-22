@@ -14,7 +14,6 @@ import AdminAuth from "./pages/admin/AdminAuth.jsx";
 import AdminForgotPassword from "./pages/admin/AdminForgotPassword.jsx";
 import AdminVerifyEmail from "./pages/admin/AdminVerifyEmail.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import AdminReviews from "./pages/admin/AdminReviews.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AdminSiteSettings from "./pages/admin/AdminSiteSettings.jsx";
 import AdminFaqs from "./pages/admin/AdminFAQs.jsx";
@@ -56,7 +55,6 @@ export default function App() {
         <Route path="catalog" element={<AdminCatalog label="Catalog" />} />
         <Route path="reservations" element={<AdminReservations label="Reservations" />} />
         <Route path="reservations/new" element={<AdminReservationAdd />} />
-        <Route path="reviews" element={<AdminReviews label="Reviews" />} />
         <Route path="users" element={<AdminUsers label="Users & Roles" />} />
         <Route path="site-settings" element={<AdminSiteSettings label="Site Settings" />} />
         <Route path="faqs" element={<AdminFaqs label="FAQs" />} />

@@ -6,7 +6,6 @@ import {
   MapPin,
   Tag,
   CalendarCheck,
-  Star,
   Users,
   Settings,
   HelpCircle,
@@ -41,7 +40,6 @@ const NAV_SECTIONS = [
     label: "Bookings",
     items: [
       { to: "/admin/reservations", label: "Reservations", icon: CalendarCheck },
-      { to: "/admin/reviews", label: "Reviews", icon: Star },
     ],
   },
   {
