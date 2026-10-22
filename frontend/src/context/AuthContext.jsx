@@ -55,9 +55,14 @@ export function AuthProvider({ children }) {
     await logoutApi();
     setUser(null);
   };
+  const refreshUser = async () => {
+    const currentUser = await getCurrentUser();
+    setUser(currentUser);
+    return currentUser;
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, googleLogin, signup, verifyEmail, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, googleLogin, signup, verifyEmail, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

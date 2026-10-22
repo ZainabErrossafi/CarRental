@@ -1,3 +1,4 @@
+import AccountSettings from "./AccountSettings.jsx";
 import ReservationsDropdown from "./ReservationsDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -72,6 +73,7 @@ export default function ClientHeader({ overlay = false }) {
           <NavLink to="/signup" onClick={closeMenus} className="tw:inline-flex tw:box-border tw:h-10 tw:items-center tw:justify-center tw:whitespace-nowrap tw:rounded-full tw:bg-[#ffc58c] tw:px-3 tw:text-xs tw:font-semibold tw:text-[#071b2e] tw:hover:bg-[#ffb36a] tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-[#ffc58c] tw:sm:px-5 tw:sm:text-sm">Create account</NavLink>
           </>}
           {!loading && user && <ReservationsDropdown overlay={overlay} />}
+          {!loading && user && <AccountSettings overlay={overlay} />}
           {!loading && user && <button type="button" onClick={handleLogout} disabled={loggingOut} className={`tw:inline-flex tw:h-10 tw:cursor-pointer tw:items-center tw:justify-center tw:gap-2 tw:rounded-full tw:border tw:border-solid tw:bg-transparent tw:px-4 tw:text-xs tw:font-semibold tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-[#ffc58c] tw:disabled:opacity-50 ${overlay ? "tw:border-white/50 tw:text-white tw:hover:bg-white/10" : "tw:border-[#071b2e]/30 tw:text-[#071b2e] tw:hover:bg-gray-100"}`}><LogOut size={16} aria-hidden="true" />{loggingOut ? "Signing out…" : "Logout"}</button>}
           <button ref={mobileButtonRef} type="button" aria-label="Toggle main menu" aria-controls="client-navigation" aria-expanded={mobileOpen} onClick={() => { setMobileOpen(!mobileOpen); }} className="tw:inline-flex tw:size-10 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg tw:border-0 tw:bg-white tw:text-[#021731] tw:hover:bg-gray-100 tw:focus-visible:outline-2 tw:focus-visible:outline-[#ff4f00] tw:lg:hidden">
             <svg aria-hidden="true" className="tw:size-6" viewBox="0 0 24 24" fill="none"><path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M5 7h14M5 12h14M5 17h14" /></svg>
