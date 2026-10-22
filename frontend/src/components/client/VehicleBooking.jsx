@@ -115,7 +115,7 @@ export default function VehicleBooking({ vehicle }) {
           </div>;
         })}</div>
         {user && <><div className="vehicle-booking-fields"><CompactDropdown label="Pick-up agency" value={form.pickup_location} placeholder="Select an agency" disabled={busy || loading} onChange={(value) => change("pickup_location")({ target: { value } })} options={locations.map((item) => ({ value: item.id, label: `${item.name} · ${item.city}` }))} /><CompactDropdown label="Return agency" value={form.dropoff_location} placeholder="Select an agency" disabled={busy || loading} onChange={(value) => change("dropoff_location")({ target: { value } })} options={locations.map((item) => ({ value: item.id, label: `${item.name} · ${item.city}` }))} /><label>Driver name<input required maxLength={100} value={form.driver_name} onChange={change("driver_name")} autoComplete="name" /></label><label>Email<input required type="email" value={user.email || ""} readOnly autoComplete="email" aria-label="Account email" /></label><label>Phone<input required type="tel" maxLength={20} value={form.phone} onChange={change("phone")} autoComplete="tel" /></label></div>{locationError && <p role="alert">Could not load agencies. Refresh to try again.</p>}</>}
-        <details className="booking-extras booking-extras-picker">
+        {user && <details className="booking-extras booking-extras-picker">
           <summary><span><strong>Optional extras</strong><small>Personalize your rental</small></span><span className="booking-extras-count" aria-live="polite">{selectedExtras.length ? `${selectedExtras.length} added` : "Add extras"}</span><span className="booking-extras-chevron" aria-hidden="true">⌄</span></summary>
           {extrasLoading ? <p role="status">Loading extras…</p> : extrasError ? <p role="status">Extras are temporarily unavailable. You can still book without them.</p> : !extras.length ? <p>No extras available.</p> : <div className="booking-extras-list" tabIndex={0} role="group" aria-label="Available optional extras">{extras.map((extra) => {
             const Icon = CATALOG_ICONS[extra.icon] || CATALOG_ICONS.tag;
@@ -131,7 +131,7 @@ export default function VehicleBooking({ vehicle }) {
               ].filter(Boolean).join(" + ") || "Included"}</small></span></span>
             </label>
           ); })}</div>}
-        </details>
+        </details>}
         <div className="vehicle-booking-estimate" aria-live="polite"><h2>Total</h2>{valid ? <><strong>{money(duration * vehicle.pricePerDay + extrasTotal)} MAD</strong><p>{duration} {duration === 1 ? "day" : "days"} · Includes selected extras. Deposit excluded.</p></> : <p>Select a future pick-up and a later return.</p>}</div>
         {error && <p className="vehicle-booking-error" role="alert">{error}</p>}
         {!loading && !user ? <Link className="vehicle-booking-button vehicle-booking-signin" to="/login" state={{ from: { pathname: `/vehicles/${vehicle.id}` } }}>Sign in to book this car <ArrowRight size={17} aria-hidden="true" /></Link> : <button type="submit" className="vehicle-booking-button" disabled={busy || loading || !valid || !contactComplete || !locations.length || locationError}>{busy ? "Booking…" : "Book now"}<ArrowRight size={17} aria-hidden="true" /></button>}
