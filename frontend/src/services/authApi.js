@@ -25,7 +25,6 @@ export const login = async ({ email, password }) => {
 
 export const logout = async () => clearSession();
 
-// The backend intentionally restricts account creation to administrators.
 export const signup = async () => {
   throw new Error('Ask an administrator to create your account. Public administrator registration is unavailable.');
 };
