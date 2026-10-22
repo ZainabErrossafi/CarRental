@@ -1,6 +1,6 @@
 from django.db.models import ProtectedError
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from apps.users.permissions import IsAdmin
@@ -17,9 +17,15 @@ class LocationViewSet(viewsets.ModelViewSet):
     ordering_fields = ['name', 'city']
     ordering = ['name']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_authenticated or self.request.user.role != 'admin':
+            return queryset.filter(active=True)
+        return queryset
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
+            return [AllowAny()]
         return [IsAdmin()]
 
     def destroy(self, request, *args, **kwargs):
