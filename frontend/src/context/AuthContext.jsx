@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   getCurrentUser,
   login as loginApi,
+  googleLogin as googleLoginApi,
   signup as signupApi,
   logout as logoutApi,
   verifyEmail as verifyEmailApi,
@@ -38,6 +39,12 @@ export function AuthProvider({ children }) {
     return signupApi(details);
   };
 
+  const googleLogin = async (credentials) => {
+    const loggedInUser = await googleLoginApi(credentials);
+    setUser(loggedInUser);
+    return loggedInUser;
+  };
+
   const verifyEmail = async (payload) => {
     const verifiedUser = await verifyEmailApi(payload);
     setUser(verifiedUser);
@@ -50,7 +57,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, verifyEmail, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, googleLogin, signup, verifyEmail, logout }}>
       {children}
     </AuthContext.Provider>
   );
