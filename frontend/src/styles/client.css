@@ -191,41 +191,34 @@
   .client-footer h2 { font-size: 14px; }
 }
 .rental-category-heading {
-  margin: 0 auto 40px;
+  margin: 0 auto 32px;
   text-align: center;
   font-family: "Plus Jakarta Sans", sans-serif;
 }
 .rental-category-heading > p {
-  margin: 0 0 12px;
-  color: #784326;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .18em;
-}
-.rental-category-heading > p::before,
-.rental-category-heading > p::after {
-  content: "";
   display: inline-block;
-  width: 32px;
-  height: 1px;
-  margin: 0 12px;
-  vertical-align: middle;
-  background: #a36b48;
+  margin: 0 0 14px;
+  padding: 6px 12px;
+  border: 1px solid #17304720;
+  border-radius: 999px;
+  color: #415362;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
 }
 .rental-category-heading h2 {
-  margin: 0 0 16px;
-  font-size: clamp(32px, 4vw, 48px);
-  line-height: 1.15;
-  letter-spacing: -.045em;
+  margin: 0 0 12px;
+  color: #021731;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.04em;
+  text-wrap: balance;
 }
-.rental-category-heading h2 em {
-  color: #865031;
-  font-family: Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -.035em;
-}
+.rental-category-heading h2 > span { color: #a5643c; }
 .rental-category-heading > span {
-  color: #475969;
+  display: block;
+  color: #52616c;
   font-size: 14px;
   line-height: 1.7;
 }
@@ -643,3 +636,11 @@
 .vehicle-detail-photo { aspect-ratio: auto; border: 0; border-radius: 0; background: transparent; }
 .vehicle-detail-photo > img { box-sizing: border-box; width: 100%; height: auto; border: 1px solid #e1e7ea; border-radius: 6px; }
 .vehicle-detail-no-photo { min-height: 180px; }
+
+.client-faqs { max-width: 760px; margin: 0 auto; padding: 24px 0 48px; color: #173047; }
+.client-faqs h1 { margin: 0 0 12px; font-size: clamp(26px, 4vw, 36px); line-height: 1.25; }
+.client-faqs-intro { margin: 0 0 32px; color: #657582; line-height: 1.6; }
+.client-faqs-list details { border-bottom: 1px solid #dce2e5; }
+.client-faqs-list summary { padding: 20px 4px; cursor: pointer; font-size: 16px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+.client-faqs-list summary:focus-visible { outline: 2px solid #975f38; outline-offset: 3px; }
+.client-faqs-list details p { margin: 0; padding: 0 4px 22px; color: #526575; font-size: 15px; line-height: 1.8; white-space: pre-line; overflow-wrap: anywhere; }
