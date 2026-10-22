@@ -8,17 +8,28 @@ from rest_framework.response import Response
 from .models import User
 from .permissions import IsAdmin, IsAdminOrOwner
 from .serializers import UserSerializer
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import redirect
 
 #//////////////////////////////oussama
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from dj_rest_auth.registration.views import SocialLoginView
 
-class GoogleLoginView(SocialLoginView):
-    adapter_class = GoogleOAuth2Adapter
-    callback_url = "http://localhost:3000/auth/callback"  # URL لي فالفرونت إند ولا 127.0.0.1:8000
-    client_class = OAuth2Client
+def google_callback_redirect(request):
+    user = request.user
+    if not user.is_authenticated:
+        return redirect("https://localhost:8443/login?error=auth_failed")
+
+    refresh = RefreshToken.for_user(user)
+    refresh['role'] = user.role
+    refresh['email'] = user.email
+
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+
+    # Kat-sift kolchi f-l-URL l-Frontend (/)
+    return redirect(f"https://localhost:8443/?access={access_token}&refresh={refresh_token}&role={user.role}")
 #////////////////////////////////////////////
 
 
