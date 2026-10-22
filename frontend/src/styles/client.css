@@ -865,3 +865,37 @@
 .booking-extra-icon { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border-radius: 8px; background: #f3f6f8; color: #526575; }
 .booking-extra-copy { display: grid; gap: 4px; min-width: 0; }
 .booking-extras-picker .booking-extra-option:has(input:checked) .booking-extra-icon { background: #fff0e1; color: #975326; }
+
+.reservation-cancel-actions { margin-top: 12px; }
+.reservation-cancel-actions > p { font-size: 11px; color: #526575; margin: 0 0 9px; }
+.reservation-cancel-actions > div { display: flex; gap: 8px; }
+.reservation-cancel-actions button { cursor: pointer; padding: 7px 10px; border: 1px solid #e1e6e9; background: #fff; color: #526575; border-radius: 7px; font: inherit; font-size: 10px; }
+.reservation-cancel-actions .reservation-cancel-trigger { border-color: #f0d6d8; color: #b34e58; background: #fff8f8; }
+.reservation-cancel-actions .reservation-cancel-confirm { color: #fff; background: #b34e58; border-color: #b34e58; }
+.reservation-cancel-actions button:disabled { opacity: .5; cursor: wait; }
+.reservation-cancel-actions button:focus-visible { outline: 2px solid #b34e58; outline-offset: 2px; }
+.reservation-popover-list article > p.reservation-cancel-error { color: #b42318; font-size: 10px; white-space: pre-line; }
+
+.account-settings-trigger { background: transparent; cursor: pointer; }
+.account-settings-dialog { width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); box-sizing: border-box; padding: 26px; border: 1px solid #e1e6e9; border-radius: 18px; background: #fff; color: #173047; box-shadow: 0 24px 80px #071b2e30; font-family: "Plus Jakarta Sans", sans-serif; }
+.account-settings-dialog::backdrop { background: #071b2e70; backdrop-filter: blur(3px); }
+.account-settings-dialog > header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.account-settings-dialog header span { font-size: 9px; letter-spacing: .15em; font-weight: 700; color: #975326; }
+.account-settings-dialog h2 { font-size: 23px; letter-spacing: -.035em; margin: 8px 0; }
+.account-settings-dialog header button { display: grid; place-items: center; padding: 7px; border: 0; background: #f4f7f8; color: #526575; border-radius: 8px; cursor: pointer; }
+.account-settings-tabs { display: flex; gap: 6px; padding: 5px; margin: 22px 0; background: #f4f7f8; border-radius: 10px; }
+.account-settings-tabs button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 7px; border: 0; border-radius: 7px; background: transparent; color: #71808a; font: inherit; font-size: 11px; cursor: pointer; }
+.account-settings-tabs button[aria-pressed="true"] { background: #fff; color: #173047; box-shadow: 0 2px 6px #071b2e09; }
+.account-settings-dialog fieldset { display: grid; gap: 17px; padding: 0; margin: 0; border: 0; min-width: 0; }
+.account-settings-dialog label { display: grid; gap: 8px; font-size: 11px; font-weight: 700; min-width: 0; }
+.account-settings-names { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.account-settings-dialog input { width: 100%; min-width: 0; box-sizing: border-box; padding: 11px 12px; border: 1px solid #dfe6ea; border-radius: 8px; background: #fff; color: #173047; font: inherit; font-weight: 400; }
+.account-settings-dialog input[readonly] { background: #f4f7f8; color: #7c8992; }
+.account-settings-dialog small { color: #7c8992; font-size: 10px; font-weight: 400; line-height: 1.6; }
+.account-settings-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; padding: 12px; border: 0; border-radius: 9px; background: #ffc58c; color: #173047; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.account-settings-dialog button:disabled { opacity: .5; cursor: wait; }
+.account-settings-error, .account-settings-success { padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6; white-space: pre-line; }
+.account-settings-error { color: #b42318; background: #fff1f0; }
+.account-settings-success { color: #3f8056; background: #edf7ef; }
+.account-settings-dialog input:focus-visible, .account-settings-dialog button:focus-visible { outline: 2px solid #b97d50; outline-offset: 2px; }
+@media (max-width: 400px) { .account-settings-dialog { padding: 20px; } .account-settings-names { grid-template-columns: 1fr; } }
