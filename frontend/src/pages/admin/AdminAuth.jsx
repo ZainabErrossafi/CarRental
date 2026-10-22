@@ -11,6 +11,7 @@ import {
   User,
   Mail,
   ArrowUpRight,
+  ArrowLeft,
   Lock,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
@@ -103,7 +104,7 @@ export default function AdminAuth({ initialMode = "login" }) {
         {/* Icon rail */}
         <ul className="gcard-nav">
           <li className="gcard-nav-brand">
-            <div className="gcard-nav-logo" />
+            <Link to="/" className="gcard-nav-logo" aria-label={t("Back to home")} />
           </li>
 
           <li>
@@ -159,7 +160,13 @@ export default function AdminAuth({ initialMode = "login" }) {
 
         {/* Form panel */}
         <div className="gcard-form">
-          <div className="auth-language-switcher"><LanguageSwitcher /></div>
+          <div className="gcard-toolbar">
+            <Link to="/" className="gcard-home-link">
+              <ArrowLeft size={16} aria-hidden="true" />
+              {t("Back to home")}
+            </Link>
+            <LanguageSwitcher />
+          </div>
           <div className="gcard-form-top">
             {view === "signin" ? (
               <span>
