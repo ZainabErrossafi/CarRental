@@ -1,6 +1,8 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from .models import User
+from urllib.parse import urlsplit, parse_qs
+from rest_framework_simplejwt.tokens import AccessToken
 
 
 class FrontendAuthenticationTests(TestCase):
@@ -38,3 +40,22 @@ class FrontendAuthenticationTests(TestCase):
 
     def test_health(self):
         self.assertEqual(self.client.get('/api/health/').json(), {'status': 'ok'})
+
+    def test_google_callback_hands_off_tokens_for_authenticated_session(self):
+        self.client.force_login(self.admin)
+        response = self.client.get('/api/auth/google/success/')
+        self.assertEqual(response.status_code, 302)
+        destination = urlsplit(response.url)
+        self.assertEqual(destination.path, '/')
+        self.assertEqual(destination.netloc, '')
+        self.assertEqual(destination.query, '')
+        tokens = parse_qs(destination.fragment)
+        access = tokens['access'][0]
+        self.assertEqual(str(AccessToken(access)['user_id']), str(self.admin.pk))
+        self.assertIn('refresh', tokens)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+        self.assertEqual(self.client.get('/api/users/me/').status_code, 200)
+
+    def test_google_callback_requires_a_session(self):
+        response = self.client.get('/api/auth/google/success/')
+        self.assertRedirects(response, '/login?error=auth_failed', fetch_redirect_response=False)
