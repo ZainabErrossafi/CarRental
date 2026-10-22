@@ -186,7 +186,6 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-
 # خلي dj-rest-auth يعطي JWT ماشي Token عادي
 REST_AUTH = {
     'USE_JWT': True,
@@ -194,6 +193,7 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
 }
 
+SOCIALACCOUNT_ADAPTER = 'apps.users.adapters.CustomSocialAccountAdapter'
 # إعدادات Google ديريكت من .env بلا ما تحتاج تعمر Admin
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
