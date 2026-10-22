@@ -123,6 +123,8 @@ export default function AdminReservations() {
               <th>{t("Driver")}</th>
               <th>{t("Pickup → Return")}</th>
               <th>{t("Duration")}</th>
+              <th>{t("Extras")}</th>
+              <th>{t("Features")}</th>
               <th>{t("Total Price")}</th>
               <th>{t("Status")}</th>
               <th>{t("Actions")}</th>
@@ -155,6 +157,14 @@ export default function AdminReservations() {
                 <td>{formatReservationDate(r.pickup_date)} → {formatReservationDate(r.return_date)}</td>
 
                 <td>{t(durationDays(r) === 1 ? "{count} day" : "{count} days", { count: durationDays(r) })}</td>
+
+                <td>
+                  {r.extra_details?.length
+                    ? r.extra_details.map((extra) => `${extra.name} × ${extra.quantity}`).join(", ")
+                    : t("None")}
+                </td>
+
+                <td>{r.features?.length ? r.features.map((name) => t(name)).join(", ") : t("None")}</td>
 
                 <td>{r.total_price} {t("MAD")}</td>
 
@@ -200,7 +210,7 @@ export default function AdminReservations() {
 
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
+                <td colSpan={10} style={{ textAlign: "center", color: "var(--muted)", padding: "2rem" }}>
                   {t("No reservations in this view.")}
                 </td>
               </tr>
@@ -277,6 +287,13 @@ export default function AdminReservations() {
                   {viewing.extra_details?.length
                     ? viewing.extra_details.map((extra) => `${extra.name} × ${extra.quantity}`).join(", ")
                     : t("None")}
+                </span>
+              </div>
+
+              <div className="detail-row">
+                <span className="detail-label">{t("Features")}</span>
+                <span className="detail-value">
+                  {viewing.features?.length ? viewing.features.map((name) => t(name)).join(", ") : t("None")}
                 </span>
               </div>
 

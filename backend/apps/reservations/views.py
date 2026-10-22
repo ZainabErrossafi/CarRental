@@ -35,8 +35,8 @@ class ReservationViewSet(viewsets.ModelViewSet):
         if not user.is_authenticated:
             return Reservation.objects.none()
         if user.is_admin():
-            return Reservation.objects.all()
-        return Reservation.objects.filter(user=user)
+            return Reservation.objects.all().prefetch_related('vehicle__features')
+        return Reservation.objects.filter(user=user).prefetch_related('vehicle__features')
 
     def perform_create(self, serializer):
         if self.request.user.is_admin():
