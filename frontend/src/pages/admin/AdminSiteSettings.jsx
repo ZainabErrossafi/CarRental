@@ -1,5 +1,3 @@
-import UploadProgress from "../../components/UploadProgress";
-import useImageReader from "../../hooks/useImageReader";
 import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -7,14 +5,12 @@ import {
   Instagram,
   Twitter,
   Linkedin,
-  ImagePlus,
-  X,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { getSiteSettings, updateSiteSettings } from "../../services/adminApi";
 
-const STEPS = ["Company & Social", "Homepage & About"];
+const STEPS = ["Company & Social", "About Section"];
 
 export default function AdminSiteSettings() {
   const { t } = useI18n();
@@ -22,13 +18,8 @@ export default function AdminSiteSettings() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState(null);
-  const [imageError, setImageError] = useState(null);
   const [step, setStep] = useState(0);
   const formRef = useRef(null);
-  const { readImage, progress: imageProgress } = useImageReader(
-    (image) => handleChange("hero_image", image), setImageError,
-  );
-
   const isLastStep = step === STEPS.length - 1;
 
   useEffect(() => {
@@ -38,16 +29,6 @@ export default function AdminSiteSettings() {
   const handleChange = (field, value) => {
     setSaved(false);
     setSettings((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleImageUpload = (file) => {
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setImageError("Image is too large. Please choose a file under 5MB.");
-      return;
-    }
-    setImageError(null);
-    readImage(file);
   };
 
   const goNext = () => {
@@ -64,7 +45,7 @@ export default function AdminSiteSettings() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (saving || imageProgress !== null) return;
+    if (saving) return;
 
     // Pressing Enter on step 1 should go to the next step, not save
     if (!isLastStep) {
@@ -94,7 +75,7 @@ export default function AdminSiteSettings() {
         <div>
           <h1>{t("Site Settings")}</h1>
           <p className="subtitle">
-            {t("Manage company details, social links, and homepage content.")}
+            {t("Manage company details, social links, and about content.")}
           </p>
         </div>
       </div>
@@ -130,17 +111,6 @@ export default function AdminSiteSettings() {
               <div className="form-card vehicle-details-card">
                 <h3>{t("Company Information")}</h3>
                 <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="company_name">{t("Company Name")}</label>
-                    <input
-                      id="company_name"
-                      type="text"
-                      value={settings.company_name}
-                      onChange={(e) => handleChange("company_name", e.target.value)}
-                      required
-                    />
-                  </div>
-
                   <div className="form-field">
                     <label htmlFor="email">{t("Email")}</label>
                     <input
@@ -259,84 +229,6 @@ export default function AdminSiteSettings() {
           {/* ================= STEP 2 ================= */}
           {step === 1 && (
             <>
-              {/* Hero Section */}
-              <div className="form-card vehicle-details-card vehicle-media-card settings-hero-card">
-                <h3>{t("Homepage Hero")}</h3>
-
-                <div className="form-field full-width">
-                  <label htmlFor="hero_image_file">{t("Hero image")}</label>
-                  <div className="image-upload">
-                    {settings.hero_image ? (
-                      <div className="image-upload-preview">
-                        <img
-                          src={settings.hero_image}
-                          alt={t("Hero preview")}
-                          className="image-preview"
-                        />
-                        <button
-                          type="button"
-                          className="image-upload-remove"
-                          disabled={saving || imageProgress !== null}
-                          onClick={() => handleChange("hero_image", "")}
-                        >
-                          <X size={14} />
-                          {t("Remove")}
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        className="image-upload-dropzone"
-                        disabled={saving || imageProgress !== null}
-                        onClick={() => document.getElementById("hero_image_file").click()}
-                      >
-                        <ImagePlus size={22} />
-                        <span className="settings-hero-upload-copy">
-                          <span className="vehicle-upload-title">{t("Choose a hero image")}</span>
-                          <span className="field-hint">{t("PNG, JPG or WEBP — up to 5MB")}</span>
-                        </span>
-                        <span className="settings-hero-upload-action">{t("Browse files")}</span>
-                      </button>
-                    )}
-                    {imageError && <div className="alert alert-error" role="alert">{t(imageError)}</div>}
-                    {imageProgress !== null && <UploadProgress value={imageProgress} label="Reading image…" />}
-                    <input
-                      id="hero_image_file"
-                      type="file"
-                      disabled={saving || imageProgress !== null}
-                      accept="image/png, image/jpeg, image/webp"
-                      className="image-upload-input"
-                      onChange={(e) => {
-                        handleImageUpload(e.target.files?.[0]);
-                        e.target.value = "";
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="hero_title_en">{t("Hero title")}</label>
-                    <input
-                      id="hero_title_en"
-                      type="text"
-                      value={settings.hero_title_en}
-                      onChange={(e) => handleChange("hero_title_en", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="hero_subtitle_en">{t("Hero subtitle")}</label>
-                    <input
-                      id="hero_subtitle_en"
-                      type="text"
-                      value={settings.hero_subtitle_en}
-                      onChange={(e) => handleChange("hero_subtitle_en", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* About */}
               <div className="form-card vehicle-details-card settings-about-card">
                 <h3>{t("About Section")}</h3>
@@ -369,7 +261,7 @@ export default function AdminSiteSettings() {
               {t("Next")} <ChevronRight size={16} />
             </button>
           ) : (
-            <button type="submit" className="btn btn-primary" disabled={saving || imageProgress !== null}>
+            <button type="submit" className="btn btn-primary" disabled={saving}>
               {saving ? t("Saving...") : t("Save Changes")}
             </button>
           )}
