@@ -103,7 +103,7 @@ export default function AdminAuth({ initialMode = "login" }) {
         {/* Icon rail */}
         <ul className="gcard-nav">
           <li className="gcard-nav-brand">
-            <div className="gcard-nav-logo" />
+            <Link to="/" className="gcard-nav-logo" aria-label={t("Back to home")} />
           </li>
 
           <li>
