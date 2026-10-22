@@ -823,3 +823,45 @@
 .compact-dropdown-trigger:focus-visible { outline: 2px solid #975326; outline-offset: 3px; }
 /* Allow option panels to extend over the card below. */
 .fleet-filters, .vehicle-booking-card { overflow: visible; }
+
+.booking-extras { margin-top: 20px; padding-top: 18px; border-top: 1px solid #edf0f1; }
+.booking-extras h2 { margin: 0 0 12px; font-size: 14px; }
+.booking-extras > p { font-size: 11px; color: #71808a; line-height: 1.6; }
+.booking-extra-option { display: flex; align-items: center; gap: 10px; padding: 12px; margin-top: 8px; border: 1px solid #e1e5e9; border-radius: 8px; cursor: pointer; }
+.booking-extra-option:has(input:checked) { background: #fff7ed; border-color: #e6b98f; }
+.booking-extra-option input { width: 17px; height: 17px; margin: 0; accent-color: #975326; flex-shrink: 0; }
+.booking-extra-option > span { display: grid; gap: 5px; }
+.booking-extra-option strong { font-size: 12px; font-weight: 700; }
+.booking-extra-option small { font-size: 10px; color: #71808a; }
+
+/* Keep long extras lists compact within the booking card. */
+.booking-extras-list { display: grid; gap: 6px; max-height: 200px; overflow-y: auto; overscroll-behavior: contain; padding: 2px 5px 2px 2px; scrollbar-width: thin; }
+.booking-extras-list:focus-visible { outline: 2px solid #975326; outline-offset: 2px; border-radius: 6px; }
+.booking-extras-list .booking-extra-option { margin: 0; padding: 8px 10px; gap: 8px; border-radius: 6px; }
+.booking-extras-list .booking-extra-option > span { gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.booking-extras-list .booking-extra-option strong { font-size: 11px; }
+.booking-extras-list .booking-extra-option small { font-size: 10px; }
+.booking-extras-list .booking-extra-option input { width: 15px; height: 15px; }
+
+/* A compact expandable picker for optional rental extras. */
+.booking-extras-picker { padding: 0; border: 1px solid #e1e7ea; border-radius: 10px; background: #fff; }
+.booking-extras-picker > summary { display: flex; align-items: center; gap: 8px; padding: 14px 12px; list-style: none; cursor: pointer; }
+.booking-extras-picker > summary::-webkit-details-marker { display: none; }
+.booking-extras-picker > summary > span:first-child { display: grid; gap: 4px; margin-right: auto; }
+.booking-extras-picker summary strong { font-size: 12px; font-weight: 700; }
+.booking-extras-picker summary small { font-size: 10px; color: #71808a; }
+.booking-extras-count { padding: 5px 8px; border-radius: 20px; background: #fff0e1; color: #8c4b26; font-size: 9px; white-space: nowrap; }
+.booking-extras-chevron { color: #71808a; }
+.booking-extras-picker[open] .booking-extras-chevron { transform: rotate(180deg); }
+.booking-extras-picker > summary:focus-visible { outline: 2px solid #975326; outline-offset: 3px; border-radius: 10px; }
+.booking-extras-picker .booking-extras-list { padding: 0 12px 8px; gap: 0; max-height: 220px; border-top: 1px solid #edf0f1; }
+.booking-extras-picker .booking-extra-option { flex-direction: row-reverse; justify-content: space-between; min-height: 48px; padding: 10px 0; border: 0; border-bottom: 1px solid #edf0f1; border-radius: 0; }
+.booking-extras-picker .booking-extra-option:last-child { border-bottom: 0; }
+.booking-extras-picker .booking-extra-option:has(input:checked) { background: transparent; }
+.booking-extras-picker .booking-extra-option:has(input:checked) strong { color: #975326; }
+.booking-extras-picker > p { padding: 0 12px 12px; margin: 0; }
+
+.booking-extras-picker .booking-extra-option > .booking-extra-content { display: flex; align-items: center; gap: 10px; }
+.booking-extra-icon { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; border-radius: 8px; background: #f3f6f8; color: #526575; }
+.booking-extra-copy { display: grid; gap: 4px; min-width: 0; }
+.booking-extras-picker .booking-extra-option:has(input:checked) .booking-extra-icon { background: #fff0e1; color: #975326; }
