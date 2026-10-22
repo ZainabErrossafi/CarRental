@@ -40,9 +40,7 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_admin():
-            owner = serializer.validated_data.get('user')
-            if owner is None:
-                raise ValidationError({'user_id': 'A customer is required to create a reservation.'})
+            owner = serializer.validated_data.get('user') or self.request.user
         else:
             owner = self.request.user
         reference = f"RES-{uuid.uuid4().hex[:8].upper()}"
