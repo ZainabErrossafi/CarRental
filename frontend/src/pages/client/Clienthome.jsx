@@ -39,7 +39,7 @@ export default function ClientHome() {
     <>
       <section
         aria-labelledby="home-title"
-        className="tw:relative tw:isolate tw:flex tw:box-border tw:min-h-[100svh] tw:flex-col tw:items-center tw:px-6 tw:pb-20 tw:pt-28 tw:text-center tw:text-white tw:md:pt-28"
+        className="client-home-hero tw:relative tw:isolate tw:flex tw:box-border tw:min-h-[100svh] tw:flex-col tw:items-center tw:px-6 tw:pb-20 tw:pt-28 tw:text-center tw:text-white tw:md:pt-28"
       >
         <div
           aria-hidden="true"

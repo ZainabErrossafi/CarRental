@@ -1,3 +1,4 @@
+import CompactDropdown from "./CompactDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
@@ -58,6 +59,7 @@ export default function VehicleBooking({ vehicle }) {
   const submit = async (event) => {
     event.preventDefault();
     if (submitting.current || reservation) return;
+    if (!form.pickup_location || !form.dropoff_location) { setError("Select pick-up and return agencies."); return; }
     if (!contactComplete) { setError("Driver name, phone number and account email are required to book."); return; }
     if (!valid) { setError("Choose a future pick-up time and a later return time."); return; }
     submitting.current = true; setBusy(true); setError("");
@@ -71,8 +73,22 @@ export default function VehicleBooking({ vehicle }) {
   return <aside className="vehicle-booking-card" aria-label="Book this vehicle"><div className="vehicle-booking-rate"><strong>{money(vehicle.pricePerDay)}</strong><span>MAD / day</span></div>
     <form onSubmit={submit}>
       <fieldset disabled={busy || loading} className="vehicle-booking-form">
-        <div className="vehicle-booking-dates"><label>Pick-up date & time<input type="datetime-local" required min={minimumPickup} value={form.pickup} onChange={change("pickup")} /></label><label>Return date & time<input type="datetime-local" required min={minimumReturn} value={form.returned} onChange={change("returned")} /></label></div>
-        {user && <><div className="vehicle-booking-fields"><label>Pick-up agency<select required value={form.pickup_location} onChange={change("pickup_location")}><option value="">Select an agency</option>{locations.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.city}</option>)}</select></label><label>Return agency<select required value={form.dropoff_location} onChange={change("dropoff_location")}><option value="">Select an agency</option>{locations.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.city}</option>)}</select></label><label>Driver name<input required maxLength={100} value={form.driver_name} onChange={change("driver_name")} autoComplete="name" /></label><label>Email<input required type="email" value={user.email || ""} readOnly autoComplete="email" aria-label="Account email" /></label><label>Phone<input required type="tel" maxLength={20} value={form.phone} onChange={change("phone")} autoComplete="tel" /></label></div>{locationError && <p role="alert">Could not load agencies. Refresh to try again.</p>}</>}
+        <div className="vehicle-booking-dates">{[
+          ["pickup", "Pick-up", minimumPickup], ["returned", "Return", minimumReturn],
+        ].map(([field, label, minimum]) => {
+          const [date = "", time = ""] = form[field].split("T");
+          return <div className="vehicle-booking-date-group" key={field}>
+            <label>{label} date<input type="date" required min={minimum.slice(0, 10)} value={date} onChange={(event) => change(field)({ target: { value: event.target.value ? `${event.target.value}T${time || minimum.slice(11)}` : "" } })} /></label>
+            <label>{label} time <input key={`${field}-${date}-${time}`} type="text" inputMode="numeric" placeholder="HH:MM" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" maxLength={5} title="Enter a 24-hour time, for example 14:30" aria-label={`${label} time in 24-hour format`} required disabled={!date} defaultValue={time} onInput={(event) => {
+              const digits = event.currentTarget.value.replace(/\D/g, "").slice(0, 4);
+              event.currentTarget.value = digits.length > 2 ? `${digits.slice(0, 2)}:${digits.slice(2)}` : digits;
+            }} onBlur={(event) => {
+              if (!date || !event.target.value || !event.target.validity.valid) return;
+              change(field)({ target: { value: `${date}T${event.target.value}` } });
+            }} /></label>
+          </div>;
+        })}</div>
+        {user && <><div className="vehicle-booking-fields"><CompactDropdown label="Pick-up agency" value={form.pickup_location} placeholder="Select an agency" disabled={busy || loading} onChange={(value) => change("pickup_location")({ target: { value } })} options={locations.map((item) => ({ value: item.id, label: `${item.name} · ${item.city}` }))} /><CompactDropdown label="Return agency" value={form.dropoff_location} placeholder="Select an agency" disabled={busy || loading} onChange={(value) => change("dropoff_location")({ target: { value } })} options={locations.map((item) => ({ value: item.id, label: `${item.name} · ${item.city}` }))} /><label>Driver name<input required maxLength={100} value={form.driver_name} onChange={change("driver_name")} autoComplete="name" /></label><label>Email<input required type="email" value={user.email || ""} readOnly autoComplete="email" aria-label="Account email" /></label><label>Phone<input required type="tel" maxLength={20} value={form.phone} onChange={change("phone")} autoComplete="tel" /></label></div>{locationError && <p role="alert">Could not load agencies. Refresh to try again.</p>}</>}
         <div className="vehicle-booking-estimate" aria-live="polite"><h2>Total</h2>{valid ? <><strong>{money(duration * vehicle.pricePerDay)} MAD</strong><p>{duration} {duration === 1 ? "day" : "days"} · Estimate excluding deposit and extras.</p></> : <p>Select a future pick-up and a later return.</p>}</div>
         {error && <p className="vehicle-booking-error" role="alert">{error}</p>}
         {!loading && !user ? <Link className="vehicle-booking-button vehicle-booking-signin" to="/login" state={{ from: { pathname: `/vehicles/${vehicle.id}` } }}>Sign in to book this car <ArrowRight size={17} aria-hidden="true" /></Link> : <button type="submit" className="vehicle-booking-button" disabled={busy || loading || !valid || !contactComplete || !locations.length || locationError}>{busy ? "Booking…" : "Book now"}<ArrowRight size={17} aria-hidden="true" /></button>}

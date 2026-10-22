@@ -53,9 +53,9 @@ export default function ClientHeader({ overlay = false }) {
   };
 
   return (
-    <header ref={headerRef} className={`tw:top-0 tw:z-20 tw:w-full tw:px-3 tw:py-3 tw:sm:px-6 ${overlay ? "tw:absolute tw:inset-x-0" : "tw:relative"}`}>
-      <nav aria-label="Main navigation" className="tw:relative tw:mx-auto tw:flex tw:w-full tw:box-border tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:bg-transparent tw:px-4 tw:py-2 tw:font-sans">
-        <NavLink to="/" onClick={closeMenus} className={`tw:flex tw:items-center tw:gap-3 ${overlay ? "tw:text-white" : "tw:text-[#021731]"}`}>
+    <header ref={headerRef} className={`client-header${overlay ? " client-header-overlay" : ""} tw:top-0 tw:z-20 tw:w-full tw:px-3 tw:py-3 tw:sm:px-6 ${overlay ? "tw:absolute tw:inset-x-0" : "tw:relative"}`}>
+      <nav aria-label="Main navigation" className="client-header-nav tw:relative tw:mx-auto tw:flex tw:w-full tw:box-border tw:flex-wrap tw:items-center tw:justify-between tw:gap-3 tw:bg-transparent tw:px-4 tw:py-2 tw:font-sans">
+        <NavLink to="/" onClick={closeMenus} className={`client-header-brand tw:flex tw:items-center tw:gap-3 ${overlay ? "tw:text-white" : "tw:text-[#021731]"}`}>
           <span aria-hidden="true" className="tw:relative tw:block tw:h-9 tw:w-11 tw:shrink-0 tw:overflow-hidden tw:rounded-lg tw:bg-[#fdfaf5]">
             <img src={logo} alt="" className="tw:absolute tw:-left-7 tw:-top-4 tw:h-24 tw:w-24 tw:max-w-none tw:object-contain" />
           </span>
@@ -65,7 +65,7 @@ export default function ClientHeader({ overlay = false }) {
           </span>
         </NavLink>
 
-        <div className="tw:relative tw:flex tw:items-center tw:gap-2 tw:ml-auto tw:lg:order-2 tw:lg:ml-0">
+        <div className="client-header-actions tw:relative tw:flex tw:items-center tw:gap-2 tw:ml-auto tw:lg:order-2 tw:lg:ml-0">
           {!loading && user?.role === "admin" && <NavLink to="/admin" onClick={closeMenus} aria-label="Admin dashboard" title="Admin dashboard" className="tw:inline-flex tw:size-10 tw:items-center tw:justify-center tw:rounded-full tw:bg-[#ffc58c] tw:text-[#071b2e] tw:hover:bg-[#ffb36a] tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-[#ffc58c]"><ShieldCheck size={19} aria-hidden="true" /></NavLink>}
           {!loading && !user && <>
           <NavLink to="/login" onClick={closeMenus} className={`tw:inline-flex tw:box-border tw:h-10 tw:items-center tw:justify-center tw:rounded-full tw:border tw:border-solid tw:px-3 tw:text-xs tw:font-semibold tw:sm:px-5 tw:sm:text-sm ${overlay ? "tw:border-white/50 tw:text-white tw:hover:bg-white/10" : "tw:border-[#071b2e]/30 tw:text-[#071b2e] tw:hover:bg-gray-100"}`}>Login</NavLink>
