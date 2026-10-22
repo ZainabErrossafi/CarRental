@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.users.serializers import AdminTokenObtainPairSerializer
-from apps.users.views import GoogleLoginView, google_callback_redirect
+from apps.users.views import google_callback_redirect
 
 urlpatterns = [
     # Health & Admin
@@ -15,7 +15,7 @@ urlpatterns = [
 
     # Authentication & OAuth
     path('api/auth/', include('dj_rest_auth.urls')),
-    path('api/auth/google/', GoogleLoginView.as_view(), name='google_login'),
+    # path('api/auth/google/', GoogleLoginView.as_view(), name='google_login'),
     path('api/accounts/', include('allauth.urls')),
     path('api/token/', TokenObtainPairView.as_view(serializer_class=AdminTokenObtainPairSerializer), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
