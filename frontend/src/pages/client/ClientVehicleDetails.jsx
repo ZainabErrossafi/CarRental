@@ -1,7 +1,7 @@
 import VehicleBooking from "../../components/client/VehicleBooking.jsx";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Users, Settings2, Fuel, Briefcase, Wind, Car, ShieldCheck, Gauge, CalendarDays, ArrowRight } from "lucide-react";
+import { Users, Settings2, Fuel, Briefcase, Wind, Car, ShieldCheck, Gauge, CalendarDays, ArrowRight } from "lucide-react";
 import { CATALOG_ICONS } from "../../components/CatalogIcons.jsx";
 import { getClientVehicle } from "../../services/clientVehicles.js";
 
@@ -37,7 +37,7 @@ export default function ClientVehicleDetails() {
           <div className="vehicle-detail-photo">{selected ? <img src={selected} alt={vehicle.name} /> : <div className="vehicle-detail-no-photo"><Car size={76} strokeWidth={1} aria-hidden="true" /><span>Photos coming soon</span></div>}<span className="vehicle-detail-category">{vehicle.category}</span></div>
           {uniqueImages.length > 1 && <div className="vehicle-detail-gallery" aria-label="Vehicle photos">{uniqueImages.map((image, index) => <button key={image} type="button" aria-label={`Show photo ${index + 1}`} aria-pressed={selected === image} onClick={() => setSelectedImage(image)}><img src={image} alt="" /></button>)}</div>}
           <section className="vehicle-detail-panel vehicle-detail-overview">
-            <h1>Location {vehicle.name} {vehicle.year}</h1>
+            <h1>{vehicle.name} {vehicle.year}</h1>
             <div className="vehicle-detail-heading-chips"><span><Fuel size={13} aria-hidden="true" />{vehicle.fuel}</span><span><Settings2 size={13} aria-hidden="true" />{vehicle.transmission}</span><span><Car size={13} aria-hidden="true" />{vehicle.doors} doors</span><span><Users size={13} aria-hidden="true" />{vehicle.seats} seats</span></div>
             {vehicle.description && <p className="vehicle-detail-description">{vehicle.description}</p>}
           </section>

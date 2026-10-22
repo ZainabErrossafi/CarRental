@@ -638,3 +638,8 @@
 .fleet-page-heading-simple h1 span { font-family: Georgia, serif; font-weight: 400; font-style: italic; color: #975f38; letter-spacing: -.035em; }
 .fleet-page-heading-simple .fleet-heading-rule { height: 1px; flex: 1; background: linear-gradient(90deg, #d9b79a, #d9b79a00); }
 @media (max-width: 500px) { .fleet-page-heading-simple { gap: 14px; } }
+
+/* Let vehicle photos keep their natural proportions without a surrounding frame. */
+.vehicle-detail-photo { aspect-ratio: auto; border: 0; border-radius: 0; background: transparent; }
+.vehicle-detail-photo > img { box-sizing: border-box; width: 100%; height: auto; border: 1px solid #e1e7ea; border-radius: 6px; }
+.vehicle-detail-no-photo { min-height: 180px; }
