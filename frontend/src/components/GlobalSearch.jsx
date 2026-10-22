@@ -6,7 +6,6 @@ import {
   getLocations,
   getCatalog,
   getReservations,
-  getReviews,
   getUsers,
   getFaqs,
   getNotifications,
@@ -21,13 +20,12 @@ const norm = (s) =>
 
 // Build one flat, searchable list from every page's data.
 async function loadIndex() {
-  const [vehicles, locations, catalog, reservations, reviews, users, faqs, notifs] =
+  const [vehicles, locations, catalog, reservations, users, faqs, notifs] =
     await Promise.allSettled([
       getVehicles(),
       getLocations(),
       getCatalog(),
       getReservations(),
-      getReviews(),
       getUsers(),
       getFaqs(),
       getNotifications(),
@@ -56,9 +54,6 @@ async function loadIndex() {
   );
   catalog.extras.forEach((e) => add("Extra", e.name, `${e.price_per_day} MAD / day`, "/admin/catalog"));
   users.forEach((u) => add("User", u.email, u.role, "/admin/users"));
-  reviews.forEach((r) =>
-    add("Review", `${r.vehicle} — ${"★".repeat(r.rating)}`, `${r.user}: ${r.comment}`, "/admin/reviews")
-  );
   faqs.forEach((f) => add("FAQ", f.question, f.answer.slice(0, 90), "/admin/faqs", f.answer));
   notifs.forEach((n) => add("Notification", n.title, n.message, "/admin/notifications"));
   return items;
