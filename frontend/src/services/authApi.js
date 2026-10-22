@@ -23,6 +23,24 @@ export const login = async ({ email, password }) => {
   }
 };
 
+export const googleLogin = async ({ access_token, code }) => {
+  if (!access_token && !code) {
+    throw new Error('A Google access token or authorization code is required.');
+  }
+  clearSession();
+  try {
+    const { data } = await api.post('auth/google/', access_token ? { access_token } : { code });
+    if (!data.access || !data.refresh) {
+      throw new Error('Google login did not return the required session tokens.');
+    }
+    localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh }));
+    return await getCurrentUser();
+  } catch (error) {
+    clearSession();
+    throw error;
+  }
+};
+
 export const logout = async () => clearSession();
 
 export const signup = async () => {
