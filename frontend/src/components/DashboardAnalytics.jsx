@@ -5,7 +5,7 @@ import { buildAnalytics, dateRange } from '../services/dashboardAnalytics';
 import { serializeReport } from '../services/reportFiles';
 import { useI18n } from '../context/I18nContext';
 
-const COLORS = ['#f97316', '#2563eb', '#16a34a', '#dc2626'];
+const COLORS = ['#ffc58c', '#2563eb', '#16a34a', '#dc2626'];
 export default function DashboardAnalytics() {
   const { t, lang } = useI18n();
   const [reservations, setReservations] = useState([]);
@@ -88,8 +88,8 @@ export default function DashboardAnalytics() {
         <article className="analytics-card analytics-trend"><div className="analytics-card-heading"><h2>{t('Booking trends')}</h2><label>{t('Metric')}<select value={metric} onChange={(e) => { setMetric(e.target.value); setPoint(null); }}><option value="revenue">{t('Booked revenue')}</option><option value="bookings">{t('Bookings')}</option></select></label></div>
           <svg viewBox="0 0 800 255" role="img" aria-label={t('Booking trends')}>
             {[0, 0.5, 1].map((fraction) => <g key={fraction}><line x1="50" x2="750" y1={205 - fraction * 165} y2={205 - fraction * 165} stroke="#eee4df" /><text x="45" y={209 - fraction * 165} textAnchor="end" fontSize="11" fill="#897973">{new Intl.NumberFormat(lang, { notation: 'compact' }).format(max * fraction)}</text></g>)}
-            <polyline points={coords.map(({ x, y }) => `${x},${y}`).join(' ')} fill="none" stroke="#f97316" strokeWidth="3" />
-            {coords.map(({ x, y, row }, index) => <circle key={row.date} cx={x} cy={y} r={point === index ? 6 : 4} fill="#f97316" tabIndex="0" role="button" aria-label={`${row.date}: ${metric === 'revenue' ? money(row.revenue) : row.bookings}`} onFocus={() => setPoint(index)} onMouseEnter={() => setPoint(index)} onClick={() => setPoint(index)}><title>{row.date}: {metric === 'revenue' ? money(row.revenue) : row.bookings}</title></circle>)}
+            <polyline points={coords.map(({ x, y }) => `${x},${y}`).join(' ')} fill="none" stroke="#ffc58c" strokeWidth="3" />
+            {coords.map(({ x, y, row }, index) => <circle key={row.date} cx={x} cy={y} r={point === index ? 6 : 4} fill="#ffc58c" tabIndex="0" role="button" aria-label={`${row.date}: ${metric === 'revenue' ? money(row.revenue) : row.bookings}`} onFocus={() => setPoint(index)} onMouseEnter={() => setPoint(index)} onClick={() => setPoint(index)}><title>{row.date}: {metric === 'revenue' ? money(row.revenue) : row.bookings}</title></circle>)}
             {coords.filter((_, index) => index === 0 || index === coords.length - 1 || index === Math.floor(coords.length / 2)).map(({ x, row }) => <text key={row.date} x={x} y="240" textAnchor="middle" fontSize="11" fill="#897973">{row.date}</text>)}
           </svg><div className="analytics-tooltip" aria-live="polite">{selected ? `${selected.row.date} · ${t('Bookings')}: ${selected.row.bookings} · ${money(selected.row.revenue)}` : t('Hover or focus a point to see details.')}</div>
         </article>
