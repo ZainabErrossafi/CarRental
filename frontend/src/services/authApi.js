@@ -8,10 +8,6 @@ const asUser = (user) => ({
 export const getCurrentUser = async () => {
   if (!localStorage.getItem(TOKEN_KEY)) return null;
   const { data } = await api.get('users/me/');
-  if (data.role !== 'admin') {
-    clearSession();
-    throw new Error('An administrator account is required.');
-  }
   return asUser(data);
 };
 

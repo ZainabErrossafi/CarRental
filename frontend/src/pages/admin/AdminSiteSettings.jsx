@@ -113,7 +113,7 @@ export default function AdminSiteSettings() {
       </div>
 
       <p className="local-editor-note">
-        {t("Changes are saved in this browser only and do not update the public site.")}
+        {t("Company details appear in the website footer in this browser. Settings are stored locally and are not published to other visitors.")}
       </p>
       {error && <div role="alert" className="alert alert-error mb-4">{t(error)}</div>}
       {saved && (
