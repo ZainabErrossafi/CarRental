@@ -1,8 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { getList } from "../../services/api.js";
+
+function AgencyDropdown({ name, label, locations, disabled, loading, labelClass, fieldClass }) {
+  const [value, setValue] = useState("");
+  const root = useRef(null);
+  const selected = locations.find((item) => String(item.id) === value);
+  useEffect(() => {
+    const close = (event) => {
+      if (!root.current?.contains(event.target)) root.current?.removeAttribute("open");
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, []);
+  return <div className={`agency-dropdown-field ${labelClass}`}>
+    <span id={`${name}-label`}>{label}</span>
+    <input type="hidden" name={name} value={selected ? value : ""} />
+    <details ref={root} className="agency-dropdown" onKeyDown={(event) => {
+      if (event.key === "Escape") { root.current.removeAttribute("open"); root.current.querySelector("summary").focus(); }
+    }}>
+      <summary className={fieldClass} aria-labelledby={`${name}-label ${name}-value`} aria-disabled={disabled} onClick={(event) => { if (disabled) event.preventDefault(); }}>
+        <span id={`${name}-value`}>{selected ? `${selected.name} · ${selected.city}` : loading ? "Chargement…" : "Sélectionnez une agence..."}</span><span aria-hidden="true">⌄</span>
+      </summary>
+      {!disabled && <div className="agency-dropdown-options" role="group" aria-labelledby={`${name}-label`}>
+        {locations.map((location) => <button key={location.id} type="button" aria-pressed={value === String(location.id)} onClick={() => {
+          setValue(String(location.id)); root.current.removeAttribute("open"); root.current.querySelector("summary").focus();
+        }}>{location.name} · {location.city}</button>)}
+      </div>}
+    </details>
+  </div>;
+}
 
 const localToday = () => {
   const now = new Date();
@@ -61,16 +90,10 @@ export default function RentalSearch() {
   };
 
   return (
-    <form onSubmit={submit} onChange={() => setError("")} aria-label="Rechercher une voiture" className="client-hero-copy tw:mx-auto tw:mt-7 tw:box-border tw:w-full tw:max-w-[1040px] tw:bg-transparent tw:p-0 tw:text-white">
-      <div className="tw:grid tw:grid-cols-1 tw:items-end tw:gap-2 tw:sm:grid-cols-2 tw:xl:grid-cols-[minmax(145px,1.3fr)_minmax(145px,1.3fr)_minmax(130px,1fr)_minmax(112px,0.9fr)_minmax(130px,1fr)_minmax(112px,0.9fr)_40px]">
+    <form onSubmit={submit} onChange={() => setError("")} aria-label="Rechercher une voiture" className="client-rental-search client-hero-copy tw:mx-auto tw:mt-7 tw:box-border tw:w-full tw:max-w-[1040px] tw:bg-transparent tw:p-0 tw:text-white">
+      <div className="client-rental-search-grid tw:grid tw:grid-cols-1 tw:items-end tw:gap-2 tw:sm:grid-cols-2 tw:xl:grid-cols-[minmax(145px,1.3fr)_minmax(145px,1.3fr)_minmax(130px,1fr)_minmax(112px,0.9fr)_minmax(130px,1fr)_minmax(112px,0.9fr)_40px]">
         {[{ name: "departure_agency", label: "Départ" }, { name: "return_agency", label: "Retour" }].map(({ name, label }) => (
-          <label key={name} className={labelClass}>
-            {label}
-            <select name={name} required disabled={locationsLoading || locationsError || !locations.length} defaultValue="" className={fieldClass}>
-              <option className="tw:bg-[#071b2e] tw:text-white" value="" disabled>{locationsLoading ? "Chargement…" : "Sélectionnez une agence..."}</option>
-              {locations.map((location) => <option className="tw:bg-[#071b2e] tw:text-white" key={location.id} value={location.id}>{location.name} · {location.city}</option>)}
-            </select>
-          </label>
+          <AgencyDropdown key={name} name={name} label={label} locations={locations} loading={locationsLoading} disabled={locationsLoading || locationsError || !locations.length} labelClass={labelClass} fieldClass={fieldClass} />
         ))}
         <label className={labelClass}>Date départ<input aria-label="Date de départ" type="date" name="departure_date" required min={localToday()} value={departureDate} onChange={(event) => { setDepartureDate(event.target.value); if (returnDate < event.target.value) setReturnDate(""); }} className={fieldClass} /></label>
         <label className={labelClass}>Heure<input aria-label="Heure de départ" type="time" name="departure_time" required defaultValue="10:00" className={fieldClass} /></label>
