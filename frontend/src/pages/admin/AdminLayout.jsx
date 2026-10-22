@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Car,
@@ -119,10 +119,10 @@ function AdminLayoutContent() {
       )}
 
       <aside className={`admin-sidebar${sidebarOpen ? " open" : ""}`}>
-        <div className="sidebar-brand">
+        <Link to="/" className="sidebar-brand" aria-label={t("Back to home")}>
           <span className="logo-dot" />
           {t("Rently Admin")}
-        </div>
+        </Link>
 
         <button
           type="button"
