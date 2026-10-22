@@ -1,8 +1,30 @@
-import { useEffect, useState } from "react";
+import CompactDropdown from "../../components/client/CompactDropdown.jsx";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { SlidersHorizontal, Search, RotateCcw, ChevronDown, MapPin, CalendarDays, ArrowRight, Info } from "lucide-react";
 import VehicleCard from "../../components/client/VehicleCard.jsx";
 import { getClientVehicles } from "../../services/clientVehicles.js";
+
+const sortOptions = [["default", "Default order"], ["price-asc", "Price: low to high"], ["price-desc", "Price: high to low"], ["name-asc", "Name: A–Z"], ["name-desc", "Name: Z–A"]];
+
+function SortDropdown({ value, onChange }) {
+  const root = useRef(null);
+  useEffect(() => {
+    const close = (event) => { if (!root.current?.contains(event.target)) root.current?.removeAttribute("open"); };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, []);
+  return <div className="fleet-sort"><span id="fleet-sort-label">Sort by</span>
+    <details ref={root} className="fleet-sort-dropdown" onKeyDown={(event) => {
+      if (event.key === "Escape") { root.current.removeAttribute("open"); root.current.querySelector("summary").focus(); }
+    }}>
+      <summary aria-labelledby="fleet-sort-label fleet-sort-value"><span id="fleet-sort-value">{sortOptions.find(([key]) => key === value)[1]}</span><span aria-hidden="true">⌄</span></summary>
+      <div className="fleet-sort-options" role="group" aria-labelledby="fleet-sort-label">{sortOptions.map(([key, label]) => <button type="button" key={key} aria-pressed={value === key} onClick={() => {
+        onChange(key); root.current.removeAttribute("open"); root.current.querySelector("summary").focus();
+      }}>{label}</button>)}</div>
+    </details>
+  </div>;
+}
 
 const brandOf = (vehicle) => vehicle.brand;
 const formatTripDate = (value) => {
@@ -81,7 +103,7 @@ export default function ClientVehicles() {
             <fieldset><legend>Category</legend>
               {["", ...categories, ...(selectedCategory && !categories.includes(selectedCategory) ? [selectedCategory] : [])].map((category) => <label className="fleet-filter-choice" key={category}><input type="radio" name="category" checked={selectedCategory === category} onChange={() => setCategory(category)} /><span>{category || "All categories"}</span><small>{category ? vehicles.filter((vehicle) => vehicle.category === category).length : vehicles.length}</small></label>)}
             </fieldset>
-            <label className="fleet-filter-select">Brand<select value={brand} onChange={(event) => setBrand(event.target.value)}><option value="">All brands</option>{brands.map((name) => <option key={name}>{name}</option>)}</select></label>
+            <CompactDropdown label="Brand" value={brand} onChange={setBrand} options={[{ value: "", label: "All brands" }, ...brands.map((name) => ({ value: name, label: name }))]} />
             <fieldset><legend>Transmission</legend><div className="fleet-transmission-options">{["", ...transmissions].map((value) => <button key={value} type="button" aria-pressed={transmission === value} className={transmission === value ? "is-selected" : ""} onClick={() => setTransmission(value)}>{value || "All"}</button>)}</div></fieldset>
             <label className="fleet-price-filter"><span>Daily budget<strong>{maxPrice ?? priceLimit} MAD</strong></span><input type="range" min="0" max={priceLimit} step="50" value={maxPrice ?? priceLimit} onChange={(event) => setMaxPrice(Number(event.target.value))} /><span className="fleet-price-limits"><small>0 MAD</small><small>{priceLimit} MAD</small></span></label>
             <button type="button" className="fleet-clear-filters" onClick={reset}><RotateCcw size={14} aria-hidden="true" />Clear all filters</button>
@@ -89,7 +111,7 @@ export default function ClientVehicles() {
         </aside>
         <div className="fleet-results">
           <div className="fleet-results-toolbar"><p role="status"><strong>{filteredVehicles.length}</strong> {filteredVehicles.length === 1 ? "vehicle" : "vehicles"} found</p><label className="fleet-search"><Search size={17} aria-hidden="true" /><input aria-label="Search vehicles by name" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search a vehicle…" /></label>
-          <label className="fleet-sort">Sort by<select value={sort} onChange={(event) => setSort(event.target.value)}><option value="default">Default order</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="name-asc">Name: A–Z</option><option value="name-desc">Name: Z–A</option></select></label></div>
+          <SortDropdown value={sort} onChange={setSort} /></div>
           <div aria-live="polite">{loading && <p role="status">Loading vehicles…</p>}{error && <div role="alert"><p>{error}</p><button type="button" onClick={() => setRetry((value) => value + 1)}>Try again</button></div>}</div>
           <div className="fleet-results-grid">{sortedVehicles.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} />)}</div>
           {!loading && !error && filteredVehicles.length === 0 && <div className="fleet-empty"><Search size={30} aria-hidden="true" /><h2>No matching vehicles</h2><p>Try a different category or increase your budget.</p><button type="button" onClick={reset}>Clear filters</button></div>}
