@@ -1,6 +1,6 @@
-from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password as django_validate_password
+from rest_framework import serializers
 from .models import User
 
 
@@ -11,11 +11,36 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'password']
 
+    def validate_email(self, value):
+        value = value.strip().lower()
+        users = User.objects.filter(email__iexact=value)
+        if self.instance:
+            users = users.exclude(pk=self.instance.pk)
+        if users.exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+
+    def validate_password(self, value):
+        django_validate_password(value)
+        return value
+
     def validate(self, data):
         request = self.context.get('request')
-        if request and not request.user.is_admin():
+        if request is None:
+            return data
+        actor = request.user
+        is_admin = actor.is_authenticated and actor.is_admin()
+
+        if not is_admin:
             data.pop('role', None)
             data.pop('is_active', None)
+            if self.instance is not None:
+                data.pop('password', None)
+        elif self.instance and self.instance == actor:
+            if 'role' in data and data['role'] != actor.role:
+                raise serializers.ValidationError({'role': 'You cannot change your own role.'})
+            if data.get('is_active') is False:
+                raise serializers.ValidationError({'is_active': 'You cannot deactivate your own account.'})
         return data
 
     def create(self, validated_data):
@@ -32,10 +57,6 @@ class UserSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
-
-    def validate_password(self, value):
-        django_validate_password(value)
-        return value
 
 
 class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
