@@ -39,7 +39,7 @@ export default function AdminAuth({ initialMode = "login" }) {
   const [view, setView] = useState(initialMode === "signup" ? "signup" : "signin");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -82,13 +82,13 @@ export default function AdminAuth({ initialMode = "login" }) {
     setLoading(true);
     try {
       if (view === "signin") {
-        const signedInUser = await login({ email: form.email, password: form.password });
+        const signedInUser = await login({ username: form.username, password: form.password });
         const requestedPath = location.state?.from?.pathname;
         const redirectTo = signedInUser.role !== "admin" && (/^\/vehicles\/[^/]+$/.test(requestedPath || "") || requestedPath === "/my-reservations") ? requestedPath : "/";
         navigate(redirectTo, { replace: true });
       } else {
-        await signup({ name: form.name, email: form.email, password: form.password });
-        navigate("/verify-email", { state: { email: form.email }, replace: true });
+        const result = await signup({ name: form.name, email: form.email, password: form.password });
+        navigate("/verify-email", { state: { email: result.email }, replace: true });
       }
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -182,17 +182,18 @@ export default function AdminAuth({ initialMode = "login" }) {
             {/* Formulaire de Connexion */}
             <form className="signin" onSubmit={handleSubmit}>
               <div className="gfield">
-                <label htmlFor="email">{t("Email")}</label>
+                <label htmlFor="username">{t("Username")}</label>
                 <div className="gfield-input">
                   <input
-                    id="email"
-                    type="email"
-                    placeholder={t("youremail@gmail.com")}
-                    value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
+                    id="username"
+                    type="text"
+                    autoComplete="username"
+                    placeholder={t("myusername")}
+                    value={form.username}
+                    onChange={(e) => handleChange("username", e.target.value)}
                     required
                   />
-                  <Mail size={18} />
+                  <User size={18} />
                 </div>
               </div>
 

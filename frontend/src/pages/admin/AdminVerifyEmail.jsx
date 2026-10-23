@@ -1,3 +1,4 @@
+import { resendVerification } from "../../services/authApi";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
@@ -12,12 +13,13 @@ export default function AdminVerifyEmail() {
   const navigate = useNavigate();
   const location = useLocation();
   const { verifyEmail } = useAuth();
-  const signupEmail = location.state?.email;
+  const signupEmail = location.state?.email || sessionStorage.getItem("rently_verification_email");
   const email = signupEmail || t("your email");
 
   const [digits, setDigits] = useState(Array(CODE_LENGTH).fill(""));
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState(null);
   const inputRefs = useRef([]);
 
   const code = digits.join("");
@@ -56,14 +58,14 @@ export default function AdminVerifyEmail() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isComplete) return;
+    if (!isComplete || !signupEmail) return;
 
     setLoading(true);
     setError(null);
 
     try {
       await verifyEmail({ email: signupEmail, code });
-      navigate("/admin", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.message || "Verification failed. Please try again.");
     } finally {
@@ -71,10 +73,21 @@ export default function AdminVerifyEmail() {
     }
   };
 
-  const handleResend = () => {
-    setDigits(Array(CODE_LENGTH).fill(""));
+  const handleResend = async () => {
+    if (!signupEmail || loading) return;
+    setLoading(true);
     setError(null);
-    inputRefs.current[0]?.focus();
+    setNotice(null);
+    try {
+      const result = await resendVerification(signupEmail);
+      setNotice(result.detail);
+      setDigits(Array(CODE_LENGTH).fill(""));
+      inputRefs.current[0]?.focus();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,10 +100,15 @@ export default function AdminVerifyEmail() {
 
         <h1 className="auth-title">{t("Check your email")}</h1>
         <p className="auth-subtitle">
-          {t("We sent a verification code to")} <strong>{email}</strong>
+          {t("Email verification")} <strong>{email}</strong>
         </p>
 
         {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
+
+        <p>{t("Email verification is not available yet. You can sign in with your username and password.")}</p>
+
+        {notice && <p role="status">{t(notice)}</p>}
+        {!signupEmail && <p><Link to="/signup">{t("Sign Up")}</Link></p>}
 
         <form onSubmit={handleSubmit} className="auth-form" style={{ alignItems: "center" }}>
           <div className="otp-inputs" onPaste={handlePaste}>
@@ -112,7 +130,7 @@ export default function AdminVerifyEmail() {
           <button
             type="submit"
             className="gcard-submit"
-            disabled={!isComplete || loading}
+            disabled={!isComplete || loading || !signupEmail}
           >
             {loading ? t("Verifying...") : t("Verify email")}
           </button>
@@ -120,7 +138,7 @@ export default function AdminVerifyEmail() {
 
         <p className="auth-footer">
           {t("Didn't receive the email?")}{" "}
-          <button type="button" className="auth-link" onClick={handleResend}>
+          <button type="button" className="auth-link" onClick={handleResend} disabled={loading || !signupEmail}>
             {t("Click to resend")}
           </button>
         </p>
