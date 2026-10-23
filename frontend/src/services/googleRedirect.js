@@ -1,14 +1,21 @@
 // Complete the redirect used by the Django Google OAuth callback.
 export function consumeGoogleRedirect(browser, tokenKey) {
   const url = new URL(browser.location.href);
-  const access = url.searchParams.get('access');
-  const refresh = url.searchParams.get('refresh');
-  if (!url.searchParams.has('access') && !url.searchParams.has('refresh')) return;
+  const fragment = new URLSearchParams(url.hash.slice(1));
+  const hasTokens = (params) => params.has('access') || params.has('refresh');
+  const fragmentCallback = hasTokens(fragment);
+  const queryCallback = hasTokens(url.searchParams);
+  if (!fragmentCallback && !queryCallback) return;
 
-  // Never trust the role supplied in the URL; users/me provides the user profile.
-  url.searchParams.delete('access');
-  url.searchParams.delete('refresh');
-  url.searchParams.delete('role');
+  const params = fragmentCallback ? fragment : url.searchParams;
+  const access = params.get('access');
+  const refresh = params.get('refresh');
+  // The authenticated profile determines the role, never the redirect URL.
+  for (const key of ['access', 'refresh', 'role']) {
+    if (queryCallback) url.searchParams.delete(key);
+    if (fragmentCallback) fragment.delete(key);
+  }
+  if (fragmentCallback) url.hash = fragment.toString();
   browser.history.replaceState(browser.history.state, '', `${url.pathname}${url.search}${url.hash}`);
 
   if (access && refresh) {
