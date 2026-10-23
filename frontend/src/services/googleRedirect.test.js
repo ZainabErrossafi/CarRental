@@ -44,3 +44,20 @@ test('ordinary visits leave the URL and stored session unchanged', () => {
   assert.equal(values.get('session'), 'existing');
   assert.equal(browser.history.replaced, undefined);
 });
+
+test('current backend fragment callback establishes the session', () => {
+  const { browser, values } = browserAt('https://localhost:8443/?lang=fr#access=access-token&refresh=refresh-token');
+  consumeGoogleRedirect(browser, 'session');
+  assert.deepEqual(JSON.parse(values.get('session')), { access: 'access-token', refresh: 'refresh-token' });
+  assert.equal(browser.history.replaced.path, '/?lang=fr');
+  consumeGoogleRedirect(browser, 'session');
+  assert.equal(values.size, 1);
+});
+
+test('incomplete fragment is removed without overwriting an existing session', () => {
+  const { browser, values } = browserAt('https://localhost:8443/#access=partial&role=admin');
+  values.set('session', 'existing');
+  consumeGoogleRedirect(browser, 'session');
+  assert.equal(values.get('session'), 'existing');
+  assert.equal(browser.history.replaced.path, '/');
+});
