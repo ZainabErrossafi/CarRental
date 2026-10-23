@@ -39,7 +39,7 @@ export default function AdminAuth({ initialMode = "login" }) {
   const [view, setView] = useState(initialMode === "signup" ? "signup" : "signin");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "", confirmPassword: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -82,15 +82,21 @@ export default function AdminAuth({ initialMode = "login" }) {
     setLoading(true);
     try {
       if (view === "signin") {
+<<<<<<< HEAD
         await login({ email: form.email, password: form.password });
         const from = location.state?.from;
         const requestedPath = from?.pathname;
         const redirectTo = /^\/vehicles\/[^/]+$/.test(requestedPath || "")
           ? requestedPath + (from.search || "") + (from.hash || "") : "/";
+=======
+        const signedInUser = await login({ username: form.username, password: form.password });
+        const requestedPath = location.state?.from?.pathname;
+        const redirectTo = signedInUser.role !== "admin" && (/^\/vehicles\/[^/]+$/.test(requestedPath || "") || requestedPath === "/my-reservations") ? requestedPath : "/";
+>>>>>>> main
         navigate(redirectTo, { replace: true });
       } else {
-        await signup({ name: form.name, email: form.email, password: form.password });
-        navigate("/verify-email", { state: { email: form.email }, replace: true });
+        const result = await signup({ name: form.name, email: form.email, password: form.password });
+        navigate("/verify-email", { state: { email: result.email }, replace: true });
       }
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -184,17 +190,18 @@ export default function AdminAuth({ initialMode = "login" }) {
             {/* Formulaire de Connexion */}
             <form className="signin" onSubmit={handleSubmit}>
               <div className="gfield">
-                <label htmlFor="email">{t("Email")}</label>
+                <label htmlFor="username">{t("Username")}</label>
                 <div className="gfield-input">
                   <input
-                    id="email"
-                    type="email"
-                    placeholder={t("youremail@gmail.com")}
-                    value={form.email}
-                    onChange={(e) => handleChange("email", e.target.value)}
+                    id="username"
+                    type="text"
+                    autoComplete="username"
+                    placeholder={t("myusername")}
+                    value={form.username}
+                    onChange={(e) => handleChange("username", e.target.value)}
                     required
                   />
-                  <Mail size={18} />
+                  <User size={18} />
                 </div>
               </div>
 
@@ -336,6 +343,19 @@ export default function AdminAuth({ initialMode = "login" }) {
 
               <button type="submit" className="gcard-submit" disabled={loading}>
                 {loading ? t("Please wait...") : t("Sign Up")}
+              </button>
+
+              <div className="gcard-divider"><span>{t("or")}</span></div>
+              <button
+                type="button"
+                className="gcard-google"
+                disabled={loading}
+                onClick={() => {
+                  window.location.href = "https://localhost:8443/api/accounts/google/login/";
+                }}
+              >
+                <FcGoogle size={20} aria-hidden="true" />
+                {t("Sign in with Google")}
               </button>
             </form>
           </div>

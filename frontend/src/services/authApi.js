@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import api, { TOKEN_KEY, SESSION_KEY, clearSession } from './api';
 
 const readLoginMethod = () => {
@@ -19,6 +20,10 @@ const consumeGoogleCallback = () => {
   sessionStorage.removeItem('rently_booking_return');
   return /^\/vehicles\/[^/?#]+(?:[?#].*)?$/.test(returnTo || '') ? returnTo : null;
 };
+=======
+import api, { TOKEN_KEY, clearSession } from './api';
+import { consumeGoogleRedirect } from './googleRedirect';
+>>>>>>> main
 
 const asUser = (user) => ({
   ...user,
@@ -30,16 +35,20 @@ const asUser = (user) => ({
 });
 
 export const getCurrentUser = async () => {
+<<<<<<< HEAD
   const returnTo = consumeGoogleCallback();
+=======
+  consumeGoogleRedirect(window, TOKEN_KEY);
+>>>>>>> main
   if (!localStorage.getItem(TOKEN_KEY)) return null;
   const { data } = await api.get('users/me/');
   if (returnTo) window.location.replace(returnTo);
   return asUser(data);
 };
 
-export const login = async ({ email, password }) => {
+export const login = async ({ username, password }) => {
   clearSession();
-  const { data } = await api.post('token/', { email, password });
+  const { data } = await api.post('token/', { username, password });
   localStorage.setItem(TOKEN_KEY, JSON.stringify(data));
   localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'password' }));
   try {
@@ -71,10 +80,19 @@ export const googleLogin = async ({ access_token, code }) => {
 
 export const logout = async () => clearSession();
 
-export const signup = async () => {
-  throw new Error('Ask an administrator to create your account. Public administrator registration is unavailable.');
+export const signup = async ({ name, email, password }) => {
+  clearSession();
+  const { data } = await api.post('auth/signup/', { username: name, email, password });
+  localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh }));
+  const user = asUser(data.user);
+  sessionStorage.setItem('rently_verification_email', user.email);
+  return user;
 };
 
 export const verifyEmail = async () => {
-  throw new Error('Email verification is not available on this backend. Please sign in with your administrator account.');
+  throw new Error('Email verification is not available yet. You can sign in with your username and password.');
+};
+
+export const resendVerification = async () => {
+  throw new Error('Verification emails are not available yet.');
 };

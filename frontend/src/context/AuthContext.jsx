@@ -35,8 +35,9 @@ export function AuthProvider({ children }) {
   };
 
   const signup = async (details) => {
-    // Account is created but not signed in until the email is verified.
-    return signupApi(details);
+    const registeredUser = await signupApi(details);
+    setUser(registeredUser);
+    return registeredUser;
   };
 
   const googleLogin = async (credentials) => {
