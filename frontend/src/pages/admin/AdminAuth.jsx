@@ -82,9 +82,11 @@ export default function AdminAuth({ initialMode = "login" }) {
     setLoading(true);
     try {
       if (view === "signin") {
-        const signedInUser = await login({ email: form.email, password: form.password });
-        const requestedPath = location.state?.from?.pathname;
-        const redirectTo = signedInUser.role !== "admin" && (/^\/vehicles\/[^/]+$/.test(requestedPath || "") || requestedPath === "/my-reservations") ? requestedPath : "/";
+        await login({ email: form.email, password: form.password });
+        const from = location.state?.from;
+        const requestedPath = from?.pathname;
+        const redirectTo = /^\/vehicles\/[^/]+$/.test(requestedPath || "")
+          ? requestedPath + (from.search || "") + (from.hash || "") : "/";
         navigate(redirectTo, { replace: true });
       } else {
         await signup({ name: form.name, email: form.email, password: form.password });
@@ -235,7 +237,13 @@ export default function AdminAuth({ initialMode = "login" }) {
                 className="gcard-google"
                 disabled={loading}
                 onClick={() => {
-                  window.location.href = "https://localhost:8443/api/accounts/google/login/";
+                  const from = location.state?.from;
+                  if (/^\/vehicles\/[^/]+$/.test(from?.pathname || "")) {
+                    sessionStorage.setItem("rently_booking_return", from.pathname + (from.search || "") + (from.hash || ""));
+                  } else {
+                    sessionStorage.removeItem("rently_booking_return");
+                  }
+                  window.location.href = "/api/accounts/google/login/";
                 }}
               >
                 <FcGoogle size={20} aria-hidden="true" />

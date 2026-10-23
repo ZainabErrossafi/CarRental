@@ -10,11 +10,14 @@ const consumeGoogleCallback = () => {
   const params = new URLSearchParams(window.location.hash.slice(1));
   const access = params.get('access');
   const refresh = params.get('refresh');
-  if (!access || !refresh) return;
+  if (!access || !refresh) return null;
   clearSession();
   localStorage.setItem(TOKEN_KEY, JSON.stringify({ access, refresh }));
   localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'google' }));
   window.history.replaceState(null, '', window.location.pathname + window.location.search);
+  const returnTo = sessionStorage.getItem('rently_booking_return');
+  sessionStorage.removeItem('rently_booking_return');
+  return /^\/vehicles\/[^/?#]+(?:[?#].*)?$/.test(returnTo || '') ? returnTo : null;
 };
 
 const asUser = (user) => ({
@@ -27,9 +30,10 @@ const asUser = (user) => ({
 });
 
 export const getCurrentUser = async () => {
-  consumeGoogleCallback();
+  const returnTo = consumeGoogleCallback();
   if (!localStorage.getItem(TOKEN_KEY)) return null;
   const { data } = await api.get('users/me/');
+  if (returnTo) window.location.replace(returnTo);
   return asUser(data);
 };
 

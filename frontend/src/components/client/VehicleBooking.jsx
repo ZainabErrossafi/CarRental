@@ -1,7 +1,7 @@
 import { CATALOG_ICONS } from "../CatalogIcons.jsx";
 import CompactDropdown from "./CompactDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 import api, { getList } from "../../services/api.js";
@@ -14,6 +14,7 @@ const nextMinute = () => localMinute(new Date(Math.floor(Date.now() / 60000) * 6
 
 export default function VehicleBooking({ vehicle }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
   const [locations, setLocations] = useState([]);
   const [extras, setExtras] = useState([]);
   const [selectedExtras, setSelectedExtras] = useState([]);
@@ -134,7 +135,7 @@ export default function VehicleBooking({ vehicle }) {
         </details>}
         <div className="vehicle-booking-estimate" aria-live="polite"><h2>Total</h2>{valid ? <><strong>{money(duration * vehicle.pricePerDay + extrasTotal)} MAD</strong><p>{duration} {duration === 1 ? "day" : "days"} · Includes selected extras. Deposit excluded.</p></> : <p>Select a future pick-up and a later return.</p>}</div>
         {error && <p className="vehicle-booking-error" role="alert">{error}</p>}
-        {!loading && !user ? <Link className="vehicle-booking-button vehicle-booking-signin" to="/login" state={{ from: { pathname: `/vehicles/${vehicle.id}` } }}>Sign in to book this car <ArrowRight size={17} aria-hidden="true" /></Link> : <button type="submit" className="vehicle-booking-button" disabled={busy || loading || !valid || !contactComplete || !locations.length || locationError}>{busy ? "Booking…" : "Book now"}<ArrowRight size={17} aria-hidden="true" /></button>}
+        {!loading && !user ? <Link className="vehicle-booking-button vehicle-booking-signin" to="/login" state={{ from: location }}>Sign in to book this car <ArrowRight size={17} aria-hidden="true" /></Link> : <button type="submit" className="vehicle-booking-button" disabled={busy || loading || !valid || !contactComplete || !locations.length || locationError}>{busy ? "Booking…" : "Book now"}<ArrowRight size={17} aria-hidden="true" /></button>}
         <p className="vehicle-booking-note">Availability and final price are checked when you submit. Reservations require confirmation.</p>
       </fieldset>
     </form>
