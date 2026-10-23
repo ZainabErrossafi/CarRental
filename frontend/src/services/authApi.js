@@ -1,29 +1,18 @@
-<<<<<<< HEAD
 import api, { TOKEN_KEY, SESSION_KEY, clearSession } from './api';
+import { consumeGoogleRedirect } from './googleRedirect';
 
 const readLoginMethod = () => {
   try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null')?.loginMethod; }
   catch { return null; }
 };
 
-// Google returns JWTs in the URL fragment after its server-side callback.
 const consumeGoogleCallback = () => {
-  const params = new URLSearchParams(window.location.hash.slice(1));
-  const access = params.get('access');
-  const refresh = params.get('refresh');
-  if (!access || !refresh) return null;
-  clearSession();
-  localStorage.setItem(TOKEN_KEY, JSON.stringify({ access, refresh }));
+  if (!consumeGoogleRedirect(window, TOKEN_KEY)) return null;
   localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'google' }));
-  window.history.replaceState(null, '', window.location.pathname + window.location.search);
   const returnTo = sessionStorage.getItem('rently_booking_return');
   sessionStorage.removeItem('rently_booking_return');
   return /^\/vehicles\/[^/?#]+(?:[?#].*)?$/.test(returnTo || '') ? returnTo : null;
 };
-=======
-import api, { TOKEN_KEY, clearSession } from './api';
-import { consumeGoogleRedirect } from './googleRedirect';
->>>>>>> main
 
 const asUser = (user) => ({
   ...user,
@@ -35,11 +24,7 @@ const asUser = (user) => ({
 });
 
 export const getCurrentUser = async () => {
-<<<<<<< HEAD
   const returnTo = consumeGoogleCallback();
-=======
-  consumeGoogleRedirect(window, TOKEN_KEY);
->>>>>>> main
   if (!localStorage.getItem(TOKEN_KEY)) return null;
   const { data } = await api.get('users/me/');
   if (returnTo) window.location.replace(returnTo);
