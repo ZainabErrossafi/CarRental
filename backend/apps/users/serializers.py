@@ -60,15 +60,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
+
 class AdminTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        from rest_framework.exceptions import AuthenticationFailed
-
         data = super().validate(attrs)
 
         user = self.user
-        if user.role != 'admin':
-            raise AuthenticationFailed('An administrator account is required.')
+        data['user'] = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'role': user.role,
+        }
 
         return data
-
