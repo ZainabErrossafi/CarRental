@@ -20,5 +20,6 @@ export function consumeGoogleRedirect(browser, tokenKey) {
 
   if (access && refresh) {
     browser.localStorage.setItem(tokenKey, JSON.stringify({ access, refresh }));
+    return true;
   }
 }
