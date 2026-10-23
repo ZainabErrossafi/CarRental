@@ -1,4 +1,5 @@
 import api, { TOKEN_KEY, clearSession } from './api';
+import { consumeGoogleRedirect } from './googleRedirect';
 
 const asUser = (user) => ({
   ...user,
@@ -6,6 +7,7 @@ const asUser = (user) => ({
 });
 
 export const getCurrentUser = async () => {
+  consumeGoogleRedirect(window, TOKEN_KEY);
   if (!localStorage.getItem(TOKEN_KEY)) return null;
   const { data } = await api.get('users/me/');
   return asUser(data);
