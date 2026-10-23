@@ -6,7 +6,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-const CODE_LENGTH = 4;
+const CODE_LENGTH = 6;
 
 export default function AdminVerifyEmail() {
   const { t } = useI18n();
