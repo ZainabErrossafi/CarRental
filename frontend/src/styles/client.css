@@ -156,7 +156,7 @@
 }
 .client-footer-home {
   padding-top: 64px;
-  background: #fdfaf5;
+  background: #a89b94;
 }
 
 .client-footer-home::before {
@@ -304,7 +304,7 @@
 
 @media (max-width: 480px) { .client-footer.client-footer-home {
   padding-top: 64px;
-  background: #fdfaf5;
+  background: #a89b94;
 } }
 
 .fleet-page { font-family: "Plus Jakarta Sans", sans-serif; }
