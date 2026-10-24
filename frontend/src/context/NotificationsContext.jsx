@@ -1,16 +1,20 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getNotifications } from "../services/adminApi";
+import { useAuth } from "./AuthContext";
+import { TOKEN_KEY } from "../services/api";
 
 const NotificationsContext = createContext(null);
 
 export function NotificationsProvider({ children }) {
+  const { user, loading } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const requestVersion = useRef(0);
   const refreshNotifications = useCallback(async () => {
+    if (loading || !user || !localStorage.getItem(TOKEN_KEY)) return;
     const version = ++requestVersion.current;
     const items = await getNotifications();
-    if (version === requestVersion.current) setNotifications(items);
-  }, []);
+    if (version === requestVersion.current && localStorage.getItem(TOKEN_KEY)) setNotifications(items);
+  }, [user, loading]);
   const updateNotifications = useCallback((update) => {
     // Ignore requests started before a local read/delete action.
     requestVersion.current += 1;
@@ -18,6 +22,11 @@ export function NotificationsProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (loading || !user) {
+      requestVersion.current += 1;
+      setNotifications([]);
+      return;
+    }
     const refresh = () => {
       if (document.visibilityState !== "hidden") {
         refreshNotifications().catch(() => {});
@@ -33,7 +42,7 @@ export function NotificationsProvider({ children }) {
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, [refreshNotifications]);
+  }, [refreshNotifications, user, loading]);
 
   return (
     <NotificationsContext.Provider value={{ notifications, setNotifications: updateNotifications, refreshNotifications }}>

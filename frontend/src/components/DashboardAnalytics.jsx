@@ -4,9 +4,12 @@ import { getReservations } from '../services/adminApi';
 import { buildAnalytics, dateRange } from '../services/dashboardAnalytics';
 import { serializeReport } from '../services/reportFiles';
 import { useI18n } from '../context/I18nContext';
+import { useAuth } from '../context/AuthContext';
+import { TOKEN_KEY } from '../services/api';
 
 const COLORS = ['#ffc58c', '#2563eb', '#16a34a', '#dc2626'];
 export default function DashboardAnalytics() {
+  const { user, loading: authLoading } = useAuth();
   const { t, lang } = useI18n();
   const [reservations, setReservations] = useState([]);
   const [range, setRange] = useState(() => dateRange(30));
@@ -22,28 +25,33 @@ export default function DashboardAnalytics() {
   const busy = useRef(false);
   const mounted = useRef(false);
   const refresh = useCallback(async () => {
-    if (busy.current) return;
+    if (busy.current || authLoading || !user || !localStorage.getItem(TOKEN_KEY)) return;
     busy.current = true;
     if (mounted.current) setLoading(true);
     try {
       const rows = await getReservations();
-      if (mounted.current) { setReservations(rows); setUpdated(new Date()); setError(false); }
+      if (mounted.current && localStorage.getItem(TOKEN_KEY)) { setReservations(rows); setUpdated(new Date()); setError(false); }
     } catch { if (mounted.current) setError(true); }
     finally { busy.current = false; if (mounted.current) setLoading(false); }
-  }, []);
+  }, [user, authLoading]);
   useEffect(() => {
+    if (authLoading || !user) {
+      setReservations([]);
+      setUpdated(null);
+      return;
+    }
     mounted.current = true;
     refresh();
     return () => { mounted.current = false; };
-  }, [refresh]);
+  }, [refresh, user, authLoading]);
   useEffect(() => {
-    if (!live) return;
+    if (!live || authLoading || !user) return;
     const update = () => { if (document.visibilityState !== 'hidden') refresh(); };
     const timer = window.setInterval(update, 10000);
     window.addEventListener('focus', update);
     document.addEventListener('visibilitychange', update);
     return () => { window.clearInterval(timer); window.removeEventListener('focus', update); document.removeEventListener('visibilitychange', update); };
-  }, [live, refresh]);
+  }, [live, refresh, user, authLoading]);
   const invalid = !range.start || !range.end || range.start > range.end;
   const data = useMemo(() => invalid ? null : buildAnalytics(reservations, { ...range, status, vehicle }), [reservations, range, status, vehicle, invalid]);
   const vehicles = useMemo(() => [...new Map(reservations.map((row) => [row.vehicle, row.vehicle_name || row.vehicle])).entries()], [reservations]);
