@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { LANGUAGES, translate } from "../i18n/translations";
+import { useLocation } from "react-router-dom";
 
 const I18nContext = createContext(null);
 const STORAGE_KEY = "rently_lang";
@@ -15,14 +16,18 @@ function getInitialLang() {
 }
 
 export function I18nProvider({ children }) {
+  const { pathname } = useLocation();
   const [lang, setLangState] = useState(getInitialLang);
   const current = LANGUAGES.find((l) => l.code === lang) || LANGUAGES[0];
+  const isClientPage = pathname === "/" || pathname === "/faqs" || /^\/vehicles(?:\/|$)/.test(pathname);
+  const pageLang = isClientPage ? "en" : current.code;
+  const pageDir = isClientPage ? "ltr" : current.dir;
 
-  // Keep <html lang> and direction (RTL for Arabic) in sync
+  // Public pages use English copy; keep the saved admin language scoped to admin/auth pages.
   useEffect(() => {
-    document.documentElement.lang = current.code;
-    document.documentElement.dir = current.dir;
-  }, [current]);
+    document.documentElement.lang = pageLang;
+    document.documentElement.dir = pageDir;
+  }, [pageLang, pageDir]);
 
   const setLang = useCallback((code) => {
     setLangState(code);
