@@ -9,6 +9,8 @@ export default function ClientLayout() {
   const isVehicles = pathname === "/vehicles";
   return (
     <div
+      lang="en"
+      dir="ltr"
       className="client-site-background client-page-gradient tw:flex tw:min-h-screen tw:flex-col tw:text-[#021731] tw:[&_a]:no-underline"
     >
       <ClientHeader overlay={isHome} />
