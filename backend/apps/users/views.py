@@ -1,13 +1,16 @@
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import viewsets
+# ####oussama: Public sign-up endpoint imports.
+from rest_framework.generics import CreateAPIView
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated  # ####oussama: Allow public sign-up.
 from rest_framework.response import Response
 
 from .models import User
 from .permissions import IsAdmin, IsAdminOrOwner
-from .serializers import UserSerializer
+from .serializers import SignupSerializer, UserSerializer  # ####oussama: Sign-up validation.
+from .views_2fa import TwoFactorThrottle  # ####oussama: Public sign-up rate limit.
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect
 from urllib.parse import urlencode
@@ -21,6 +24,13 @@ def google_callback_redirect(request):
     user = request.user
     if not user.is_authenticated:
         return redirect("/login?error=auth_failed")
+
+    if not user.is_active:
+        return redirect('/login?error=auth_failed')
+    if user.two_factor_enabled:
+        from django.http import JsonResponse
+        from .two_factor import start_email_challenge
+        return JsonResponse(start_email_challenge(user))
 
     refresh = RefreshToken.for_user(user)
     refresh['role'] = user.role
@@ -100,3 +110,35 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=409,
             )
         return super().destroy(request, *args, **kwargs)
+
+
+# ####oussama: Create a pending account and send its email verification challenge.
+class SignupView(CreateAPIView):
+    serializer_class = SignupSerializer
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    # ####oussama: Rate-limit public sign-up requests.
+    throttle_classes = [TwoFactorThrottle]
+
+    def create(self, request, *args, **kwargs):
+        from django.db import transaction
+        from .two_factor import start_email_challenge  # ####oussama: No session before verification.
+
+        # ####oussama: Resume an unfinished sign-up only when all original credentials match.
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        if all(isinstance(value, str) for value in (username, email, password)):
+            pending = User.objects.filter(
+                username=username.strip(), email__iexact=email.strip(),
+                is_active=False, email_verified=False, two_factor_enabled=True,
+            ).first()
+            if pending is not None and pending.check_password(password):
+                return Response(start_email_challenge(pending, purpose='signup'), status=200)
+
+        # ####oussama: Validate against real accounts, then store only a temporary request.
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        from .registration import start_registration
+        data, created = start_registration(serializer.validated_data)
+        return Response(data, status=201 if created else 200)

@@ -13,4 +13,5 @@ sqlparse==0.5.5
 typing_extensions==4.16.0
 django-allauth
 dj-rest-auth
+pyotp>=2.9.0
 requests
