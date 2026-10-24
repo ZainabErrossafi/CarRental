@@ -24,14 +24,18 @@ class FrontendAuthenticationTests(TestCase):
         self.assertEqual(refresh.status_code, 200)
         self.assertIn('access', refresh.data)
 
-    def test_bad_password_and_client_role_are_rejected(self):
+    def test_bad_password_is_rejected_and_client_can_login(self):
         User.objects.create_user('client', 'client@example.com', 'StrongPassword123!')
-        for email, password in [('admin@example.com', 'wrong'), ('client@example.com', 'StrongPassword123!')]:
-            response = self.client.post('/api/token/', {'email': email, 'password': password}, format='json')
-            self.assertEqual(response.status_code, 401)
+        response = self.client.post('/api/token/', {'email': 'admin@example.com', 'password': 'wrong'}, format='json')
+        self.assertEqual(response.status_code, 401)
+        response = self.client.post('/api/token/', {'email': 'client@example.com', 'password': 'StrongPassword123!'}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['role'], 'client')
 
     def test_duplicate_emails_are_rejected(self):
-        User.objects.create_user('duplicate', 'admin@example.com', 'StrongPassword123!')
+        # The database prevents exact duplicates; ambiguous case variants must
+        # still fail safely on databases with case-sensitive unique constraints.
+        User.objects.create_user('duplicate', 'ADMIN@example.com', 'StrongPassword123!')
         response = self.client.post('/api/token/', {'email': 'admin@example.com', 'password': 'StrongPassword123!'}, format='json')
         self.assertEqual(response.status_code, 401)
 

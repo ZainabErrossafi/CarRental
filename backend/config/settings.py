@@ -62,6 +62,8 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
 ##//////////
 
+    # ####oussama: Enable persistent FAQs.
+    'apps.faqs',
     'apps.brands',
     'apps.categories',
     'apps.features',
@@ -188,6 +190,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 # خلي dj-rest-auth يعطي JWT ماشي Token عادي
 REST_AUTH = {
+    'LOGIN_SERIALIZER': 'apps.users.serializers.TwoFactorAwareLoginSerializer',
     'USE_JWT': True,
     'JWT_AUTH_COOKIE': 'jwt-auth',
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
@@ -222,3 +225,16 @@ REST_FRAMEWORK = {
 }
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Development prints messages to the backend console. Set EMAIL_BACKEND to
+# django.core.mail.backends.smtp.EmailBackend in production and supply SMTP env vars.
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.example.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+# ####oussama: Support SMTP providers using either STARTTLS (587) or SSL (465).
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'false').lower() in ('true', '1', 'yes')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'false' if EMAIL_USE_SSL else 'true').lower() in ('true', '1', 'yes')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@example.com')
+EMAIL_TIMEOUT = 10

@@ -30,3 +30,4 @@ create_user:
 	docker compose exec backend python manage.py createsuperuser
 certs:
 	sh nginx/generate-certs.sh
+	
