@@ -180,23 +180,6 @@ export default function VehicleForm({
                     </span>
                   </div>
 
-                  <label className="vehicle-featured-control full-width">
-                    <span className="vehicle-featured-copy">
-                      <span className="vehicle-featured-title">{t("Featured vehicle")}</span>
-                      <span className="field-hint" id="vehicle-featured-hint">
-                        {t("Highlight this vehicle on the site to help it stand out.")}
-                      </span>
-                    </span>
-                    <input
-                      className="vehicle-featured-input"
-                      type="checkbox"
-                      role="switch"
-                      aria-describedby="vehicle-featured-hint"
-                      checked={!!form.is_featured}
-                      onChange={(e) => onChange("is_featured", e.target.checked)}
-                    />
-                    <span className="vehicle-featured-switch" aria-hidden="true" />
-                  </label>
                 </div>
               </div>
 
