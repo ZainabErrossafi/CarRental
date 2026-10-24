@@ -93,7 +93,13 @@ export default function AdminAuth({ initialMode = "login" }) {
         navigate("/verify-email", { state: { email: result.email }, replace: true });
       }
     } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
+      if (view === "signin") {
+        setError(err.response?.status === 401
+          ? "Invalid username or password"
+          : "Something went wrong. Please try again.");
+      } else {
+        setError(err.message || "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
