@@ -36,7 +36,7 @@ export function AuthProvider({ children }) {
 
   const signup = async (details) => {
     const registeredUser = await signupApi(details);
-    setUser(registeredUser);
+    setUser(null);
     return registeredUser;
   };
 
