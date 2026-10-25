@@ -2,7 +2,11 @@ import api, { TOKEN_KEY, SESSION_KEY, clearSession } from './api';
 import { consumeGoogleRedirect } from './googleRedirect';
 
 const readLoginMethod = () => {
-  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null')?.loginMethod; }
+  try {
+    const tokens = JSON.parse(localStorage.getItem(TOKEN_KEY) || 'null');
+    const session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+    return tokens?.loginMethod || session?.loginMethod;
+  }
   catch { return null; }
 };
 
@@ -37,7 +41,7 @@ export const getCurrentUser = async () => {
 export const login = async ({ username, password }) => {
   clearSession();
   const { data } = await api.post('token/', { username, password });
-  localStorage.setItem(TOKEN_KEY, JSON.stringify(data));
+  localStorage.setItem(TOKEN_KEY, JSON.stringify({ ...data, loginMethod: "password" }));
   localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'password' }));
   try {
     return await getCurrentUser();
@@ -57,7 +61,7 @@ export const googleLogin = async ({ access_token, code }) => {
     if (!data.access || !data.refresh) {
       throw new Error('Google login did not return the required session tokens.');
     }
-    localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh }));
+    localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh, loginMethod: "google" }));
     localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'google' }));
     return await getCurrentUser();
   } catch (error) {
@@ -100,7 +104,7 @@ export const verifyEmail = async ({ email, code }) => {
   }
   sessionStorage.removeItem(VERIFICATION_KEY);
   sessionStorage.removeItem('rently_verification_email');
-  localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh }));
+  localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh, loginMethod: "password" }));
   localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'password' }));
   try {
     return await getCurrentUser();

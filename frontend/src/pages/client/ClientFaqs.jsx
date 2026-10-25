@@ -24,9 +24,10 @@ export default function ClientFaqs() {
   }, []);
 
   return (
-    <section className="client-faqs" aria-labelledby="faqs-title">
-      <h1 id="faqs-title">Frequently asked questions</h1>
-      <p className="client-faqs-intro">Find answers to common rental questions.</p>
+    <section className="client-faqs client-faqs-soft" aria-labelledby="faqs-title">
+      <header className="client-faqs-heading">
+        <h1 id="faqs-title">FAQs</h1>
+      </header>
       {loading ? (
         <p role="status">Loading questions…</p>
       ) : error ? (
@@ -37,7 +38,7 @@ export default function ClientFaqs() {
         <div className="client-faqs-list">
           {faqs.map((faq) => (
             <details key={faq.id}>
-              <summary>{faq.question}</summary>
+              <summary><span>{faq.question}</span><span className="client-faqs-toggle" aria-hidden="true" /></summary>
               <p>{faq.answer}</p>
             </details>
           ))}
