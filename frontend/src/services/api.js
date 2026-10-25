@@ -43,7 +43,7 @@ api.interceptors.response.use(
           refreshRequest = api.post('token/refresh/', { refresh }).then(({ data }) => {
             // A pending refresh must not restore a session after logout.
             if (readTokens()?.refresh !== refresh) throw new Error('Session ended. Please sign in again.');
-            localStorage.setItem(TOKEN_KEY, JSON.stringify({ refresh, ...data }));
+            localStorage.setItem(TOKEN_KEY, JSON.stringify({ ...readTokens(), refresh, ...data }));
             return data.access;
           }).finally(() => { refreshRequest = null; });
         }
