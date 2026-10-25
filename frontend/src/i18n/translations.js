@@ -22,6 +22,16 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "Choose a new password": "Choisissez un nouveau mot de passe",
+    "Enter and confirm your new password.": "Saisissez et confirmez votre nouveau mot de passe.",
+    "New password": "Nouveau mot de passe",
+    "Confirm password": "Confirmer le mot de passe",
+    "Show password": "Afficher le mot de passe",
+    "Change password": "Changer le mot de passe",
+    "Request a new reset link": "Demander un nouveau lien de réinitialisation",
+    "This form is a preview. Password changes are not connected yet.": "Ce formulaire est un aperçu. La modification du mot de passe n’est pas encore disponible.",
+    "Password updated": "Mot de passe modifié",
+    "Your password has been changed. You can now log in.": "Votre mot de passe a été modifié. Vous pouvez maintenant vous connecter.",
     "Back to home": "Retour à l’accueil",
     "or": "ou",
     "Sign in with Google": "Se connecter avec Google",
@@ -625,6 +635,16 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "Choose a new password": "اختر كلمة مرور جديدة",
+    "Enter and confirm your new password.": "أدخل كلمة المرور الجديدة وأكدها.",
+    "New password": "كلمة المرور الجديدة",
+    "Confirm password": "تأكيد كلمة المرور",
+    "Show password": "إظهار كلمة المرور",
+    "Change password": "تغيير كلمة المرور",
+    "Request a new reset link": "طلب رابط جديد لإعادة تعيين كلمة المرور",
+    "This form is a preview. Password changes are not connected yet.": "هذا النموذج للمعاينة. ميزة تغيير كلمة المرور غير متاحة بعد.",
+    "Password updated": "تم تحديث كلمة المرور",
+    "Your password has been changed. You can now log in.": "تم تغيير كلمة المرور. يمكنك الآن تسجيل الدخول.",
     "Back to home": "العودة إلى الصفحة الرئيسية",
     "or": "أو",
     "Sign in with Google": "تسجيل الدخول باستخدام Google",
