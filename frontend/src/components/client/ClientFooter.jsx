@@ -66,7 +66,7 @@ export default function ClientFooter({ home = false }) {
         <nav aria-label="Footer navigation">
           <h2>Liens rapides</h2>
           <Link to="/">Accueil</Link>
-          <Link to="/vehicles">Nos véhicules</Link>
+          <Link to="/vehicles">Vehicles</Link>
           <Link to="/faqs">FAQs</Link>
         </nav>
         {hasContact && (
