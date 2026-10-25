@@ -18,9 +18,20 @@ export default function ClientHome() {
           }}
         />
         <div className="client-hero-copy tw:mx-auto tw:w-full tw:max-w-[1120px] tw:text-center">
-          <p className="tw:mb-3 tw:mt-0 tw:text-lg tw:font-normal tw:uppercase tw:tracking-wide tw:text-white tw:md:text-2xl">Welcome to Rently</p>
-          <h1 id="home-title" className="tw:mx-auto tw:my-0 tw:max-w-[850px] tw:text-[clamp(36px,5.5vw,72px)] tw:font-extrabold tw:uppercase tw:tracking-[-0.02em] tw:leading-[1.2] tw:text-white tw:drop-shadow-lg">Find your next drive<br />with Rently</h1>
-          <p className="tw:mx-auto tw:mb-0 tw:mt-5 tw:max-w-[540px] tw:text-base tw:font-normal tw:leading-relaxed tw:text-white/80 tw:drop-shadow-md tw:md:text-lg">Discover our fleet and explore Morocco at your own pace.</p>
+          <p className="tw:mb-3 tw:mt-0 tw:text-lg tw:font-normal tw:uppercase tw:tracking-wide tw:text-white tw:md:text-2xl">
+            Welcome to Rently
+          </p>
+          <h1
+            id="home-title"
+            className="tw:mx-auto tw:my-0 tw:max-w-[850px] tw:text-[clamp(36px,5.5vw,72px)] tw:font-extrabold tw:uppercase tw:tracking-[-0.02em] tw:leading-[1.2] tw:text-white tw:drop-shadow-lg"
+          >
+            Find your next drive
+            <br />
+            with Rently
+          </h1>
+          <p className="tw:mx-auto tw:mb-0 tw:mt-5 tw:max-w-[540px] tw:text-base tw:font-normal tw:leading-relaxed tw:text-white/80 tw:drop-shadow-md tw:md:text-lg">
+            Discover our fleet and explore Morocco at your own pace.
+          </p>
         </div>
         <RentalSearch />
       </section>
