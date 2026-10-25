@@ -14,14 +14,17 @@ const consumeGoogleCallback = () => {
   return /^\/vehicles\/[^/?#]+(?:[?#].*)?$/.test(returnTo || '') ? returnTo : null;
 };
 
-const asUser = (user) => ({
+const asUser = (user) => {
+  if (!user) throw new Error("The server did not return a user profile.");
+  return ({
   ...user,
   // Prefer server metadata when available; otherwise use the current login method.
   canChangePassword: typeof user.has_usable_password === 'boolean'
     ? user.has_usable_password
     : readLoginMethod() !== 'google',
   name: [user.first_name, user.last_name].filter(Boolean).join(' ') || user.username,
-});
+  });
+};
 
 export const getCurrentUser = async () => {
   const returnTo = consumeGoogleCallback();
@@ -65,19 +68,51 @@ export const googleLogin = async ({ access_token, code }) => {
 
 export const logout = async () => clearSession();
 
+const VERIFICATION_KEY = 'rently_verification_token';
+
+const verificationToken = (email) => {
+  const token = sessionStorage.getItem(VERIFICATION_KEY);
+  if (!token || sessionStorage.getItem('rently_verification_email') !== email) {
+    throw new Error('Your verification session has expired. Please sign up again.');
+  }
+  return token;
+};
+
 export const signup = async ({ name, email, password }) => {
   clearSession();
-  const { data } = await api.post('auth/signup/', { username: name, email, password });
+  sessionStorage.removeItem(VERIFICATION_KEY);
+  sessionStorage.removeItem('rently_verification_email');
+  const { data } = await api.post('auth/signup/', { username: name.trim(), email: email.trim(), password });
+  if (!data.ephemeral_token || !data.email) {
+    throw new Error('Signup did not return an email verification session.');
+  }
+  sessionStorage.setItem(VERIFICATION_KEY, data.ephemeral_token);
+  sessionStorage.setItem('rently_verification_email', data.email);
+  return data;
+};
+
+export const verifyEmail = async ({ email, code }) => {
+  const { data } = await api.post('auth/2fa/verify/', {
+    ephemeral_token: verificationToken(email), code,
+  });
+  if (!data.access || !data.refresh) {
+    throw new Error('Verification did not return the required session tokens.');
+  }
+  sessionStorage.removeItem(VERIFICATION_KEY);
+  sessionStorage.removeItem('rently_verification_email');
   localStorage.setItem(TOKEN_KEY, JSON.stringify({ access: data.access, refresh: data.refresh }));
-  const user = asUser(data.user);
-  sessionStorage.setItem('rently_verification_email', user.email);
-  return user;
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'password' }));
+  try {
+    return await getCurrentUser();
+  } catch (error) {
+    clearSession();
+    throw error;
+  }
 };
 
-export const verifyEmail = async () => {
-  throw new Error('Email verification is not available yet. You can sign in with your username and password.');
-};
-
-export const resendVerification = async () => {
-  throw new Error('Verification emails are not available yet.');
+export const resendVerification = async (email) => {
+  const { data } = await api.post('auth/2fa/resend/', {
+    ephemeral_token: verificationToken(email),
+  });
+  return { ...data, detail: data.message };
 };

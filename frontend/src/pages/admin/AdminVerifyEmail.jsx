@@ -105,7 +105,7 @@ export default function AdminVerifyEmail() {
 
         {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
-        <p>{t("Email verification is not available yet. You can sign in with your username and password.")}</p>
+        <p>{t("Enter the six-digit code sent to your email.")}</p>
 
         {notice && <p role="status">{t(notice)}</p>}
         {!signupEmail && <p><Link to="/signup">{t("Sign Up")}</Link></p>}
