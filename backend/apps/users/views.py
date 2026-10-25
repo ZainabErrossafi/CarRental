@@ -1,5 +1,3 @@
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import viewsets
 # ####oussama: Public sign-up endpoint imports.
 from rest_framework.generics import CreateAPIView
@@ -58,7 +56,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['retrieve', 'update', 'partial_update']:
             return [IsAdminOrOwner()]
-        elif self.action in ['me', 'change_password']:
+        elif self.action in ['me', 'change_password', 'confirm_password']:
             return [IsAuthenticated()]
         else:
             return [IsAdmin()]
@@ -70,17 +68,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], url_path='change-password')
     def change_password(self, request):
-        old = request.data.get('old_password', '')
-        new = request.data.get('new_password', '')
-        if not request.user.check_password(old):
-            return Response({'detail': 'Old password is incorrect.'}, status=400)
-        try:
-            validate_password(new, user=request.user)
-        except DjangoValidationError as e:
-            return Response({'new_password': list(e.messages)}, status=400)
-        request.user.set_password(new)
-        request.user.save()
-        return Response({'detail': 'Password updated.'})
+        from .password_change import request_change
+        return request_change(request)
+
+    @action(detail=False, methods=['post'], url_path='confirm-password')
+    def confirm_password(self, request):
+        from .password_change import confirm_change
+        return confirm_change(request)
 
     @action(detail=True, methods=['post'])
     def deactivate(self, request, pk=None):

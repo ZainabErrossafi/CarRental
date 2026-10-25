@@ -1,0 +1,24 @@
+Hello {{ reservation.driver_name }},
+
+Your reservation {{ reservation.reference }} has been confirmed by our team.
+You can come and collect your vehicle at the pickup date and time below.
+
+VEHICLE
+{{ vehicle.brand.name }} {{ vehicle.model }} ({{ vehicle.year }})
+Transmission: {{ vehicle.get_transmission_display }}
+Fuel: {{ vehicle.get_fuel_display }}
+Seats: {{ vehicle.seats }} | Doors: {{ vehicle.doors }}
+
+YOUR RENTAL
+Pickup: {{ pickup }}
+Pickup location: {{ reservation.pickup_location }}
+Return: {{ return_time }}
+Return location: {{ reservation.dropoff_location }}
+Timezone: {{ rental_timezone }}
+Rental duration: {{ duration }}
+Billed rental days: {{ reservation.duration_days }}
+{% for item in extras %}Extra: {{ item.extra.name }} × {{ item.quantity }}
+{% endfor %}
+TOTAL RENTAL PRICE: {{ total }} MAD
+
+Thank you for choosing Rently.
