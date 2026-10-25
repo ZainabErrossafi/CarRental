@@ -54,9 +54,23 @@ class Reservation(models.Model):
         self.save(update_fields=['total_price', 'updated_at'])
 
     def confirm(self):
-        self.status = ReservationStatus.CONFIRMED
-        self.save()
-        self._notify('reservation_confirmed', 'Reservation confirmed', f"Your reservation {self.reference} has been confirmed.")
+        from django.db import transaction
+        from rest_framework.exceptions import ValidationError
+        from .emails import send_confirmation_email
+
+        with transaction.atomic():
+            reservation = Reservation.objects.select_for_update().get(pk=self.pk)
+            if reservation.status != ReservationStatus.PENDING:
+                raise ValidationError({'detail': 'Only pending reservations can be confirmed.'})
+            reservation.status = ReservationStatus.CONFIRMED
+            reservation.save(update_fields=['status', 'updated_at'])
+            reservation._notify(
+                'reservation_confirmed', 'Reservation confirmed',
+                f"Your reservation {reservation.reference} has been confirmed.",
+            )
+            send_confirmation_email(reservation)
+        self.status = reservation.status
+        self.updated_at = reservation.updated_at
 
     def cancel(self, by=None):
         self.status = ReservationStatus.CANCELLED

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<body style="margin:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#17212b">
+  <main style="max-width:600px;margin:32px auto;background:#fff;padding:32px;border-radius:12px">
+    <p style="color:#2563eb;font-weight:bold">RENTLY</p>
+    <h1 style="font-size:24px">Your reservation is confirmed</h1>
+    <p>Hello {{ reservation.driver_name }},</p>
+    <p>Our team has confirmed reservation <strong>{{ reservation.reference }}</strong>. You can come and collect your vehicle at the pickup date and time below.</p>
+    <h2 style="font-size:18px">Your vehicle</h2>
+    <p><strong>{{ vehicle.brand.name }} {{ vehicle.model }} ({{ vehicle.year }})</strong><br>
+      {{ vehicle.get_transmission_display }} · {{ vehicle.get_fuel_display }} · {{ vehicle.seats }} seats · {{ vehicle.doors }} doors</p>
+    <h2 style="font-size:18px">Your rental</h2>
+    <p><strong>Pickup:</strong> {{ pickup }}<br>{{ reservation.pickup_location }}</p>
+    <p><strong>Return:</strong> {{ return_time }}<br>{{ reservation.dropoff_location }}</p>
+    <p>Timezone: {{ rental_timezone }}<br><strong>Rental duration:</strong> {{ duration }}<br>Billed rental days: {{ reservation.duration_days }}</p>
+    {% if extras %}<h2 style="font-size:18px">Extras</h2><ul>{% for item in extras %}<li>{{ item.extra.name }} × {{ item.quantity }}</li>{% endfor %}</ul>{% endif %}
+    <p style="padding:16px;background:#eff6ff;font-size:20px"><strong>Total rental price: {{ total }} MAD</strong></p>
+    <p>Thank you for choosing Rently.</p>
+  </main>
+</body>
+</html>

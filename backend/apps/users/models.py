@@ -107,3 +107,12 @@ class PendingSignup(EmailCodeMixin, models.Model):
     def check_password(self, password):
         from django.contrib.auth.hashers import check_password
         return check_password(password, self.password)
+
+
+class PasswordChange(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    code_hash = models.CharField(max_length=128)
+    password_hash = models.CharField(max_length=128)
+    original_password = models.CharField(max_length=128)
+    created_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
