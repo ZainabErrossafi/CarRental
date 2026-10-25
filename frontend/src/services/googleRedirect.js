@@ -19,7 +19,7 @@ export function consumeGoogleRedirect(browser, tokenKey) {
   browser.history.replaceState(browser.history.state, '', `${url.pathname}${url.search}${url.hash}`);
 
   if (access && refresh) {
-    browser.localStorage.setItem(tokenKey, JSON.stringify({ access, refresh }));
+    browser.localStorage.setItem(tokenKey, JSON.stringify({ access, refresh, loginMethod: "google" }));
     return true;
   }
 }
