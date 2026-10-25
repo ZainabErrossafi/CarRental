@@ -15,11 +15,7 @@ export default function AdminForgotPassword() {
     e.preventDefault();
     setLoading(true);
 
-    // No real backend yet — just simulate the request being sent.
-    await new Promise((res) => setTimeout(res, 500));
-
-    setLoading(false);
-    setSent(true);
+    navigate("/reset-password");
   };
 
   return (

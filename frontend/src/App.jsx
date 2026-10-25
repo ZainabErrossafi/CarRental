@@ -12,6 +12,7 @@ import AdminReservationAdd from "./pages/admin/Adminreservationadd.jsx";
 import AdminVehicleAdd from "./pages/admin/AdminVehicleAdd.jsx";
 import AdminAuth from "./pages/admin/AdminAuth.jsx";
 import AdminForgotPassword from "./pages/admin/AdminForgotPassword.jsx";
+import AdminResetPassword from "./pages/admin/AdminResetPassword.jsx";
 import AdminVerifyEmail from "./pages/admin/AdminVerifyEmail.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
@@ -31,6 +32,7 @@ export default function App() {
       <Route path="/terms" element={<AdminTerms />} />
       <Route path="/signup" element={<AdminAuth initialMode="signup" />} />
       <Route path="/forgot-password" element={<AdminForgotPassword />} />
+      <Route path="/reset-password" element={<AdminResetPassword />} />
       <Route path="/verify-email" element={<AdminVerifyEmail />} />
       <Route path="/" element={<ClientLayout />}>
         <Route index element={<ClientHome />} />
