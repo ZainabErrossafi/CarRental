@@ -618,7 +618,7 @@
 .fleet-card-clickable .fleet-card-specs { gap: 8px; margin: 16px 0 20px; }
 .fleet-card-clickable .fleet-card-specs > span { padding: 7px 9px; border-radius: 6px; background: #f4f7f8; font-size: 10px; gap: 6px; text-transform: capitalize; }
 .fleet-card-clickable .fleet-card-specs svg { width: 14px; height: 14px; }
-.fleet-card-clickable .fleet-card-bottom { margin-top: auto; align-items: center; flex-wrap: nowrap; gap: 8px; padding-top: 16px; }
+.fleet-card-clickable .fleet-card-bottom { margin-top: auto; align-items: flex-end; flex-wrap: nowrap; gap: 8px; padding-top: 16px; }
 .fleet-card-clickable .fleet-card-price > span { font-size: 9px; color: #7b8994; }
 .fleet-card-clickable .fleet-card-price strong { font-size: 25px; }
 .fleet-card-clickable .fleet-card-price p { white-space: nowrap; font-size: 10px; }
@@ -953,3 +953,8 @@
 
 .fleet-budget-min { color: #71808a; font-size: 11px; font-weight: 400; }
 
+
+.fleet-card-clickable .fleet-card-price p { display: flex; align-items: baseline; gap: 2px; min-height: 40px; margin-bottom: 0; padding-top: 7px; box-sizing: border-box; line-height: 1; }
+
+select.compact-dropdown-trigger { display: block; width: 100%; font: inherit; font-size: 11px; color: #173047; }
+.fleet-layout-horizontal .compact-dropdown > span { display: block; margin-bottom: 8px; }
