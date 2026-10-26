@@ -1,3 +1,5 @@
+import django_filters
+
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -16,6 +18,15 @@ from .serializers import PublicVehicleSerializer
 from .throttling import PublicAPIKeyThrottle
 
 
+class PublicVehicleFilter(django_filters.FilterSet):
+    min_rate = django_filters.NumberFilter(field_name='daily_rate', lookup_expr='gte')
+    max_rate = django_filters.NumberFilter(field_name='daily_rate', lookup_expr='lte')
+
+    class Meta:
+        model = Vehicle
+        fields = ['brand', 'category', 'status', 'fuel', 'transmission']
+
+
 class PublicAPIBaseViewSet:
     authentication_classes = [PublicAPIKeyAuthentication]
     permission_classes = [IsAuthenticated]
@@ -28,7 +39,7 @@ class PublicVehicleViewSet(PublicAPIBaseViewSet, ModelViewSet):
     ).prefetch_related('features')
     serializer_class = PublicVehicleSerializer
     parser_classes = [JSONParser, FormParser, MultiPartParser]
-    filterset_fields = ['brand', 'category', 'status', 'fuel', 'transmission']
+    filterset_class = PublicVehicleFilter
     search_fields = ['model', 'brand__name', 'category__name']
     ordering_fields = ['year', 'daily_rate', 'created_at']
     ordering = ['-created_at']
