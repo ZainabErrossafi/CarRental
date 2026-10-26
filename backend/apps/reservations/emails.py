@@ -31,6 +31,8 @@ def send_confirmation_email(reservation):
         'rental_timezone': str(rental_timezone),
         'duration': duration,
         'total': format(reservation.total_price, '.2f'),
+        'daily_rate': format(reservation.vehicle.daily_rate, '.2f'),
+        'deposit': format(reservation.vehicle.deposit, '.2f'),
         'extras': reservation.reservation_extras.select_related('extra'),
     }
     try:
