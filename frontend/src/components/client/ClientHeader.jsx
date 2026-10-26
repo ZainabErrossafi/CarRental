@@ -145,7 +145,7 @@ export default function ClientHeader({ overlay = false }) {
             onClick={() => {
               setMobileOpen(!mobileOpen);
             }}
-            className="tw:inline-flex tw:size-10 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg tw:border-0 tw:bg-white tw:text-[#021731] tw:hover:bg-gray-100 tw:focus-visible:outline-2 tw:focus-visible:outline-[#ff4f00] tw:lg:hidden"
+            className="client-mobile-menu-toggle tw:inline-flex tw:size-10 tw:cursor-pointer tw:items-center tw:justify-center tw:rounded-lg tw:border-0 tw:bg-white tw:text-[#021731] tw:hover:bg-gray-100 tw:focus-visible:outline-2 tw:focus-visible:outline-[#ff4f00] tw:lg:hidden"
           >
             <svg aria-hidden="true" className="tw:size-6" viewBox="0 0 24 24" fill="none">
               <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M5 7h14M5 12h14M5 17h14" />
