@@ -17,8 +17,10 @@ Return location: {{ reservation.dropoff_location }}
 Timezone: {{ rental_timezone }}
 Rental duration: {{ duration }}
 Billed rental days: {{ reservation.duration_days }}
+Vehicle rate: {{ daily_rate }} MAD / day
 {% for item in extras %}Extra: {{ item.extra.name }} × {{ item.quantity }}
 {% endfor %}
 TOTAL RENTAL PRICE: {{ total }} MAD
+Security deposit: {{ deposit }} MAD (separate from the total rental price)
 
 Thank you for choosing Rently.
