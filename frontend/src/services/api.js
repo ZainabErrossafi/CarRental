@@ -17,6 +17,21 @@ const readTokens = () => {
   }
 };
 
+const normalize = (url = '') => url.replace(/^\/+/, '');
+
+// Login / signup / refresh endpoints: never send a (possibly stale) token to these.
+const isAuthEndpoint = (url) => {
+  const path = normalize(url);
+  return path.startsWith('token/') || path.startsWith('auth/');
+};
+
+// Public GET endpoints: send the token if we have one (so admins can see more),
+// but if the server rejects it with 401, retry once anonymously.
+const OPTIONAL_AUTH_PATHS = ['locations/'];
+const isOptionalAuth = (config) =>
+  (config?.method || 'get').toLowerCase() === 'get' &&
+  OPTIONAL_AUTH_PATHS.some((p) => normalize(config?.url).startsWith(p));
+
 const api = axios.create({
   baseURL: `${(import.meta.env.VITE_API_URL || '/api').replace(/\/+$/, '')}/`,
   timeout: 15000,
@@ -24,7 +39,7 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const access = readTokens()?.access;
-  if (access && !config.url.startsWith('token/')) {
+  if (access && !config._skipAuth && !isAuthEndpoint(config.url)) {
     config.headers.Authorization = `Bearer ${access}`;
   }
   return config;
@@ -35,8 +50,18 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const config = error.config;
+    const status = error.response?.status;
     const refresh = readTokens()?.refresh;
-    if (error.response?.status === 401 && config && !config.url.startsWith('token/') && !config._retry && refresh) {
+
+    if (status === 401 && config && isOptionalAuth(config)) {
+      // Public endpoint rejected our token: retry once without it, and don't log the user out.
+      if (!config._anon) {
+        config._anon = true;
+        config._skipAuth = true;
+        delete config.headers.Authorization;
+        return api(config);
+      }
+    } else if (status === 401 && config && !isAuthEndpoint(config.url) && !config._retry && refresh) {
       config._retry = true;
       try {
         if (!refreshRequest) {
@@ -53,8 +78,10 @@ api.interceptors.response.use(
         clearSession();
         throw refreshError;
       }
+    } else if (status === 401 && config && !isAuthEndpoint(config.url)) {
+      clearSession();
     }
-    if (error.response?.status === 401 && !config?.url.startsWith('token/')) clearSession();
+
     const body = error.response?.data;
     if (typeof body?.detail === 'string') error.message = body.detail;
     else if (body && typeof body === 'object') {
