@@ -75,15 +75,27 @@ class Vehicle(models.Model):
         return f"{self.brand} {self.model} ({self.year})"
 
     def is_available(self, start, end, exclude_reservation_id=None):
-        """
-        Return True if this vehicle can be booked from start to end.
+      from apps.reservations.models import ReservationStatus
 
-        TODO: temporary stub, always returns True.
-        Real logic: False if start >= end, if status != AVAILABLE, or if a
-        pending/confirmed reservation overlaps [start, end)
-        (pickup_date < end and return_date > start).
-        """
-        return True
+      if start >= end:
+          return False
+
+      if self.status != self.Status.AVAILABLE:
+          return False
+
+      reservations = self.reservations.filter(
+          status__in=[
+              ReservationStatus.PENDING,
+              ReservationStatus.CONFIRMED,
+          ],
+          pickup_date__lt=end,
+          return_date__gt=start,
+      )
+
+      if exclude_reservation_id is not None:
+          reservations = reservations.exclude(pk=exclude_reservation_id)
+
+      return not reservations.exists()
 
 
 class VehicleImage(models.Model):

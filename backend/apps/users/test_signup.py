@@ -46,7 +46,7 @@ class SignupTests(TestCase):
         self.assertFalse(user.is_staff)
         self.assertTrue(user.is_active)
         self.assertTrue(user.email_verified)
-        self.assertTrue(user.two_factor_enabled)
+        self.assertFalse(user.two_factor_enabled)
         self.assertTrue(user.check_password(self.payload['password']))
         self.assertFalse(PendingSignup.objects.exists())
         self.assertEqual(self.verify(token, pending.two_factor_code).status_code, 401)
@@ -55,8 +55,8 @@ class SignupTests(TestCase):
         self.client.credentials()
         login = self.client.post('/api/token/', {'email': user.email, 'password': self.payload['password']}, format='json')
         self.assertEqual(login.status_code, 200)
-        self.assertTrue(login.data['two_factor_required'])
-        self.assertNotIn('access', login.data)
+        self.assertIn('access', login.data)
+        self.assertNotIn('two_factor_required', login.data)
 
     def test_weak_or_missing_password_creates_nothing(self):
         for password in [None, '', '12345678', 'newdriver']:

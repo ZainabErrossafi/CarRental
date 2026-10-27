@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     'apps.extras',
     'apps.reviews',
     'apps.notifications',
+    'apps.public_api',
 ]
 
 MIDDLEWARE = [
@@ -205,10 +206,14 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.getenv('GOOGLE_CLIENT_SECRET', ''),
             'key': ''
         },
+        # Let Google authenticate an existing manual account when its verified
+        # email matches, then link the Google identity for future sign-ins.
+        'EMAIL_AUTHENTICATION': True,
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
     }
 }
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 #///////
 
 REST_FRAMEWORK = {
@@ -222,7 +227,14 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_RATES': {
+        'public_api': os.getenv('PUBLIC_API_RATE_LIMIT', '60/minute'),
+    },
 }
+
+# The dedicated public API stays disabled until a deployment supplies a secret key.
+PUBLIC_API_KEY = os.getenv('PUBLIC_API_KEY', '')
+PUBLIC_API_RATE_LIMIT = os.getenv('PUBLIC_API_RATE_LIMIT', '60/minute')
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 

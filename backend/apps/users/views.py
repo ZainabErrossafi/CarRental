@@ -26,9 +26,12 @@ def google_callback_redirect(request):
     if not user.is_active:
         return redirect('/login?error=auth_failed')
     if user.two_factor_enabled:
-        from django.http import JsonResponse
         from .two_factor import start_email_challenge
-        return JsonResponse(start_email_challenge(user))
+        challenge = start_email_challenge(user)
+        return redirect('/verify-email#' + urlencode({
+            'google_2fa': challenge['ephemeral_token'],
+            'email': challenge['email'],
+        }))
 
     refresh = RefreshToken.for_user(user)
     refresh['role'] = user.role
