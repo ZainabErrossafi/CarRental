@@ -805,8 +805,11 @@
 .vehicle-booking-date-group { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 10px; min-width: 0; }
 .vehicle-booking-dates { grid-template-columns: minmax(0, 1fr); }
 
-.vehicle-booking-date-group { align-items: start; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 12px; }
-.vehicle-booking-date-group > label { display: grid; gap: 8px; margin: 0; }
+.vehicle-booking-date-group {
+  align-items: start;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+  gap: 12px;
+}.vehicle-booking-date-group > label { display: grid; gap: 8px; margin: 0; }
 .vehicle-booking-date-group input { height: 44px; box-sizing: border-box; border-radius: 8px; padding: 10px; font-size: 13px; }
 .vehicle-booking-date-group input[type="text"] { font-variant-numeric: tabular-nums; }
 .vehicle-booking-date-group input:disabled { background: #f8fafb; color: #8a969f; }
