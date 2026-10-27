@@ -2,7 +2,8 @@ import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useI18n } from "../../context/I18nContext";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, KeyRound, Check } from "lucide-react";
+import { ArrowLeft, KeyRound } from "lucide-react";
+import { requestPasswordReset } from "../../services/Passwordresetapi.js";
 
 export default function AdminForgotPassword() {
   const { t } = useI18n();
@@ -10,12 +11,27 @@ export default function AdminForgotPassword() {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    navigate("/reset-password");
+    setError("");
+    try {
+      const cleanEmail = email.trim();
+      await requestPasswordReset(cleanEmail);
+      navigate("/reset-password", { state: { email: cleanEmail } });
+    } catch (err) {
+      setError(
+        err.response?.status === 429
+          ? "Too many attempts. Please wait a minute and try again."
+          : err.response?.status === 503
+            ? "We couldn't send the email right now. Please try again later."
+            : "Something went wrong. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,9 +48,10 @@ export default function AdminForgotPassword() {
         <p className="auth-subtitle">
           {sent
             ? t("We've sent password reset instructions to {value0}.", { value0: email })
-            : t("No worries, we'll send you reset instructions.")}
+            : t("No worries, we'll email you a 6-digit verification code.")}
         </p>
 
+        {error && <p role="alert" className="auth-error">{t(error)}</p>}
         {!sent && (
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-field">
