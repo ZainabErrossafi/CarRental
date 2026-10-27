@@ -60,7 +60,7 @@ export default function ClientFooter({ home = false }) {
           </Link>
           <p>
             {settings.about_en?.trim() ||
-              "Location de voitures au Maroc. Découvrez le pays à votre rythme avec Rently."}
+              "Rently."}
           </p>
         </div>
         <nav aria-label="Footer navigation">
