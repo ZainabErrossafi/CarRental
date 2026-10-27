@@ -27,9 +27,12 @@ class RequestPasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
 
-class ConfirmPasswordResetSerializer(serializers.Serializer):
+class VerifyPasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
     code = serializers.RegexField(r'^[0-9]{6}$', min_length=6, max_length=6)
+
+
+class ConfirmPasswordResetSerializer(VerifyPasswordResetSerializer):
     new_password = serializers.CharField(trim_whitespace=False, max_length=128)
 
 
@@ -37,6 +40,25 @@ class PublicPasswordResetView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
     throttle_classes = [PasswordResetThrottle]
+
+    def validate_code(self, email, code):
+        # Both callers hold a transaction so checks and failed attempts are atomic.
+        matches = list(User.objects.select_for_update().filter(
+            email__iexact=email, is_active=True, email_verified=True,
+        ).order_by('pk')[:2])
+        if len(matches) != 1:
+            return None
+        user = matches[0]
+        pending = PasswordResetChallenge.objects.select_for_update().filter(user=user).first()
+        if (not pending or pending.attempts >= 5
+                or pending.original_password != user.password
+                or not timedelta(0) <= timezone.now() - pending.created_at < timedelta(minutes=10)):
+            return None
+        if not check_password(code, pending.code_hash):
+            pending.attempts += 1
+            pending.save(update_fields=['attempts'])
+            return None
+        return user, pending
 
 
 class PasswordResetRequestView(PublicPasswordResetView):
@@ -87,6 +109,21 @@ class PasswordResetRequestView(PublicPasswordResetView):
         return Response(generic_response)
 
 
+class PasswordResetVerifyView(PublicPasswordResetView):
+    def post(self, request):
+        serializer = VerifyPasswordResetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        with transaction.atomic():
+            challenge = self.validate_code(
+                serializer.validated_data['email'].strip(),
+                serializer.validated_data['code'],
+            )
+            if challenge is None:
+                return Response({'detail': 'Invalid or expired verification code.'}, status=400)
+        # Keep the challenge for confirmation, which checks the code again.
+        return Response({'detail': 'Verification code verified.'})
+
+
 class PasswordResetConfirmView(PublicPasswordResetView):
     def post(self, request):
         serializer = ConfirmPasswordResetSerializer(data=request.data)
@@ -97,22 +134,10 @@ class PasswordResetConfirmView(PublicPasswordResetView):
         invalid = Response({'detail': 'Invalid or expired verification code.'}, status=400)
 
         with transaction.atomic():
-            matches = list(User.objects.select_for_update().filter(
-                email__iexact=email, is_active=True, email_verified=True,
-            ).order_by('pk')[:2])
-            if len(matches) != 1:
+            challenge = self.validate_code(email, code)
+            if challenge is None:
                 return invalid
-            user = matches[0]
-            pending = PasswordResetChallenge.objects.select_for_update().filter(user=user).first()
-            if (not pending or pending.attempts >= 5
-                    or pending.original_password != user.password
-                    or not timedelta(0) <= timezone.now() - pending.created_at < timedelta(minutes=10)):
-                return invalid
-
-            if not check_password(code, pending.code_hash):
-                pending.attempts += 1
-                pending.save(update_fields=['attempts'])
-                return invalid
+            user, pending = challenge
 
             if user.check_password(new_password):
                 return Response({'new_password': ['Choose a different password.']}, status=400)
