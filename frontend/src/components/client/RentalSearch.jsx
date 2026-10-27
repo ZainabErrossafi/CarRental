@@ -27,6 +27,11 @@ const localToday = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 };
 
+const localTime = () => {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+};
+
 export default function RentalSearch() {
   const navigate = useNavigate();
   const [locations, setLocations] = useState([]);
@@ -56,6 +61,7 @@ export default function RentalSearch() {
   }, []);
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
+  const [departureTime, setDepartureTime] = useState("10:00");
   const [error, setError] = useState("");
   const fieldClass =
     "tw:box-border tw:h-10 tw:w-full tw:min-w-0 tw:rounded-lg tw:border tw:border-solid tw:border-white/65 tw:bg-[#071b2e]/55 tw:backdrop-blur-sm tw:[color-scheme:dark] tw:px-2.5 tw:font-sans tw:text-[11px] tw:font-semibold tw:text-white tw:drop-shadow-sm tw:focus:outline-2 tw:focus:outline-[#ff8a3d]";
@@ -124,6 +130,9 @@ export default function RentalSearch() {
             onChange={(event) => {
               setDepartureDate(event.target.value);
               if (returnDate < event.target.value) setReturnDate("");
+              if (event.target.value === localToday() && departureTime < localTime()) {
+                setDepartureTime(localTime());
+              }
             }}
             className={fieldClass}
           />
@@ -135,7 +144,12 @@ export default function RentalSearch() {
             type="time"
             name="departure_time"
             required
-            defaultValue="10:00"
+            min={departureDate === localToday() ? localTime() : undefined}
+            value={departureTime}
+            onChange={(event) => {
+              const chosenTime = event.target.value;
+              setDepartureTime(departureDate === localToday() && chosenTime < localTime() ? localTime() : chosenTime);
+            }}
             className={fieldClass}
           />
         </label>
@@ -160,6 +174,7 @@ export default function RentalSearch() {
             name="return_time"
             required
             defaultValue="10:00"
+            min={returnDate === departureDate ? departureTime : undefined}
             className={fieldClass}
           />
         </label>

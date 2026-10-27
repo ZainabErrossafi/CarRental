@@ -8,16 +8,20 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from apps.users.serializers import AdminTokenObtainPairSerializer
 from apps.users.views import SignupView, google_callback_redirect  # ####oussama: Sign-up view.
 from apps.users.views_2fa import EmailLoginView, TwoFactorToggleView, TwoFactorResendView, TwoFactorVerifyView
+from apps.users.password_reset import PasswordResetRequestView, PasswordResetConfirmView
 
 urlpatterns = [
     # Health & Admin
     path('api/health/', lambda request: JsonResponse({'status': 'ok'})),
+    path('api/public/v1/', include('apps.public_api.urls')),
     path('admin/', admin.site.urls),
 
     # Authentication & OAuth
     path('api/auth/2fa/toggle/', TwoFactorToggleView.as_view(), name='two_factor_toggle'),
     path('api/auth/2fa/resend/', TwoFactorResendView.as_view(), name='two_factor_resend'),
     path('api/auth/2fa/verify/', TwoFactorVerifyView.as_view(), name='two_factor_verify'),
+    path('api/auth/password-reset/request/', PasswordResetRequestView.as_view(), name='password_reset_request'),
+    path('api/auth/password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     # ####oussama: Public account registration route.
     path('api/auth/signup/', SignupView.as_view(), name='signup'),
     path('api/auth/', include('dj_rest_auth.urls')),

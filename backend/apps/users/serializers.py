@@ -107,7 +107,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise AuthenticationFailed('Invalid email or password.')
         if self.user.two_factor_enabled:
             return start_email_challenge(self.user)
-        # ####oussama: Preserve main's user payload only after authentication and 2FA checks.
+        # ####oussama: Preserve main's user payload after authentication and 2FA checks.
         return {
             **session_tokens(self.user),
             'user': {

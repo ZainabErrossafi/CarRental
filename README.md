@@ -19,4 +19,8 @@ GOOGLE_CLIENT_ID="your-client-id-from-google-console"
 GOOGLE_CLIENT_SECRET="your-client-secret-from-google-console"
 
 
+# Public API (set a generated private key; never put it in frontend code)
+PUBLIC_API_KEY=
+PUBLIC_API_RATE_LIMIT=60/minute
+
 ## -----------------------

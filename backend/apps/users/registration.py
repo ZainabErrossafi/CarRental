@@ -58,7 +58,7 @@ def complete_registration(pending):
                 raise serializers.ValidationError({'email': 'This email is already registered.'})
             user = User.objects.create(
                 username=pending.username, email=pending.email, password=pending.password,
-                is_active=True, email_verified=True, two_factor_enabled=True,
+                is_active=True, email_verified=True, two_factor_enabled=False,
             )
             pending.delete()
             return user
