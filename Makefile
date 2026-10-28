@@ -1,4 +1,10 @@
-.PHONY: up down build restart logs ps clean migrate certs db-sync-password
+.DEFAULT_GOAL := all
+
+.PHONY: all run up down build restart logs ps clean fclean migrate certs db-sync-password create_user
+
+all: up
+
+run: up
 
 up: certs
 	docker compose up --build -d
@@ -30,4 +36,3 @@ create_user:
 	docker compose exec backend python manage.py createsuperuser
 certs:
 	sh nginx/generate-certs.sh
-	
