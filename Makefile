@@ -1,4 +1,6 @@
-.PHONY: up down build restart re logs ps clean migrate certs db-sync-password
+.PHONY: all up down build re logs ps clean migrate certs db-sync-password create_user
+
+all: up
 
 up: certs
 	docker compose up --build -d
@@ -9,9 +11,8 @@ down:
 build:
 	docker compose build
 
-restart: down up
+re: down up
 
-re: restart
 
 logs:
 	docker compose logs -f
