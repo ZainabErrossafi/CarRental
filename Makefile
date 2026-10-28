@@ -1,4 +1,4 @@
-.PHONY: up down build restart logs ps clean migrate certs db-sync-password
+.PHONY: up down build restart re logs ps clean migrate certs db-sync-password
 
 up: certs
 	docker compose up --build -d
@@ -10,6 +10,8 @@ build:
 	docker compose build
 
 restart: down up
+
+re: restart
 
 logs:
 	docker compose logs -f
@@ -30,4 +32,3 @@ create_user:
 	docker compose exec backend python manage.py createsuperuser
 certs:
 	sh nginx/generate-certs.sh
-	

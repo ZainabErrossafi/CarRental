@@ -140,7 +140,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer-rently-scene.png") center 65% / cover no-repeat;
+  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer.png") center 65% / cover no-repeat;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
   mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
   pointer-events: none;
@@ -162,7 +162,7 @@
 .client-footer-home::before {
   inset: 0;
   height: auto;
-  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer-rently-scene.png") center 65% / cover no-repeat;
+  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer.png") center 65% / cover no-repeat;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
   mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
 }
