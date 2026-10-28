@@ -10,7 +10,7 @@ import { useConfirm } from "../../context/Confirmcontext";
 
 const EMPTY_USER = { username: "", email: "", password: "", first_name: "", last_name: "", phone: "", role: "client", is_active: true };
 
-const ROLE_TABS = ["All", "Client", "Staff", "Admin"];
+const ROLE_TABS = ["All", "Client", "Admin"];
 
 function initials(email) {
   return email.charAt(0).toUpperCase();
@@ -128,7 +128,6 @@ export default function AdminUsers() {
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 
   const activeCount = users.filter((u) => u.is_active).length;
-  const staffCount = users.filter((u) => u.role === "staff").length;
   const adminCount = users.filter((u) => u.role === "admin").length;
 
   const viewingReservations = viewing
@@ -167,15 +166,6 @@ export default function AdminUsers() {
           </div>
           <div className="stat-value-row">
             <span className="stat-value">{activeCount}</span>
-          </div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-card-top">
-            <span className="stat-label">{t("Staff")}</span>
-          </div>
-          <div className="stat-value-row">
-            <span className="stat-value">{staffCount}</span>
           </div>
         </div>
 

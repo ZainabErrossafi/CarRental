@@ -140,7 +140,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer-rently-scene.png") center 65% / cover no-repeat;
+  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer.png") center 65% / cover no-repeat;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
   mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
   pointer-events: none;
@@ -162,7 +162,7 @@
 .client-footer-home::before {
   inset: 0;
   height: auto;
-  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer-rently-scene.png") center 65% / cover no-repeat;
+  background: linear-gradient(90deg, rgba(3, 16, 31, .88), rgba(3, 16, 31, .8) 65%, rgba(3, 16, 31, .42)), url("../assets/footer.png") center 65% / cover no-repeat;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
   mask-image: linear-gradient(to bottom, transparent 0px, rgba(0, 0, 0, .04) 8px, rgba(0, 0, 0, .16) 18px, rgba(0, 0, 0, .42) 32px, rgba(0, 0, 0, .73) 47px, rgba(0, 0, 0, .94) 62px, #000 78px);
 }
@@ -1004,4 +1004,26 @@ select.compact-dropdown-trigger { display: block; width: 100%; font: inherit; fo
 @media (max-width: 600px) {
   .client-faqs-soft .client-faqs-list summary { padding: 18px; }
   .client-faqs-soft .client-faqs-list details p { padding: 18px; }
+}
+
+/* Keep the desktop booking sidebar short enough to show its total and action. */
+@media (min-width: 851px) {
+  .vehicle-booking-card { padding: 20px; }
+  .vehicle-booking-rate { margin-bottom: 18px; }
+  .vehicle-booking-rate strong { font-size: 30px; }
+  .vehicle-booking-dates { gap: 10px; }
+  .vehicle-booking-date-group { gap: 9px; }
+  .vehicle-booking-dates label { gap: 6px; }
+  .vehicle-booking-dates input { padding: 9px 7px; }
+  .vehicle-booking-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+  .vehicle-booking-fields > :last-child { grid-column: 1 / -1; }
+  .vehicle-booking-fields label, .vehicle-booking-fields .compact-dropdown { gap: 6px; font-size: 11px; }
+  .vehicle-booking-fields input { min-height: 40px; padding: 9px; font-size: 12px; }
+  .vehicle-booking-fields .compact-dropdown-trigger { min-height: 40px; padding: 9px; font-size: 11px; }
+  .booking-extras { margin-top: 14px; padding-top: 0; border-top: 0; }
+  .booking-extras-picker > summary { padding: 12px 10px; }
+  .vehicle-booking-estimate { margin: 16px 0; padding-top: 14px; }
+  .vehicle-booking-estimate h2 { margin-bottom: 8px; }
+  .vehicle-booking-button { padding: 11px; }
+  .vehicle-booking-note { margin: 9px 0 0; font-size: 10px; line-height: 1.45; }
 }

@@ -46,6 +46,7 @@ export default function VehicleBooking({ vehicle }) {
     phone: "",
   });
   const [error, setError] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [reservation, setReservation] = useState(null);
@@ -88,6 +89,7 @@ export default function VehicleBooking({ vehicle }) {
   }, [user]);
   const change = (field) => (event) => {
     setError("");
+    setUnavailable(false);
     let value = event.target.value;
     if (value && (field === "pickup" || field === "returned")) {
       const currentMinimum = nextMinute();
@@ -163,7 +165,9 @@ export default function VehicleBooking({ vehicle }) {
       });
       setReservation(data);
     } catch (err) {
-      setError(err.message || "Could not create your reservation. Please try again.");
+      const message = err.message || "Could not create your reservation. Please try again.";
+      setError(message);
+      if (message.toLowerCase().includes("not available")) setUnavailable(true);
     } finally {
       submitting.current = false;
       setBusy(false);
@@ -411,7 +415,7 @@ export default function VehicleBooking({ vehicle }) {
             <button
               type="submit"
               className="vehicle-booking-button"
-              disabled={busy || loading || !valid || !contactComplete || !locations.length || locationError}
+              disabled={busy || loading || unavailable || !valid || !contactComplete || !locations.length || locationError}
             >
               {busy ? "Booking…" : "Book now"}
               <ArrowRight size={17} aria-hidden="true" />
