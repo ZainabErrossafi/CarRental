@@ -1,3 +1,4 @@
+import { clampReservationTime, currentReservationTime } from "../../utils/reservationTime";
 import { useI18n } from "../../context/I18nContext";
 import SearchableSelect from "../../components/SearchableSelect";
 import { useEffect, useState } from "react";
@@ -26,6 +27,7 @@ const EMPTY_RESERVATION = {
 export default function AdminReservationAdd() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const [minimumTime, setMinimumTime] = useState(currentReservationTime);
   
   // Data states
   const [vehicles, setVehicles] = useState([]);
@@ -82,7 +84,7 @@ export default function AdminReservationAdd() {
     if (!form.pickup_date || !form.return_date) return 0;
     const start = new Date(form.pickup_date);
     const end = new Date(form.return_date);
-    const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
+    const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     return diff > 0 ? diff : 0;
   })();
 
@@ -127,6 +129,8 @@ export default function AdminReservationAdd() {
       // Append calculated total_price to the submission payload
       const payload = {
         ...form,
+        pickup_date: new Date(form.pickup_date).toISOString(),
+        return_date: new Date(form.return_date).toISOString(),
         user_id: form.user_id ?? "",
         total_price: estimatedTotal.toFixed(2)
       };
@@ -234,25 +238,28 @@ export default function AdminReservationAdd() {
               </div>
 
               <div className="form-field">
-                <label htmlFor="pickup_date">{t("Pickup Date")}</label>
+                <label htmlFor="pickup_date">{t("Pickup date and time")}</label>
                 <input
                   id="pickup_date"
-                  type="date"
+                  type="datetime-local"
+                  min={minimumTime}
+                  onFocus={() => setMinimumTime(currentReservationTime())}
                   value={form.pickup_date}
-                  onChange={(e) => handleChange("pickup_date", e.target.value)}
+                  onChange={(e) => handleChange("pickup_date", clampReservationTime(e.target.value))}
                   required
                 />
               </div>
 
               <div className="form-field">
-                <label htmlFor="return_date">{t("Return Date")}</label>
+                <label htmlFor="return_date">{t("Return date and time")}</label>
                 <input
                   id="return_date"
-                  type="date"
+                  type="datetime-local"
                   disabled={!form.pickup_date}
-                  min={form.pickup_date || undefined}
+                  min={form.pickup_date > minimumTime ? form.pickup_date : minimumTime}
+                  onFocus={() => setMinimumTime(currentReservationTime())}
                   value={form.return_date}
-                  onChange={(e) => handleChange("return_date", e.target.value)}
+                  onChange={(e) => handleChange("return_date", clampReservationTime(e.target.value))}
                   required
                 />
               </div>
