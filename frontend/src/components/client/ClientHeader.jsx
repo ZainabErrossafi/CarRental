@@ -1,10 +1,10 @@
+import { useAuth } from "../../context/AuthContext";
 import AccountSettings from "./AccountSettings.jsx";
 import ReservationsDropdown from "./ReservationsDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { ShieldCheck, LogOut } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
 
 const links = [
   { to: "/", label: "Home" },

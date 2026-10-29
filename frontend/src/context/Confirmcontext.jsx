@@ -1,5 +1,5 @@
 import { useI18n } from "./I18nContext";
-import { createContext, useCallback, useContext, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 
 const ConfirmContext = createContext(null);
@@ -11,7 +11,7 @@ export function ConfirmProvider({ children }) {
 
   // Returns a Promise<boolean> — true if the user clicked confirm, false otherwise.
   // Drop-in replacement for `if (!confirm("...")) return;` → `if (!(await confirm("..."))) return;`
-  const confirm = useCallback((message, options = {}) => {
+  const confirm = (message, options = {}) => {
     setDialog({
       message,
       confirmLabel: options.confirmLabel || "Confirm",
@@ -21,7 +21,7 @@ export function ConfirmProvider({ children }) {
     return new Promise((resolve) => {
       resolver.current = resolve;
     });
-  }, []);
+  };
 
   const handle = (result) => {
     setDialog(null);
@@ -29,38 +29,33 @@ export function ConfirmProvider({ children }) {
     resolver.current = null;
   };
 
-  return (
-    <ConfirmContext.Provider value={confirm}>
-      {children}
-
-      {dialog && (
-        <div className="modal-overlay" onClick={() => handle(false)}>
-          <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
-            <div className={`confirm-icon ${dialog.danger ? "danger" : ""}`}>
-              <AlertTriangle size={20} />
-            </div>
-            <p className="confirm-message">{t(dialog.message)}</p>
-            <div className="confirm-actions">
-              <button className="btn btn-secondary" onClick={() => handle(false)}>
-                {t(dialog.cancelLabel)}
-              </button>
-              <button
-                className={`btn ${dialog.danger ? "btn-danger" : "btn-primary"}`}
-                onClick={() => handle(true)}
-                autoFocus
-              >
-                {t(dialog.confirmLabel)}
-              </button>
-            </div>
-          </div>
+  const confirmationDialog = dialog && (
+    <div className="modal-overlay" onClick={() => handle(false)}>
+      <div className="confirm-card" onClick={(e) => e.stopPropagation()}>
+        <div className={`confirm-icon ${dialog.danger ? "danger" : ""}`}>
+          <AlertTriangle size={20} />
         </div>
-      )}
-    </ConfirmContext.Provider>
+        <p className="confirm-message">{t(dialog.message)}</p>
+        <div className="confirm-actions">
+          <button className="btn btn-secondary" onClick={() => handle(false)}>
+            {t(dialog.cancelLabel)}
+          </button>
+          <button
+            className={`btn ${dialog.danger ? "btn-danger" : "btn-primary"}`}
+            onClick={() => handle(true)}
+            autoFocus
+          >
+            {t(dialog.confirmLabel)}
+          </button>
+        </div>
+      </div>
+    </div>
   );
+  return <ConfirmContext.Provider value={confirm}>{children}{confirmationDialog}</ConfirmContext.Provider>;
 }
 
 export function useConfirm() {
-  const ctx = useContext(ConfirmContext);
-  if (!ctx) throw new Error("useConfirm must be used within a ConfirmProvider");
-  return ctx;
+  const value = useContext(ConfirmContext);
+  if (!value) throw new Error("useConfirm must be used within ConfirmProvider");
+  return value;
 }

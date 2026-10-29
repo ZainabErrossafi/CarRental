@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from "../context/AuthContext";
+import { useI18n } from "../context/I18nContext";
+import { useEffect, useRef, useState } from 'react';
 import { Download, RefreshCw, Printer } from 'lucide-react';
 import { getReservations } from '../services/adminApi';
 import { buildAnalytics, dateRange } from '../services/dashboardAnalytics';
 import { serializeReport } from '../services/reportFiles';
-import { useI18n } from '../context/I18nContext';
-import { useAuth } from '../context/AuthContext';
 import { TOKEN_KEY } from '../services/api';
 
 const COLORS = ['#ffc58c', '#2563eb', '#16a34a', '#dc2626'];
@@ -24,7 +24,7 @@ export default function DashboardAnalytics() {
   const [point, setPoint] = useState(null);
   const busy = useRef(false);
   const mounted = useRef(false);
-  const refresh = useCallback(async () => {
+  const refresh = async () => {
     if (busy.current || authLoading || !user || !localStorage.getItem(TOKEN_KEY)) return;
     busy.current = true;
     if (mounted.current) setLoading(true);
@@ -33,7 +33,8 @@ export default function DashboardAnalytics() {
       if (mounted.current && localStorage.getItem(TOKEN_KEY)) { setReservations(rows); setUpdated(new Date()); setError(false); }
     } catch { if (mounted.current) setError(true); }
     finally { busy.current = false; if (mounted.current) setLoading(false); }
-  }, [user, authLoading]);
+  };
+  // Refresh reads the auth values listed in the effect dependencies.
   useEffect(() => {
     if (authLoading || !user) {
       setReservations([]);
@@ -43,7 +44,7 @@ export default function DashboardAnalytics() {
     mounted.current = true;
     refresh();
     return () => { mounted.current = false; };
-  }, [refresh, user, authLoading]);
+  }, [user, authLoading]);
   useEffect(() => {
     if (!live || authLoading || !user) return;
     const update = () => { if (document.visibilityState !== 'hidden') refresh(); };
@@ -51,10 +52,10 @@ export default function DashboardAnalytics() {
     window.addEventListener('focus', update);
     document.addEventListener('visibilitychange', update);
     return () => { window.clearInterval(timer); window.removeEventListener('focus', update); document.removeEventListener('visibilitychange', update); };
-  }, [live, refresh, user, authLoading]);
+  }, [live, user, authLoading]);
   const invalid = !range.start || !range.end || range.start > range.end;
-  const data = useMemo(() => invalid ? null : buildAnalytics(reservations, { ...range, status, vehicle }), [reservations, range, status, vehicle, invalid]);
-  const vehicles = useMemo(() => [...new Map(reservations.map((row) => [row.vehicle, row.vehicle_name || row.vehicle])).entries()], [reservations]);
+  const data = invalid ? null : buildAnalytics(reservations, { ...range, status, vehicle });
+  const vehicles = [...new Map(reservations.map((row) => [row.vehicle, row.vehicle_name || row.vehicle])).entries()];
   const money = (value) => new Intl.NumberFormat(lang, { style: 'currency', currency: 'MAD', maximumFractionDigits: 0 }).format(value);
   const number = (value) => new Intl.NumberFormat(lang, { maximumFractionDigits: 1 }).format(value);
   const csv = () => {

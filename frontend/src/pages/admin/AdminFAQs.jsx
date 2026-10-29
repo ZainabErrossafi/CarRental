@@ -1,7 +1,8 @@
 import { useI18n } from "../../context/I18nContext";
+import { useConfirm } from "../../context/Confirmcontext";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, ChevronUp, ChevronDown, X } from "lucide-react";
 import {
   getFaqs,
@@ -10,7 +11,6 @@ import {
   deleteFaq,
   swapFaqOrder,
 } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
 
 const STATUS_TABS = ["All", "Active", "Hidden"];
 
@@ -30,8 +30,7 @@ export default function AdminFaqs() {
     getFaqs().then(setFaqs);
   }, []);
 
-  const filtered = useMemo(() => {
-    return faqs
+  const filtered = faqs
       .filter((f) => {
         if (tab === "Active") return f.active;
         if (tab === "Hidden") return !f.active;
@@ -40,7 +39,6 @@ export default function AdminFaqs() {
       .filter((f) =>
         `${f.question} ${f.answer}`.toLowerCase().includes(query.toLowerCase())
       );
-  }, [faqs, tab, query]);
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 

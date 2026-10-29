@@ -1,8 +1,9 @@
-import { CATALOG_ICONS as ICONS } from "../../components/CatalogIcons.jsx";
 import { useI18n } from "../../context/I18nContext";
+import { useConfirm } from "../../context/Confirmcontext";
+import { CATALOG_ICONS as ICONS } from "../../components/CatalogIcons.jsx";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Plus,
   Pencil,
@@ -17,7 +18,6 @@ import {
   updateCatalogItem,
   deleteCatalogItem,
 } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
 
 
 
@@ -84,14 +84,15 @@ export default function AdminCatalog() {
 
   const items = catalog?.[tab] ?? [];
 
-  const filtered = useMemo(() => {
+  const calculateFiltered = () => {
     const q = query.toLowerCase();
     return items.filter((i) =>
       `${i.name} ${i.slug ?? ""}`
         .toLowerCase()
         .includes(q)
     );
-  }, [items, query]);
+  };
+  const filtered = calculateFiltered();
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 

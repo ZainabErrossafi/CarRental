@@ -1,7 +1,8 @@
 import { useI18n } from "../../context/I18nContext";
+import { useConfirm } from "../../context/Confirmcontext";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, X, MapPin } from "lucide-react";
 import {
   getLocations,
@@ -9,7 +10,6 @@ import {
   updateLocation,
   deleteLocation,
 } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
 
 const STATUS_TABS = ["All", "Active", "Inactive"];
 
@@ -29,8 +29,7 @@ export default function AdminLocations() {
     getLocations().then(setLocations);
   }, []);
 
-  const filtered = useMemo(() => {
-    return locations
+  const filtered = locations
       .filter((l) => {
         if (tab === "Active") return l.active;
         if (tab === "Inactive") return !l.active;
@@ -39,7 +38,6 @@ export default function AdminLocations() {
       .filter((l) =>
         `${l.name} ${l.city} ${l.country}`.toLowerCase().includes(query.toLowerCase())
       );
-  }, [locations, tab, query]);
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 

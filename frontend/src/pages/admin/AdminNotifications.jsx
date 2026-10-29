@@ -1,7 +1,9 @@
 import { useI18n } from "../../context/I18nContext";
+import { useNotifications } from "../../context/NotificationsContext";
+import { useConfirm } from "../../context/Confirmcontext";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CalendarCheck,
@@ -19,9 +21,7 @@ import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
 } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
 
-import { useNotifications } from "../../context/NotificationsContext";
 
 const TABS = ["All", "Unread", "Read"];
 
@@ -55,15 +55,13 @@ export default function AdminNotifications() {
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
-  const filtered = useMemo(() => {
-    return notifications
+  const filtered = notifications
       .filter((n) => {
         if (tab === "Unread") return !n.is_read;
         if (tab === "Read") return n.is_read;
         return true;
       })
       .filter((n) => typeFilter === "all" || n.type === typeFilter);
-  }, [notifications, tab, typeFilter]);
 
   const pagination = usePagination(filtered, JSON.stringify([tab, typeFilter]));
 

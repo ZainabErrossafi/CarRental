@@ -1,3 +1,7 @@
+import { NotificationsProvider } from "../../context/NotificationsContext";
+import { useAuth } from "../../context/AuthContext";
+import { useI18n } from "../../context/I18nContext";
+import { useNotifications } from "../../context/NotificationsContext";
 import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -15,12 +19,9 @@ import {
   LogOut,
   Menu,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
-import { useI18n } from "../../context/I18nContext";
 import GlobalSearch from "../../components/GlobalSearch.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 
-import { NotificationsProvider, useNotifications } from "../../context/NotificationsContext";
 
 const NAV_SECTIONS = [
   {

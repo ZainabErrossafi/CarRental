@@ -1,4 +1,4 @@
-import { useI18n } from '../context/I18nContext';
+import { useI18n } from "../context/I18nContext";
 
 export default function UploadProgress({ value, label = 'Uploading…' }) {
   const { t } = useI18n();

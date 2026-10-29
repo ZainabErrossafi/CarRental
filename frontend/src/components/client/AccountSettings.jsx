@@ -1,6 +1,6 @@
+import { useAuth } from "../../context/AuthContext";
 import { useRef, useState } from "react";
 import { UserRound, X, LockKeyhole, Save } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
 import api from "../../services/api.js";
 
 export default function AccountSettings({ overlay }) {
