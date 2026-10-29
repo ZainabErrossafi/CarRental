@@ -16,6 +16,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import heroCarImage from "../../assets/rently.png";
 import { FcGoogle } from "react-icons/fc";
+import api from "../../services/api";
 
 function PasswordRequirement({ met, label }) {
   return (
@@ -351,7 +352,7 @@ export default function AdminAuth({ initialMode = "login" }) {
                 className="gcard-google"
                 disabled={loading}
                 onClick={() => {
-                  window.location.href = "https://localhost:8443/api/accounts/google/login/";
+                  window.location.href = `${api.defaults.baseURL}accounts/google/login/`;
                 }}
               >
                 <FcGoogle size={20} aria-hidden="true" />
