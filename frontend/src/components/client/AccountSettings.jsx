@@ -14,6 +14,8 @@ export default function AccountSettings({ overlay }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const inFlight = useRef(false);
+  const changeProfile = (field, value) => setProfile({ ...profile, [field]: value });
+  const changePassword = (field, value) => setPassword({ ...password, [field]: value });
   const show = () => {
     setProfile({
       first_name: user.first_name || "",
@@ -150,7 +152,7 @@ export default function AccountSettings({ overlay }) {
                     maxLength={150}
                     autoComplete="given-name"
                     value={profile.first_name}
-                    onChange={(event) => setProfile({ ...profile, first_name: event.target.value })}
+                    onChange={(event) => changeProfile("first_name", event.target.value)}
                   />
                 </label>
                 <label>
@@ -160,7 +162,7 @@ export default function AccountSettings({ overlay }) {
                     maxLength={150}
                     autoComplete="family-name"
                     value={profile.last_name}
-                    onChange={(event) => setProfile({ ...profile, last_name: event.target.value })}
+                    onChange={(event) => changeProfile("last_name", event.target.value)}
                   />
                 </label>
               </div>
@@ -177,7 +179,7 @@ export default function AccountSettings({ overlay }) {
                   maxLength={20}
                   autoComplete="tel"
                   value={profile.phone}
-                  onChange={(event) => setProfile({ ...profile, phone: event.target.value })}
+                  onChange={(event) => changeProfile("phone", event.target.value)}
                 />
               </label>
               <button className="account-settings-save" type="submit">
@@ -196,7 +198,7 @@ export default function AccountSettings({ overlay }) {
                   type="password"
                   autoComplete="current-password"
                   value={password.old}
-                  onChange={(event) => setPassword({ ...password, old: event.target.value })}
+                  onChange={(event) => changePassword("old", event.target.value)}
                 />
               </label>
               <label>
@@ -207,7 +209,7 @@ export default function AccountSettings({ overlay }) {
                   minLength={8}
                   autoComplete="new-password"
                   value={password.next}
-                  onChange={(event) => setPassword({ ...password, next: event.target.value })}
+                  onChange={(event) => changePassword("next", event.target.value)}
                 />
                 <small>Use at least 8 characters and avoid common passwords.</small>
               </label>
@@ -219,7 +221,7 @@ export default function AccountSettings({ overlay }) {
                   minLength={8}
                   autoComplete="new-password"
                   value={password.confirm}
-                  onChange={(event) => setPassword({ ...password, confirm: event.target.value })}
+                  onChange={(event) => changePassword("confirm", event.target.value)}
                 />
               </label>
               <button className="account-settings-save" type="submit">

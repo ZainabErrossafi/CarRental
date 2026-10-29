@@ -1,16 +1,7 @@
 import CompactDropdown from "../../components/client/CompactDropdown.jsx";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  SlidersHorizontal,
-  Search,
-  RotateCcw,
-  ChevronDown,
-  MapPin,
-  CalendarDays,
-  ArrowRight,
-  Info,
-} from "lucide-react";
+import { Search, RotateCcw, ChevronDown, MapPin, CalendarDays, ArrowRight, Info } from "lucide-react";
 import VehicleCard from "../../components/client/VehicleCard.jsx";
 import { getClientVehicles } from "../../services/clientVehicles.js";
 
@@ -93,21 +84,17 @@ export default function ClientVehicles() {
     setTransmission("");
     setMaxPrice(null);
   };
-  const activeFilters = [
-    selectedCategory,
-    brand,
-    transmission,
-    maxPrice !== null && maxPrice < priceLimit,
-    search.trim(),
-  ].filter(Boolean).length;
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      vehicle.name.toLowerCase().includes(search.trim().toLowerCase()) &&
-      (!selectedCategory || vehicle.category === selectedCategory) &&
-      (!brand || vehicle.brand === brand) &&
-      (!transmission || vehicle.transmission === transmission) &&
-      vehicle.pricePerDay <= (maxPrice ?? priceLimit),
-  );
+  const searchText = search.trim().toLowerCase();
+  const budget = maxPrice ?? priceLimit;
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const matchesSearch = vehicle.name.toLowerCase().includes(searchText);
+    const matchesCategory = !selectedCategory || vehicle.category === selectedCategory;
+    const matchesBrand = !brand || vehicle.brand === brand;
+    const matchesTransmission = !transmission || vehicle.transmission === transmission;
+    const matchesPrice = vehicle.pricePerDay <= budget;
+
+    return matchesSearch && matchesCategory && matchesBrand && matchesTransmission && matchesPrice;
+  });
   const sortedVehicles = [...filteredVehicles].sort((a, b) => {
     if (sort === "price-asc") return a.pricePerDay - b.pricePerDay;
     if (sort === "price-desc") return b.pricePerDay - a.pricePerDay;
@@ -208,17 +195,17 @@ export default function ClientVehicles() {
             <label className="fleet-price-filter">
               <span>Daily budget</span>
               <span className="fleet-budget-control">
-                <strong>{maxPrice ?? priceLimit} MAD</strong>
+                <strong>{budget} MAD</strong>
                 <input
                   aria-label="Maximum daily budget"
                   style={{
-                    "--budget-fill": `${priceLimit > 0 ? Math.min(100, Math.max(0, ((maxPrice ?? priceLimit) / priceLimit) * 100)) : 0}%`,
+                    "--budget-fill": `${Math.min(100, Math.max(0, (budget / priceLimit) * 100))}%`,
                   }}
                   type="range"
                   min="0"
                   max={priceLimit}
                   step="50"
-                  value={maxPrice ?? priceLimit}
+                  value={budget}
                   onChange={(event) => setMaxPrice(Number(event.target.value))}
                 />
                 <small className="fleet-budget-min">0</small>
