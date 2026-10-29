@@ -82,7 +82,7 @@ export default function AdminReservations() {
   const durationDays = (r) => {
     const start = new Date(r.pickup_date);
     const end = new Date(r.return_date);
-    const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
+    const diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
     return diff > 0 ? diff : 1;
   };
 
