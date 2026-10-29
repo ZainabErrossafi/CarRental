@@ -1,5 +1,6 @@
-import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
+import { useAuth } from "../../context/AuthContext";
 import { useI18n } from "../../context/I18nContext";
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
@@ -13,7 +14,6 @@ import {
   ArrowUpRight,
   Lock,
 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 import heroCarImage from "../../assets/rently.png";
 import { FcGoogle } from "react-icons/fc";
 import api from "../../services/api";

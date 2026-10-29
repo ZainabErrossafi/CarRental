@@ -1,9 +1,9 @@
+import { useAuth } from "../../context/AuthContext";
 import { CATALOG_ICONS } from "../CatalogIcons.jsx";
 import CompactDropdown from "./CompactDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
 import api, { getList } from "../../services/api.js";
 
 const localMinute = (date) => {

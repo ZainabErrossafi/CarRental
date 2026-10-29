@@ -1,10 +1,10 @@
+import { useAuth } from "../../context/AuthContext";
+import { useI18n } from "../../context/I18nContext";
 import { resendVerification } from "../../services/authApi";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 
 const CODE_LENGTH = 6;
 

@@ -1,8 +1,9 @@
-import { formatReservationDate, printReservationInvoice } from "../../services/reservationInvoice";
 import { useI18n } from "../../context/I18nContext";
+import { useConfirm } from "../../context/Confirmcontext";
+import { formatReservationDate, printReservationInvoice } from "../../services/reservationInvoice";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, X, CheckCheck, User, Phone, Mail, Plus, Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,7 +12,6 @@ import {
   cancelReservation,
   completeReservation,
 } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
 
 const STATUS_TABS = ["All", "Pending", "Confirmed", "Completed", "Cancelled"];
 
@@ -54,10 +54,11 @@ export default function AdminReservations() {
     getReservations().then(setReservations);
   }, []);
 
-  const filtered = useMemo(() => {
+  const calculateFiltered = () => {
     if (tab === "All") return reservations;
     return reservations.filter((r) => r.status === tab.toLowerCase());
-  }, [reservations, tab]);
+  };
+  const filtered = calculateFiltered();
 
   const pagination = usePagination(filtered, tab);
 

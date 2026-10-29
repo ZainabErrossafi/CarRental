@@ -1,12 +1,12 @@
 import { useI18n } from "../../context/I18nContext";
+import { useConfirm } from "../../context/Confirmcontext";
 import { formatReservationDate } from "../../services/reservationInvoice";
 import Pagination from "../../components/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, Pencil, Plus, Trash2, X } from "lucide-react";
 import { getUsers, getReservations, createUser, updateUser, deleteUser } from "../../services/adminApi";
 
-import { useConfirm } from "../../context/Confirmcontext";
 
 const EMPTY_USER = { username: "", email: "", password: "", first_name: "", last_name: "", phone: "", role: "client", is_active: true };
 
@@ -106,7 +106,7 @@ export default function AdminUsers() {
   }, []);
 
   // Prefer the linked account; guest bookings fall back to a normalized email.
-  const reservationsByUser = useMemo(() => {
+  const calculateReservationsByUser = () => {
     const map = new Map();
     users.forEach((user) => {
       const email = (user.email || "").trim().toLowerCase();
@@ -117,13 +117,12 @@ export default function AdminUsers() {
       ));
     });
     return map;
-  }, [users, reservations]);
+  };
+  const reservationsByUser = calculateReservationsByUser();
 
-  const filtered = useMemo(() => {
-    return users
+  const filtered = users
       .filter((u) => tab === "All" || u.role === tab.toLowerCase())
       .filter((u) => u.email.toLowerCase().includes(query.toLowerCase()));
-  }, [users, tab, query]);
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 

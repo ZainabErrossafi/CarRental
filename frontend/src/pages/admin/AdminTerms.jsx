@@ -1,8 +1,8 @@
+import { useI18n } from "../../context/I18nContext";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, FileText } from "lucide-react";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-import { useI18n } from "../../context/I18nContext";
 import logo from "../../assets/logo.png";
 
 const SECTIONS = [

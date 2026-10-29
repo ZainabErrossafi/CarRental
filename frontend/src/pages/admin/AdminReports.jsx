@@ -1,9 +1,9 @@
+import { useI18n } from "../../context/I18nContext";
 import UploadProgress from '../../components/UploadProgress';
 import { useRef, useState } from 'react';
 import { Download, Upload, FileSpreadsheet, FileJson, Database, CheckCircle2, ArrowRight, FileUp, Info, X } from 'lucide-react';
 import { getVehicles, getLocations, getReservations, getUsers, getReviews, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
 import { serializeReport, parseReport, prepareImport } from '../../services/reportFiles';
-import { useI18n } from '../../context/I18nContext';
 
 const LOADERS = { vehicles: getVehicles, locations: getLocations, reservations: getReservations, users: getUsers, reviews: getReviews };
 const WRITERS = { vehicles: { create: createVehicle, update: updateVehicle }, locations: { create: createLocation, update: updateLocation } };

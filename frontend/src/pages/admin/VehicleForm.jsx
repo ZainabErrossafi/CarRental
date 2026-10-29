@@ -1,6 +1,6 @@
+import { useI18n } from "../../context/I18nContext";
 import UploadProgress from "../../components/UploadProgress";
 import useImageReader from "../../hooks/useImageReader";
-import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import { X, ImagePlus, ChevronLeft, ChevronRight } from "lucide-react";
 

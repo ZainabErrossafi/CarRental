@@ -1,10 +1,10 @@
+import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { confirmPasswordReset, requestPasswordReset, verifyPasswordResetCode }
 from "../../services/Passwordresetapi";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-import { useI18n } from "../../context/I18nContext";
 
 const N = 6;
 const msg = (e) => e.response?.data?.detail || e.response?.data?.new_password?.[0] || "Something went wrong. Please try again.";

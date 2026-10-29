@@ -1,6 +1,6 @@
+import { useI18n } from "../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown, Globe } from "lucide-react";
-import { useI18n } from "../context/I18nContext";
 
 export default function LanguageSwitcher() {
   const { lang, setLang, languages, t } = useI18n();
