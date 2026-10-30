@@ -5,7 +5,7 @@ import { useConfirm } from "../../context/Confirmcontext";
 import { printReservationInvoice } from "../../services/reservationInvoice";
 
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -25,6 +25,9 @@ export default function AdminReservations() {
   const [tab, setTab] = useState("All");
   const [viewing, setViewing] = useState(null);
   const [printError, setPrintError] = useState(null);
+  const [actionError, setActionError] = useState(null);
+  const [pendingId, setPendingId] = useState(null);
+  const actionInProgress = useRef(false);
   const handlePrint = () => {
     setPrintError(null);
     try {
@@ -35,7 +38,9 @@ export default function AdminReservations() {
   };
 
   useEffect(() => {
-    getReservations().then(setReservations);
+    getReservations()
+      .then(setReservations)
+      .catch((error) => setActionError(error.message));
   }, []);
 
   const calculateFiltered = () => {
@@ -52,36 +57,47 @@ export default function AdminReservations() {
     );
   };
 
-  const handleConfirm = async (id) => {
-    if (
-      !(await confirm("Are you sure you want to confirm this reservation?", {
-        confirmLabel: "Confirm",
-      }))
-    )
-      return;
-    applyUpdate(await confirmReservation(id));
+  const runReservationAction = async (id, action, message, options) => {
+    if (actionInProgress.current) return;
+    actionInProgress.current = true;
+    setActionError(null);
+    try {
+      if (!(await confirm(message, options))) return;
+      setPendingId(id);
+      applyUpdate(await action(id));
+    } catch (error) {
+      setActionError(
+        error.message || "Could not update the reservation. Please try again.",
+      );
+    } finally {
+      setPendingId(null);
+      actionInProgress.current = false;
+    }
   };
-  const handleCancel = async (id) => {
-    if (
-      !(await confirm("Are you sure you want to cancel this reservation?", {
-        danger: true,
-        confirmLabel: "Cancel Reservation",
-        cancelLabel: "Back",
-      }))
-    )
-      return;
-    applyUpdate(await cancelReservation(id));
-  };
-  const handleComplete = async (id) => {
-    if (
-      !(await confirm(
-        "Are you sure you want to mark this reservation as completed?",
-        { confirmLabel: "Mark Completed" },
-      ))
-    )
-      return;
-    applyUpdate(await completeReservation(id));
-  };
+
+  const handleConfirm = (id) =>
+    runReservationAction(
+      id,
+      confirmReservation,
+      "Are you sure you want to confirm this reservation?",
+      { confirmLabel: "Confirm" },
+    );
+
+  const handleCancel = (id) =>
+    runReservationAction(
+      id,
+      cancelReservation,
+      "Are you sure you want to cancel this reservation?",
+      { danger: true, confirmLabel: "Cancel Reservation", cancelLabel: "Back" },
+    );
+
+  const handleComplete = (id) =>
+    runReservationAction(
+      id,
+      completeReservation,
+      "Are you sure you want to mark this reservation as completed?",
+      { confirmLabel: "Mark Completed" },
+    );
 
   const durationDays = (r) => {
     const start = new Date(r.pickup_date);
@@ -117,7 +133,14 @@ export default function AdminReservations() {
         ))}
       </div>
 
+      {actionError && (
+        <div role="alert" className="alert alert-error">
+          {t(actionError)}
+        </div>
+      )}
+
       <ReservationsTable
+        pendingId={pendingId}
         tab={tab}
         filtered={filtered}
         pagination={pagination}

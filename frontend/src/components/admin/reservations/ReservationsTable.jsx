@@ -37,6 +37,7 @@ export default function ReservationsTable({
   handleConfirm,
   handleCancel,
   handleComplete,
+  pendingId,
 }) {
   const { t } = useI18n();
   return (
@@ -132,12 +133,16 @@ export default function ReservationsTable({
                   {r.status === "pending" && (
                     <>
                       <button
+                        disabled={pendingId != null}
+                        aria-busy={pendingId === r.id}
                         onClick={() => handleConfirm(r.id)}
                         title={t("Confirm")}
                       >
                         <Check size={15} />
                       </button>
                       <button
+                        disabled={pendingId != null}
+                        aria-busy={pendingId === r.id}
                         onClick={() => handleCancel(r.id)}
                         title={t("Cancel")}
                         className="danger"
@@ -150,12 +155,16 @@ export default function ReservationsTable({
                   {r.status === "confirmed" && (
                     <>
                       <button
+                        disabled={pendingId != null}
+                        aria-busy={pendingId === r.id}
                         onClick={() => handleComplete(r.id)}
                         title={t("Complete")}
                       >
                         <CheckCheck size={15} />
                       </button>
                       <button
+                        disabled={pendingId != null}
+                        aria-busy={pendingId === r.id}
                         onClick={() => handleCancel(r.id)}
                         title={t("Cancel")}
                         className="danger"
