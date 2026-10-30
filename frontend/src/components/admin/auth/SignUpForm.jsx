@@ -70,7 +70,6 @@ export default function SignUpForm({
         </div>
       </div>
 
-      {/* Champ Confirm Password */}
       <div className="gfield">
         <label htmlFor="confirm_password">{t("Confirm Password")}</label>
         <div className="gfield-input">

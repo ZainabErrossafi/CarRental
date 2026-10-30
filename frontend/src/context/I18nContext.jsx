@@ -9,7 +9,7 @@ function getInitialLang() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (LANGUAGES.some((l) => l.code === saved)) return saved;
   } catch {
-    /* storage unavailable */
+
   }
   return "en";
 }
@@ -24,7 +24,6 @@ export function I18nProvider({ children }) {
   const pageLang = isClientPage ? "en" : current.code;
   const pageDir = isClientPage ? "ltr" : current.dir;
 
-  // Public pages use English copy; keep the saved admin language scoped to admin/auth pages.
   useEffect(() => {
     document.documentElement.lang = pageLang;
     document.documentElement.dir = pageDir;
@@ -35,7 +34,7 @@ export function I18nProvider({ children }) {
     try {
       localStorage.setItem(STORAGE_KEY, code);
     } catch {
-      /* ignore */
+
     }
   };
 

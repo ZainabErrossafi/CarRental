@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import Pagination from "../../Pagination.jsx";
+import Pagination from "../pagination/Pagination.jsx";
 import { initials, capitalize } from "./userDisplay.js";
 
 export default function UsersTable({

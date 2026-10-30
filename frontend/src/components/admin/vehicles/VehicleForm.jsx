@@ -1,16 +1,16 @@
-import VehicleDescriptionField from "../../components/admin/vehicles/VehicleDescriptionField.jsx";
-import VehicleMediaFields from "../../components/admin/vehicles/VehicleMediaFields.jsx";
-import VehiclePricingFields from "../../components/admin/vehicles/VehiclePricingFields.jsx";
-import VehicleFeatureFields from "../../components/admin/vehicles/VehicleFeatureFields.jsx";
-import VehicleSpecificationFields from "../../components/admin/vehicles/VehicleSpecificationFields.jsx";
-import VehicleIdentityFields from "../../components/admin/vehicles/VehicleIdentityFields.jsx";
-import { useI18n } from "../../context/I18nContext";
-import UploadProgress from "../../components/UploadProgress";
-import useImageReader from "../../hooks/useImageReader";
+import VehicleDescriptionField from "./VehicleDescriptionField.jsx";
+import VehicleMediaFields from "./VehicleMediaFields.jsx";
+import VehiclePricingFields from "./VehiclePricingFields.jsx";
+import VehicleFeatureFields from "./VehicleFeatureFields.jsx";
+import VehicleSpecificationFields from "./VehicleSpecificationFields.jsx";
+import VehicleIdentityFields from "./VehicleIdentityFields.jsx";
+import { useI18n } from "../../../context/I18nContext";
+import UploadProgress from "../forms/UploadProgress";
+import useImageReader from "../../../hooks/useImageReader";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { getCatalog } from "../../services/adminApi";
+import { getCatalog } from "../../../services/adminApi";
 
 const STEPS = ["Vehicle Details", "Photo & Description"];
 
@@ -78,11 +78,11 @@ export default function VehicleForm({
   }, []);
 
   const isLastStep = !multiStep || step === STEPS.length - 1;
-  // show(0) -> step 1, show(1) -> step 2. Everything shows when multiStep is off.
+
   const show = (n) => !multiStep || step === n;
 
   const goNext = (event) => {
-    // Cancel the click's default action before rendering the submit button.
+
     event?.preventDefault();
     if (formRef.current && !formRef.current.reportValidity()) return;
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -99,7 +99,7 @@ export default function VehicleForm({
       e.preventDefault();
       return;
     }
-    // Pressing Enter on step 1 should go to the next step, not save
+
     if (!isLastStep) {
       e.preventDefault();
       goNext();
@@ -135,17 +135,16 @@ export default function VehicleForm({
       )}
       <form ref={formRef} onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
-          {/* ================= STEP 1 ================= */}
+
           {show(0) && (
             <>
-              {/* Identity */}
+
               <VehicleIdentityFields
                 form={form}
                 onChange={onChange}
                 catalog={catalog}
               />
 
-              {/* Specs */}
               <VehicleSpecificationFields form={form} onChange={onChange} />
 
               <VehicleFeatureFields
@@ -155,14 +154,13 @@ export default function VehicleForm({
                 saving={saving}
               />
 
-              {/* Pricing & Rental Rules */}
               <VehiclePricingFields form={form} onChange={onChange} />
             </>
           )}
 
           {show(1) && (
             <>
-              {/* Media */}
+
               <VehicleMediaFields
                 form={form}
                 onChange={onChange}
@@ -173,7 +171,6 @@ export default function VehicleForm({
                 readImage={readImage}
               />
 
-              {/* Description */}
               <VehicleDescriptionField form={form} onChange={onChange} />
             </>
           )}
@@ -190,7 +187,6 @@ export default function VehicleForm({
           />
         )}
 
-        {/* Footer Actions */}
         <div className="form-actions step-actions">
           {step === 0 ? (
             <button

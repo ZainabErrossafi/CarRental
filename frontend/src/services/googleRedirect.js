@@ -1,4 +1,4 @@
-// Complete the redirect used by the Django Google OAuth callback.
+
 export function consumeGoogleRedirect(browser, tokenKey) {
   const url = new URL(browser.location.href);
   const fragment = new URLSearchParams(url.hash.slice(1));
@@ -10,7 +10,7 @@ export function consumeGoogleRedirect(browser, tokenKey) {
   const params = fragmentCallback ? fragment : url.searchParams;
   const access = params.get('access');
   const refresh = params.get('refresh');
-  // The authenticated profile determines the role, never the redirect URL.
+
   for (const key of ['access', 'refresh', 'role']) {
     if (queryCallback) url.searchParams.delete(key);
     if (fragmentCallback) fragment.delete(key);

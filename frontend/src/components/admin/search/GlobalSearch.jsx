@@ -1,4 +1,4 @@
-import { useI18n } from "../context/I18nContext";
+import { useI18n } from "../../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, CornerDownLeft } from "lucide-react";
@@ -10,15 +10,14 @@ import {
   getUsers,
   getFaqs,
   getNotifications,
-} from "../services/adminApi";
+} from "../../../services/adminApi";
 
 const norm = (s) =>
   String(s ?? "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, ""); // "Aéroport" matches "aeroport"
+    .replace(/[\u0300-\u036f]/g, "");
 
-// Build one flat, searchable list from every page's data.
 async function loadIndex() {
   const [vehicles, locations, catalog, reservations, users, faqs, notifs] =
     await Promise.allSettled([
@@ -69,7 +68,6 @@ export default function GlobalSearch({ open, onClose, pages }) {
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(0);
 
-  // (Re)load fresh data every time the palette opens
   useEffect(() => {
     if (!open) return;
     setQuery("");
@@ -99,7 +97,6 @@ export default function GlobalSearch({ open, onClose, pages }) {
   };
   const results = calculateResults();
 
-  // Group while keeping a single flat order for keyboard navigation
   const calculateGroups = () => {
     const map = new Map();
     results.forEach((r, i) => {

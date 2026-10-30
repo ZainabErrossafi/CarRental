@@ -138,7 +138,6 @@ export default function AdminUsers() {
     getReservations().then(setReservations);
   }, []);
 
-  // Prefer the linked account; guest bookings fall back to a normalized email.
   const calculateReservationsByUser = () => {
     const map = new Map();
     users.forEach((user) => {

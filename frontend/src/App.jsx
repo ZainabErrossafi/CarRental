@@ -14,7 +14,7 @@ import AdminAuth from "./pages/admin/AdminAuth.jsx";
 import AdminForgotPassword from "./pages/admin/AdminForgotPassword.jsx";
 import AdminResetPassword from "./pages/admin/AdminResetPassword.jsx";
 import AdminVerifyEmail from "./pages/admin/AdminVerifyEmail.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import ProtectedRoute from "./components/admin/auth/ProtectedRoute.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
 import AdminSiteSettings from "./pages/admin/AdminSiteSettings.jsx";
 import AdminFaqs from "./pages/admin/AdminFAQs.jsx";

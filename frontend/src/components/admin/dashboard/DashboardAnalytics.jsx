@@ -1,11 +1,11 @@
-import { useAuth } from "../context/AuthContext";
-import { useI18n } from "../context/I18nContext";
+import { useAuth } from "../../../context/AuthContext";
+import { useI18n } from "../../../context/I18nContext";
 import { useEffect, useRef, useState } from 'react';
 import { Download, RefreshCw, Printer } from 'lucide-react';
-import { getReservations } from '../services/adminApi';
-import { buildAnalytics, dateRange } from '../services/dashboardAnalytics';
-import { serializeReport } from '../services/reportFiles';
-import { TOKEN_KEY } from '../services/api';
+import { getReservations } from "../../../services/adminApi";
+import { buildAnalytics, dateRange } from "../../../services/dashboardAnalytics";
+import { serializeReport } from "../../../services/reportFiles";
+import { TOKEN_KEY } from "../../../services/api";
 
 const COLORS = ['#ffc58c', '#2563eb', '#16a34a', '#dc2626'];
 export default function DashboardAnalytics() {
@@ -34,7 +34,7 @@ export default function DashboardAnalytics() {
     } catch { if (mounted.current) setError(true); }
     finally { busy.current = false; if (mounted.current) setLoading(false); }
   };
-  // Refresh reads the auth values listed in the effect dependencies.
+
   useEffect(() => {
     if (authLoading || !user) {
       setReservations([]);

@@ -16,7 +16,7 @@ import {
 } from "../../services/adminApi";
 
 const EMPTY_RESERVATION = {
-  user_id: null, // Start without a selected user or guest option
+  user_id: null,
   vehicle_id: "",
   pickup_location_id: "",
   dropoff_location_id: "",
@@ -25,7 +25,7 @@ const EMPTY_RESERVATION = {
   email: "",
   pickup_date: "",
   return_date: "",
-  extras: [], // Array of selected extra IDs
+  extras: [],
 };
 
 export default function AdminReservationAdd() {
@@ -33,25 +33,22 @@ export default function AdminReservationAdd() {
   const navigate = useNavigate();
   const [minimumTime, setMinimumTime] = useState(currentReservationTime);
 
-  // Data states
   const [vehicles, setVehicles] = useState([]);
   const [locations, setLocations] = useState([]);
   const [users, setUsers] = useState([]);
   const [availableExtras, setAvailableExtras] = useState([]);
 
-  // Form states
   const [form, setForm] = useState(EMPTY_RESERVATION);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch initial data
   useEffect(() => {
     Promise.all([getVehicles(), getLocations(), getUsers(), getExtras()])
       .then(([vData, lData, uData, eData]) => {
         setVehicles(vData.filter((v) => v.status === "available"));
         setLocations(lData);
         setUsers(uData);
-        setAvailableExtras(eData.filter((e) => e.active !== false)); // Assuming active flag
+        setAvailableExtras(eData.filter((e) => e.active !== false));
       })
       .catch((err) => {
         setError(err.message || "Could not load reservation options.");
@@ -83,7 +80,6 @@ export default function AdminReservationAdd() {
     });
   };
 
-  // Calculations
   const selectedVehicle = vehicles.find(
     (v) => v.id === Number(form.vehicle_id),
   );
@@ -99,10 +95,8 @@ export default function AdminReservationAdd() {
   const estimatedTotal = (() => {
     if (!selectedVehicle || estimatedDays === 0) return 0;
 
-    // Vehicle daily rate
     let total = estimatedDays * Number(selectedVehicle.dailyRate || 0);
 
-    // Add Extras (accounting for flat price or per day price)
     form.extras.forEach((extraId) => {
       const extra = availableExtras.find((e) => e.id === Number(extraId));
       if (extra) {
@@ -118,7 +112,6 @@ export default function AdminReservationAdd() {
     e.preventDefault();
     setError(null);
 
-    // Basic Validation
     if (
       !form.vehicle_id ||
       !form.pickup_location_id ||
@@ -138,7 +131,7 @@ export default function AdminReservationAdd() {
 
     setSaving(true);
     try {
-      // Append calculated total_price to the submission payload
+
       const payload = {
         ...form,
         pickup_date: new Date(form.pickup_date).toISOString(),
@@ -178,14 +171,13 @@ export default function AdminReservationAdd() {
 
       <form onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
-          {/* User Details */}
+
           <ReservationCustomerFields
             form={form}
             handleChange={handleChange}
             users={users}
           />
 
-          {/* Vehicle & Dates */}
           <ReservationBookingFields
             form={form}
             handleChange={handleChange}
@@ -195,14 +187,12 @@ export default function AdminReservationAdd() {
             setMinimumTime={setMinimumTime}
           />
 
-          {/* Extras */}
           <ReservationExtrasFields
             form={form}
             availableExtras={availableExtras}
             handleExtraToggle={handleExtraToggle}
           />
 
-          {/* Pricing Summary */}
           {estimatedDays > 0 && selectedVehicle && (
             <div className="form-card vehicle-details-card">
               <div className="form-field full-width">

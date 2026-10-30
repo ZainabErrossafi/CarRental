@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import { X, ImagePlus } from "lucide-react";
-import UploadProgress from "../../UploadProgress";
+import UploadProgress from "../forms/UploadProgress";
 
 export default function VehicleMediaFields({
   form,

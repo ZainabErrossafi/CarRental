@@ -1,5 +1,5 @@
 import { useI18n } from "../../../context/I18nContext";
-import Pagination from "../../Pagination.jsx";
+import Pagination from "../pagination/Pagination.jsx";
 import { Check, X, CheckCheck, User, Phone, Mail } from "lucide-react";
 import { formatReservationDate } from "../../../services/reservationInvoice";
 function EyeIcon(props) {

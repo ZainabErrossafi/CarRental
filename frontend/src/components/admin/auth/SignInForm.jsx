@@ -53,7 +53,6 @@ export default function SignInForm({
         </div>
       </div>
 
-      {/* Forgot Password Link */}
       <div className="gfield-forgot">
         <Link to="/forgot-password" className="forgot-password-link">
           {t("Forgot password?")}

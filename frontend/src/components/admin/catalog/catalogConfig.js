@@ -22,7 +22,6 @@ export const ICON_LABELS = {
   tag: "Tag",
 };
 
-// Categories only offer these three icons (Economy / SUV / Luxury style).
 export const CATEGORY_ICON_KEYS = ["car", "truck", "sportscar"];
 
 export const KINDS = {

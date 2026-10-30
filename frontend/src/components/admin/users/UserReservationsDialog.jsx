@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import { X } from "lucide-react";
-import Pagination from "../../Pagination.jsx";
+import Pagination from "../pagination/Pagination.jsx";
 import { formatReservationDate } from "../../../services/reservationInvoice";
 import { initials, capitalize } from "./userDisplay.js";
 

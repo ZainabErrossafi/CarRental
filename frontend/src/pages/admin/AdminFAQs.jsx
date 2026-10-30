@@ -97,8 +97,6 @@ export default function AdminFaqs() {
     setFaqs((prev) => prev.map((f) => (f.id === updated.id ? updated : f)));
   };
 
-  // Move up/down relative to the *full* ordered list (not the filtered view),
-  // so reordering stays correct even while a filter/search is active.
   const handleMove = async (faq, direction) => {
     const index = faqs.findIndex((f) => f.id === faq.id);
     const neighbor = faqs[index + direction];

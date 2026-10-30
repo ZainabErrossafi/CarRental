@@ -28,7 +28,7 @@ export default function AdminSiteSettings() {
   };
 
   const goNext = () => {
-    // validate the fields visible on the current step before moving on
+
     if (formRef.current && !formRef.current.reportValidity()) return;
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -43,7 +43,6 @@ export default function AdminSiteSettings() {
     e.preventDefault();
     if (saving) return;
 
-    // Pressing Enter on step 1 should go to the next step, not save
     if (!isLastStep) {
       goNext();
       return;
@@ -76,7 +75,6 @@ export default function AdminSiteSettings() {
         </div>
       </div>
 
-      {/* Step indicator */}
       <div className="step-indicator">
         {STEPS.map((label, i) => (
           <div
@@ -107,16 +105,15 @@ export default function AdminSiteSettings() {
 
       <form ref={formRef} onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
-          {/* ================= STEP 1 ================= */}
+
           {step === 0 && (
             <>
-              {/* Company Info */}
+
               <CompanySettingsFields
                 settings={settings}
                 handleChange={handleChange}
               />
 
-              {/* Social Links */}
               <SocialSettingsFields
                 settings={settings}
                 handleChange={handleChange}
@@ -124,10 +121,9 @@ export default function AdminSiteSettings() {
             </>
           )}
 
-          {/* ================= STEP 2 ================= */}
           {step === 1 && (
             <>
-              {/* About */}
+
               <AboutSettingsFields
                 settings={settings}
                 handleChange={handleChange}
@@ -136,7 +132,6 @@ export default function AdminSiteSettings() {
           )}
         </div>
 
-        {/* Actions */}
         <div className="form-actions step-actions">
           {step > 0 && (
             <button

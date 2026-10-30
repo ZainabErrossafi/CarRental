@@ -1,4 +1,4 @@
-import { CATALOG_ICONS } from "../CatalogIcons.jsx";
+import { CATALOG_ICONS } from "../admin/catalog/CatalogIcons.jsx";
 
 export default function BookingExtras({ extras, selectedExtras, loading, error, onChange, money }) {
   return (
