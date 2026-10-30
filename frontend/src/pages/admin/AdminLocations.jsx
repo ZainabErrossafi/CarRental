@@ -1,9 +1,11 @@
+import LocationsTable from "../../components/admin/locations/LocationsTable.jsx";
+import LocationFormDialog from "../../components/admin/locations/LocationFormDialog.jsx";
 import { useI18n } from "../../context/I18nContext";
 import { useConfirm } from "../../context/Confirmcontext";
-import Pagination from "../../components/Pagination.jsx";
+
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, X, MapPin } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   getLocations,
   createLocation,
@@ -30,14 +32,16 @@ export default function AdminLocations() {
   }, []);
 
   const filtered = locations
-      .filter((l) => {
-        if (tab === "Active") return l.active;
-        if (tab === "Inactive") return !l.active;
-        return true;
-      })
-      .filter((l) =>
-        `${l.name} ${l.city} ${l.country}`.toLowerCase().includes(query.toLowerCase())
-      );
+    .filter((l) => {
+      if (tab === "Active") return l.active;
+      if (tab === "Inactive") return !l.active;
+      return true;
+    })
+    .filter((l) =>
+      `${l.name} ${l.city} ${l.country}`
+        .toLowerCase()
+        .includes(query.toLowerCase()),
+    );
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 
@@ -50,7 +54,12 @@ export default function AdminLocations() {
   };
 
   const openEdit = (loc) => {
-    setForm({ name: loc.name, city: loc.city, country: loc.country, active: loc.active });
+    setForm({
+      name: loc.name,
+      city: loc.city,
+      country: loc.country,
+      active: loc.active,
+    });
     setEditing(loc);
   };
 
@@ -69,7 +78,9 @@ export default function AdminLocations() {
         setLocations((prev) => [...prev, created]);
       } else {
         const updated = await updateLocation(editing.id, form);
-        setLocations((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+        setLocations((prev) =>
+          prev.map((l) => (l.id === updated.id ? updated : l)),
+        );
       }
       closeModal();
     } catch (err) {
@@ -78,14 +89,22 @@ export default function AdminLocations() {
   };
 
   const handleDelete = async (loc) => {
-    if (!(await confirm(t('Are you sure you want to delete "{name}"?', { name: loc.name }), { danger: true, confirmLabel: "Delete" }))) return;
+    if (
+      !(await confirm(
+        t('Are you sure you want to delete "{name}"?', { name: loc.name }),
+        { danger: true, confirmLabel: "Delete" },
+      ))
+    )
+      return;
     await deleteLocation(loc.id);
     setLocations((prev) => prev.filter((l) => l.id !== loc.id));
   };
 
   const handleToggleActive = async (loc) => {
     const updated = await updateLocation(loc.id, { active: !loc.active });
-    setLocations((prev) => prev.map((l) => (l.id === updated.id ? updated : l)));
+    setLocations((prev) =>
+      prev.map((l) => (l.id === updated.id ? updated : l)),
+    );
   };
 
   const isNew = editing === "new";
@@ -143,163 +162,26 @@ export default function AdminLocations() {
         ))}
       </div>
 
-      <div className="table-card">
-        <div className="table-card-header">
-          {tab === "All" ? t("All Locations") : t("{value0} Locations", { value0: t(tab) })}
-          <span className="count-pill">{filtered.length}</span>
-
-          <div className="search-box users-search">
-            <input
-              placeholder={t("Search locations")}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>{t("Name")}</th>
-              <th>{t("City")}</th>
-              <th>{t("Country")}</th>
-              <th>{t("Status")}</th>
-              <th>{t("Actions")}</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {pagination.pageItems.map((l) => (
-              <tr key={l.id}>
-                <td>
-                  <div className="name-cell">
-                    <span className="icon-badge">
-                      <MapPin size={16} />
-                    </span>
-                    <strong>{l.name}</strong>
-                  </div>
-                </td>
-
-                <td>{l.city}</td>
-                <td>{l.country}</td>
-
-                <td>
-                  <button
-                    className={`toggle ${l.active ? "on" : ""}`}
-                    onClick={() => handleToggleActive(l)}
-                    title={l.active ? t("Click to deactivate") : t("Click to activate")}
-                  >
-                    <span className="toggle-knob" />
-                  </button>
-                </td>
-
-                <td>
-                  <div className="row-actions">
-                    <button onClick={() => openEdit(l)} title={t("Edit location")}>
-                      <Pencil size={15} />
-                    </button>
-                    <button onClick={() => handleDelete(l)} title={t("Delete location")} className="danger">
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={5} className="table-empty">
-                  {query ? t("No locations match your search.") : t("No locations yet.")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <Pagination {...pagination} />
-      </div>
+      <LocationsTable
+        tab={tab}
+        filtered={filtered}
+        query={query}
+        setQuery={setQuery}
+        pagination={pagination}
+        handleToggleActive={handleToggleActive}
+        openEdit={openEdit}
+        handleDelete={handleDelete}
+      />
 
       {editing && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div
-            className="modal-card modal-wide catalog-dialog"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <form onSubmit={handleSave}>
-              <div className="modal-header">
-                <div className="catalog-dialog-heading">
-                  <h3>{isNew ? t("Add Location") : t("Edit Location")}</h3>
-                  <p>{t("Set up a pickup or dropoff point customers can choose when booking.")}</p>
-                </div>
-                <button type="button" className="modal-close" onClick={closeModal} aria-label={t("Close")}>
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="modal-body catalog-dialog-body">
-                <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="loc_name">{t("Name")}</label>
-                  <input
-                    id="loc_name"
-                    type="text"
-                    placeholder={t("e.g. Rabat Agdal")}
-                    value={form.name}
-                    onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                    autoFocus
-                    required
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="loc_city">{t("City")}</label>
-                  <input
-                    id="loc_city"
-                    type="text"
-                    placeholder={t("e.g. Rabat")}
-                    value={form.city}
-                    onChange={(e) => setForm((p) => ({ ...p, city: e.target.value }))}
-                    required
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="loc_country">{t("Country")}</label>
-                  <input
-                    id="loc_country"
-                    type="text"
-                    value={form.country}
-                    onChange={(e) => setForm((p) => ({ ...p, country: e.target.value }))}
-                    required 
-                  />
-                </div>
-
-                <label className="vehicle-featured-control">
-                  <span className="vehicle-featured-copy">
-                    <span className="vehicle-featured-title">{t("Active")}</span>
-                    <span className="field-hint"> {t("Available as a pickup and dropoff point.")}
-                    </span>
-                  </span>
-                  <input
-                    className="vehicle-featured-input"
-                    type="checkbox"
-                    role="switch"
-                    checked={!!form.active}
-                    onChange={(e) => setForm((prev) => ({ ...prev, active: e.target.checked }))}
-                  />
-                  <span className="vehicle-featured-switch" aria-hidden="true" />
-                </label>
-              </div>
-
-              <div className="modal-footer" style={{ gap: "0.6rem" }}>
-                <button type="button" className="btn btn-secondary" onClick={closeModal} disabled={saving}>
-                  {t("Cancel")}
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? t("Saving...") : isNew ? t("Add Location") : t("Save Changes")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <LocationFormDialog
+          closeModal={closeModal}
+          handleSave={handleSave}
+          isNew={isNew}
+          form={form}
+          setForm={setForm}
+          saving={saving}
+        />
       )}
     </div>
   );
