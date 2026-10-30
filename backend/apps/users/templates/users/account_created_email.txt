@@ -1,0 +1,15 @@
+Hello {{ name }},
+
+An administrator has created your Rently account.
+
+Username: {{ username }}
+Email: {{ email }}
+Temporary password: {{ password }}
+Role: {{ role }}
+
+Sign in using your email or username and the temporary password above.
+Please change your password immediately after signing in using the Change password option in your account settings. Choose a password that only you know.
+
+Keep these details private. If you were not expecting this account, contact your Rently administrator.
+
+The Rently team
