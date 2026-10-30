@@ -24,6 +24,7 @@ import ClientHome from "./pages/client/Clienthome.jsx";
 import ClientVehicles from "./pages/client/ClientVehicles.jsx";
 import ClientVehicleDetails from "./pages/client/ClientVehicleDetails.jsx";
 import ClientFaqs from "./pages/client/ClientFaqs.jsx";
+import ClientTwoFactor from "./pages/client/ClientTwoFactor.jsx";
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/forgot-password" element={<AdminForgotPassword />} />
       <Route path="/reset-password" element={<AdminResetPassword />} />
       <Route path="/verify-email" element={<AdminVerifyEmail />} />
+      <Route path="/two-factor" element={<ClientTwoFactor />} />
       <Route path="/" element={<ClientLayout />}>
         <Route index element={<ClientHome />} />
         <Route path="faqs" element={<ClientFaqs />} />

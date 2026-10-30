@@ -41,6 +41,11 @@ export const getCurrentUser = async () => {
 export const login = async ({ username, password }) => {
   clearSession();
   const { data } = await api.post('token/', { username, password });
+  if (data.two_factor_required) {
+    sessionStorage.setItem('rently_verification_token', data.ephemeral_token);
+    sessionStorage.setItem('rently_verification_email', data.email);
+    return data;
+  }
   localStorage.setItem(TOKEN_KEY, JSON.stringify({ ...data, loginMethod: "password" }));
   localStorage.setItem(SESSION_KEY, JSON.stringify({ loginMethod: 'password' }));
   try {

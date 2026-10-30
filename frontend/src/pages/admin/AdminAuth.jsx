@@ -72,7 +72,11 @@ export default function AdminAuth({ initialMode = "login" }) {
     setLoading(true);
     try {
       if (view === "signin") {
-        await login({ username: form.username, password: form.password });
+        const result = await login({ username: form.username, password: form.password });
+        if (result.two_factor_required) {
+          navigate("/two-factor", { state: { from: location.state?.from }, replace: true });
+          return;
+        }
         const from = location.state?.from;
         const requestedPath = from?.pathname;
         const redirectTo = /^\/vehicles\/[^/]+$/.test(requestedPath || "")
