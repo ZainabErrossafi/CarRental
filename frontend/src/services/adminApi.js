@@ -1,6 +1,5 @@
 import api, { getList } from './api';
 
-// DASHBOARD STATS
 export const getAdminStats = async () => {
   const { data } = await api.get('dashboard/stats/');
   return data;
@@ -8,7 +7,6 @@ export const getAdminStats = async () => {
 
 import { vehicleFromApi, vehiclePayload } from './vehicleData';
 
-// VEHICLES
 export const getVehicles = async () => {
   return (await getList('vehicles/')).map(vehicleFromApi);
 };
@@ -26,7 +24,7 @@ export const createVehicle = async (vehicleData, onUploadProgress) => {
 export const updateVehicle = async (id, vehicleData, onUploadProgress) => {
   const payload = await vehiclePayload(vehicleData);
   const { data } = await api.patch(`vehicles/${id}/`, payload, { onUploadProgress });
-  // Multipart cannot represent an empty relation list; clear it explicitly.
+
   if (payload instanceof FormData && vehicleData.feature_ids?.length === 0) {
     const { data: updated } = await api.patch(`vehicles/${id}/`, { feature_ids: [] });
     return vehicleFromApi(updated);
@@ -44,7 +42,6 @@ export const updateVehicleStatus = async (id, status) => {
   return data;
 };
 
-// LOCATIONS
 export const getLocations = async () => {
   return getList('locations/');
 };
@@ -64,7 +61,6 @@ export const deleteLocation = async (id) => {
   return data;
 };
 
-// CATALOG
 const catalogKinds = ['brands', 'categories', 'features', 'extras'];
 const catalogPath = (kind, id) => {
   if (!catalogKinds.includes(kind)) throw new Error('Unknown catalog type.');
@@ -90,7 +86,6 @@ export const deleteCatalogItem = async (kind, id) => {
 export { getSiteSettings, updateSiteSettings } from './localAdminData';
 export const getExtras = async () => getList('extras/');
 
-// RESERVATIONS
 export const getReservations = async () => {
   return getList('reservations/');
 };
@@ -118,7 +113,6 @@ export const confirmReservation = (id) => updateReservationStatus(id, "confirmed
 export const cancelReservation = (id) => updateReservationStatus(id, "cancelled");
 export const completeReservation = (id) => updateReservationStatus(id, "completed");
 
-// REVIEWS
 export const getReviews = async () => {
   return getList('reviews/');
 };
@@ -128,7 +122,6 @@ export const deleteReview = async (id) => {
   return data;
 };
 
-// USERS
 export const getUsers = async () => {
   return getList('users/');
 };
@@ -152,7 +145,6 @@ export const updateUserRole = async (id, role) => {
   return data;
 };
 
-// FAQS
 export const getFaqs = async () => {
   return getList('faqs/');
 };
@@ -173,12 +165,11 @@ export const deleteFaq = async (id) => {
 };
 
 export const swapFaqOrder = async (idA, idB) => {
-  // If your backend handles swap via a dedicated endpoint:
+
   const { data } = await api.post('faqs/swap/', { id_a: idA, id_b: idB });
   return data;
 };
 
-// NOTIFICATIONS
 export const getNotifications = async () => {
   return getList('notifications/');
 };

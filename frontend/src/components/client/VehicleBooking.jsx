@@ -1,9 +1,10 @@
-import { CATALOG_ICONS } from "../CatalogIcons.jsx";
+import { useAuth } from "../../context/AuthContext";
+import BookingExtras from "./BookingExtras.jsx";
+import BookingSuccess from "./BookingSuccess.jsx";
 import CompactDropdown from "./CompactDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
+import { ArrowRight } from "lucide-react";
 import api, { getList } from "../../services/api.js";
 
 const localMinute = (date) => {
@@ -18,6 +19,10 @@ export default function VehicleBooking({ vehicle }) {
   const [locations, setLocations] = useState([]);
   const [extras, setExtras] = useState([]);
   const [selectedExtras, setSelectedExtras] = useState([]);
+  const changeExtra = (id, checked) => {
+    setError("");
+    setSelectedExtras((previous) => checked ? [...previous, id] : previous.filter((value) => value !== id));
+  };
   const [extrasLoading, setExtrasLoading] = useState(true);
   const [extrasError, setExtrasError] = useState(false);
   useEffect(() => {
@@ -46,6 +51,7 @@ export default function VehicleBooking({ vehicle }) {
     phone: "",
   });
   const [error, setError] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [reservation, setReservation] = useState(null);
@@ -88,6 +94,7 @@ export default function VehicleBooking({ vehicle }) {
   }, [user]);
   const change = (field) => (event) => {
     setError("");
+    setUnavailable(false);
     let value = event.target.value;
     if (value && (field === "pickup" || field === "returned")) {
       const currentMinimum = nextMinute();
@@ -123,27 +130,32 @@ export default function VehicleBooking({ vehicle }) {
     );
   const valid = duration > 0 && new Date(form.pickup) > new Date();
   const contactComplete = Boolean(form.driver_name.trim() && form.phone.trim() && user?.email?.trim());
-  const submit = async (event) => {
-    event.preventDefault();
-    if (submitting.current || reservation) return;
+  const agencyOptions = locations.map((item) => ({ value: item.id, label: `${item.name} · ${item.city}` }));
+  const validateBooking = () => {
     if (
       ![form.pickup, form.returned].every((value) =>
         /^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$/.test(value),
       )
     ) {
-      setError("Enter valid times from 00:00 to 23:59.");
-      return;
+      return "Enter valid times from 00:00 to 23:59.";
     }
     if (!form.pickup_location || !form.dropoff_location) {
-      setError("Select pick-up and return agencies.");
-      return;
+      return "Select pick-up and return agencies.";
     }
     if (!contactComplete) {
-      setError("Driver name, phone number and account email are required to book.");
-      return;
+      return "Driver name, phone number and account email are required to book.";
     }
     if (!valid) {
-      setError("Choose a future pick-up time and a later return time.");
+      return "Choose a future pick-up time and a later return time.";
+    }
+    return "";
+  };
+  const submit = async (event) => {
+    event.preventDefault();
+    if (submitting.current || reservation) return;
+    const validationError = validateBooking();
+    if (validationError) {
+      setError(validationError);
       return;
     }
     submitting.current = true;
@@ -163,44 +175,15 @@ export default function VehicleBooking({ vehicle }) {
       });
       setReservation(data);
     } catch (err) {
-      setError(err.message || "Could not create your reservation. Please try again.");
+      const message = err.message || "Could not create your reservation. Please try again.";
+      setError(message);
+      if (message.toLowerCase().includes("not available")) setUnavailable(true);
     } finally {
       submitting.current = false;
       setBusy(false);
     }
   };
-  if (reservation)
-    return (
-      <aside className="vehicle-booking-card booking-success" role="status">
-        <div className="booking-success-icon">
-          <Check size={27} aria-hidden="true" />
-        </div>
-        <span className="booking-success-eyebrow">ALL SET FOR THE NEXT STEP</span>
-        <h2>Request received!</h2>
-        <p>We’ll review your reservation and confirm it shortly.</p>
-        <div className="booking-success-summary">
-          <span>
-            Booking reference<strong>{reservation.reference}</strong>
-          </span>
-          <span>
-            Total rental<strong>{money(reservation.total_price)} MAD</strong>
-          </span>
-          <span>
-            Status<strong className="booking-pending">Pending confirmation</strong>
-          </span>
-        </div>
-        <button
-          type="button"
-          className="vehicle-booking-button vehicle-booking-signin"
-          onClick={() => window.dispatchEvent(new Event("rently:show-reservations"))}
-        >
-          My reservations <ArrowRight size={16} aria-hidden="true" />
-        </button>
-        <Link className="booking-success-back" to="/vehicles">
-          Continue exploring vehicles
-        </Link>
-      </aside>
-    );
+  if (reservation) return <BookingSuccess reservation={reservation} money={money} />;
   return (
     <aside className="vehicle-booking-card" aria-label="Book this vehicle">
       <div className="vehicle-booking-rate">
@@ -263,10 +246,7 @@ export default function VehicleBooking({ vehicle }) {
                   placeholder="Select an agency"
                   disabled={busy || loading}
                   onChange={(value) => change("pickup_location")({ target: { value } })}
-                  options={locations.map((item) => ({
-                    value: item.id,
-                    label: `${item.name} · ${item.city}`,
-                  }))}
+                  options={agencyOptions}
                 />
                 <CompactDropdown
                   label="Return agency"
@@ -274,10 +254,7 @@ export default function VehicleBooking({ vehicle }) {
                   placeholder="Select an agency"
                   disabled={busy || loading}
                   onChange={(value) => change("dropoff_location")({ target: { value } })}
-                  options={locations.map((item) => ({
-                    value: item.id,
-                    label: `${item.name} · ${item.city}`,
-                  }))}
+                  options={agencyOptions}
                 />
                 <label>
                   Driver name
@@ -315,72 +292,7 @@ export default function VehicleBooking({ vehicle }) {
               {locationError && <p role="alert">Could not load agencies. Refresh to try again.</p>}
             </>
           )}
-          {user && (
-            <details className="booking-extras booking-extras-picker">
-              <summary>
-                <span>
-                  <strong>Optional extras</strong>
-                  <small>Personalize your rental</small>
-                </span>
-                <span className="booking-extras-count" aria-live="polite">
-                  {selectedExtras.length ? `${selectedExtras.length} added` : "Add extras"}
-                </span>
-                <span className="booking-extras-chevron" aria-hidden="true">
-                  ⌄
-                </span>
-              </summary>
-              {extrasLoading ? (
-                <p role="status">Loading extras…</p>
-              ) : extrasError ? (
-                <p role="status">Extras are temporarily unavailable. You can still book without them.</p>
-              ) : !extras.length ? (
-                <p>No extras available.</p>
-              ) : (
-                <div
-                  className="booking-extras-list"
-                  tabIndex={0}
-                  role="group"
-                  aria-label="Available optional extras"
-                >
-                  {extras.map((extra) => {
-                    const Icon = CATALOG_ICONS[extra.icon] || CATALOG_ICONS.tag;
-                    return (
-                      <label key={extra.id} className="booking-extra-option">
-                        <input
-                          type="checkbox"
-                          checked={selectedExtras.includes(extra.id)}
-                          onChange={(event) => {
-                            setError("");
-                            setSelectedExtras((prev) =>
-                              event.target.checked
-                                ? [...prev, extra.id]
-                                : prev.filter((id) => id !== extra.id),
-                            );
-                          }}
-                        />
-                        <span className="booking-extra-content">
-                          <span className="booking-extra-icon">
-                            <Icon size={18} strokeWidth={1.6} aria-hidden="true" />
-                          </span>
-                          <span className="booking-extra-copy">
-                            <strong>{extra.name}</strong>
-                            <small>
-                              {[
-                                Number(extra.price_per_day) > 0 && `${money(extra.price_per_day)} MAD / day`,
-                                Number(extra.flat_price) > 0 && `${money(extra.flat_price)} MAD once`,
-                              ]
-                                .filter(Boolean)
-                                .join(" + ") || "Included"}
-                            </small>
-                          </span>
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              )}
-            </details>
-          )}
+          {user && <BookingExtras extras={extras} selectedExtras={selectedExtras} loading={extrasLoading} error={extrasError} onChange={changeExtra} money={money} />}
           <div className="vehicle-booking-estimate" aria-live="polite">
             <h2>Total</h2>
             {valid ? (
@@ -411,7 +323,7 @@ export default function VehicleBooking({ vehicle }) {
             <button
               type="submit"
               className="vehicle-booking-button"
-              disabled={busy || loading || !valid || !contactComplete || !locations.length || locationError}
+              disabled={busy || loading || unavailable || !valid || !contactComplete || !locations.length || locationError}
             >
               {busy ? "Booking…" : "Book now"}
               <ArrowRight size={17} aria-hidden="true" />

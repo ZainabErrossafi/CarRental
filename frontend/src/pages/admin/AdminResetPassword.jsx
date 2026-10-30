@@ -1,98 +1,92 @@
-import { useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
-import { confirmPasswordReset, verifyPasswordResetCode } from "../../services/Passwordresetapi.js";
-import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useI18n } from "../../context/I18nContext";
+import { useRef, useState } from "react";
+import { Link, Navigate, useLocation } from "react-router-dom";
+import { Mail } from "lucide-react";
+import { confirmPasswordReset, requestPasswordReset, verifyPasswordResetCode }
+from "../../services/Passwordresetapi";
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
+
+const N = 6;
+const msg = (e) => e.response?.data?.detail || e.response?.data?.new_password?.[0] || "Something went wrong. Please try again.";
 
 export default function AdminResetPassword() {
   const { t } = useI18n();
   const email = useLocation().state?.email;
-  const [code, setCode] = useState("");
-  const [verified, setVerified] = useState(false);
-  const [password, setPassword] = useState("");
-  const [confirmation, setConfirmation] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [d, setD] = useState(Array(N).fill(""));
+  const [step, setStep] = useState("code");
+  const [pw, setPw] = useState("");
+  const [pw2, setPw2] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
-
-  const errorText = (err) => {
-    const data = err.response?.data;
-    return data?.new_password?.[0] || data?.code?.[0] || data?.detail ||
-      (err.response?.status === 429
-        ? "Too many attempts. Please wait a minute and try again."
-        : "Something went wrong. Please try again.");
-  };
-
-  async function verifyCode(event) {
-    event.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      await verifyPasswordResetCode({ email, code });
-      setVerified(true);
-    } catch (err) {
-      setError(errorText(err));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function submit(event) {
-    event.preventDefault();
-    if (password !== confirmation) {
-      setError("Passwords do not match.");
-      return;
-    }
-    setError("");
-    setLoading(true);
-    try {
-      await confirmPasswordReset({ email, code, newPassword: password });
-      setDone(true);
-    } catch (err) {
-      // Code expired or was invalidated meanwhile: send the user back to the code step.
-      if (err.response?.data?.detail) { setVerified(false); setCode(""); }
-      setError(errorText(err));
-    } finally {
-      setLoading(false);
-    }
-  }
+  const [busy, setBusy] = useState(false);
+  const refs = useRef([]);
+  const code = d.join("");
 
   if (!email) return <Navigate to="/forgot-password" replace />;
+
+  const clear = () => { setD(Array(N).fill("")); refs.current[0]?.focus(); };
+  const change = (i, v) => {
+    const x = v.replace(/\D/g, "").slice(-1);
+    setD(d.map((c, j) => (j === i ? x : c)));
+    if (x && i < N - 1) refs.current[i + 1]?.focus();
+  };
+  const paste = (e) => {
+    const p = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, N);
+    e.preventDefault();
+    setD(Array.from({ length: N }, (_, i) => p[i] || ""));
+  };
+  const run = (fn) => async (e) => {
+    e.preventDefault();
+    setError(""); setBusy(true);
+    try { await fn(); } catch (err) { setError(msg(err)); } finally { setBusy(false); }
+  };
+
+  const verify = run(async () => { await verifyPasswordResetCode({ email, code }); setStep("password"); });
+  const resend = run(async () => { await requestPasswordReset(email); clear(); });
+  const save = run(async () => {
+    if (pw !== pw2) throw { response: { data: { detail: "Passwords do not match." } } };
+    try { await confirmPasswordReset({ email, code, newPassword: pw }); setStep("done"); }
+    catch (err) { if (err.response?.data?.detail) { setStep("code"); clear(); } throw err; }
+  });
 
   return (
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-language-switcher"><LanguageSwitcher /></div>
-        <div className="auth-logo"><div className="logo-dot" /></div>
-        <h1 className="auth-title">{t(done ? "Password updated" : verified ? "Choose a new password" : "Enter verification code")}</h1>
-        <p className="auth-subtitle">{t(done ? "Your password has been changed. You can now log in." : verified ? "Enter and confirm your new password." : "Enter the 6-digit code we emailed you.")}</p>
-        {error && <p role="alert" className="auth-error">{t(error)}</p>}
-        {!verified && !done && (
-          <form className="auth-form" onSubmit={verifyCode}>
-            <div className="form-field">
-              <label htmlFor="otp-code">{t("Verification code")}</label>
-              <input id="otp-code" type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required autoFocus value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))} />
+        {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
+
+        {step === "code" && (<>
+          <div className="auth-icon-circle"><Mail size={20} /></div>
+          <h1 className="auth-title">{t("Check your email")}</h1>
+          <p className="auth-subtitle">{t("Email verification")} <strong>{email}</strong></p>
+          <form onSubmit={verify} className="auth-form" style={{ alignItems: "center" }}>
+            <div className="otp-inputs" onPaste={paste}>
+              {d.map((c, i) => (
+                <input key={i} ref={(el) => (refs.current[i] = el)} className="otp-input" inputMode="numeric"
+                  maxLength={1} value={c} autoFocus={i === 0} onChange={(e) => change(i, e.target.value)}
+                  onKeyDown={(e) => e.key === "Backspace" && !c && refs.current[i - 1]?.focus()} />
+              ))}
             </div>
-            <button type="submit" className="gcard-submit" disabled={loading || code.length !== 6}>{t(loading ? "Verifying..." : "Verify code")}</button>
+            <button className="gcard-submit" disabled={code.length < N || busy}>{t(busy ? "Verifying..." : "Verify code")}</button>
           </form>
-        )}
-        {verified && !done && (
-          <form className="auth-form" onSubmit={submit}>
-            <div className="form-field">
-              <label htmlFor="new-password">{t("New password")}</label>
-              <input id="new-password" type={showPassword ? "text" : "password"} autoComplete="new-password" minLength={8} maxLength={128} required value={password} onChange={(e) => setPassword(e.target.value)} />
-            </div>
-            <div className="form-field">
-              <label htmlFor="confirm-password">{t("Confirm password")}</label>
-              <input id="confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password" minLength={8} maxLength={128} required value={confirmation} onChange={(e) => setConfirmation(e.target.value)} />
-            </div>
-            <label><input type="checkbox" checked={showPassword} onChange={(e) => setShowPassword(e.target.checked)} /> {t("Show password")}</label>
-            <button type="submit" className="gcard-submit" disabled={loading}>{t(loading ? "Saving..." : "Change password")}</button>
+          <p className="auth-footer">{t("Didn't receive the email?")}{" "}
+            <button type="button" className="auth-link" onClick={resend} disabled={busy}>{t("Click to resend")}</button></p>
+        </>)}
+
+        {step === "password" && (<>
+          <h1 className="auth-title">{t("Choose a new password")}</h1>
+          <form onSubmit={save} className="auth-form">
+            <input type="password" placeholder={t("New password")} minLength={8} required value={pw} onChange={(e) => setPw(e.target.value)} />
+            <input type="password" placeholder={t("Confirm password")} minLength={8} required value={pw2} onChange={(e) => setPw2(e.target.value)} />
+            <button className="gcard-submit" disabled={busy}>{t(busy ? "Saving..." : "Change password")}</button>
           </form>
-        )}
-        {!done && <p className="auth-footer"><Link className="auth-link" to="/forgot-password">{t("Request a new code")}</Link></p>}
-        <p className="auth-footer"><Link className="auth-link" to="/login">{t("Back to log in")}</Link></p>
+        </>)}
+
+        {step === "done" && (<>
+          <h1 className="auth-title">{t("Password updated")}</h1>
+          <p className="auth-subtitle">{t("Your password has been changed. You can now log in.")}</p>
+        </>)}
+
+        <p className="auth-footer"><Link to="/login" className="auth-link">{t("Back to log in")}</Link></p>
       </div>
     </div>
   );

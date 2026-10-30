@@ -1,4 +1,4 @@
-// File conversion runs entirely in the browser. Nested values use JSON in CSV cells.
+
 const safeCell = (value) => {
   let text = value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
   if (/^[\s]*[=+\-@]/.test(text)) text = "'" + text;
@@ -43,7 +43,7 @@ export function parseReport(text, filename, dataset, t = (key, values = {}) => k
       return Object.fromEntries(headers.map((key, index) => {
         let value = values[index];
         if (/^'[\s]*[=+\-@]/.test(value)) value = value.slice(1);
-        if (/^[\[{]/.test(value)) { try { value = JSON.parse(value); } catch { /* Preserve ordinary strings. */ } }
+        if (/^[\[{]/.test(value)) { try { value = JSON.parse(value); } catch {                                  } }
         return [key, value];
       }));
     });

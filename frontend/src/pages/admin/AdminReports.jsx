@@ -1,9 +1,9 @@
-import UploadProgress from '../../components/UploadProgress';
+import { useI18n } from "../../context/I18nContext";
+import UploadProgress from "../../components/admin/forms/UploadProgress";
 import { useRef, useState } from 'react';
 import { Download, Upload, FileSpreadsheet, FileJson, Database, CheckCircle2, ArrowRight, FileUp, Info, X } from 'lucide-react';
 import { getVehicles, getLocations, getReservations, getUsers, getReviews, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
 import { serializeReport, parseReport, prepareImport } from '../../services/reportFiles';
-import { useI18n } from '../../context/I18nContext';
 
 const LOADERS = { vehicles: getVehicles, locations: getLocations, reservations: getReservations, users: getUsers, reviews: getReviews };
 const WRITERS = { vehicles: { create: createVehicle, update: updateVehicle }, locations: { create: createLocation, update: updateLocation } };
@@ -42,7 +42,7 @@ export default function AdminReports() {
       setMessage(t('Report downloaded.'));
     } catch (error) {
       if (error.response?.data instanceof Blob) {
-        try { error.message = JSON.parse(await error.response.data.text()).detail || error.message; } catch { /* Keep API error. */ }
+        try { error.message = JSON.parse(await error.response.data.text()).detail || error.message; } catch {                       }
       }
       fail(error);
     } finally { setBusy(false); }

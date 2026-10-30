@@ -1,7 +1,8 @@
 import { useI18n } from "../../context/I18nContext";
-import Pagination from "../../components/Pagination.jsx";
+import { useConfirm } from "../../context/Confirmcontext";
+import Pagination from "../../components/admin/pagination/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pencil, Trash2, Plus, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +11,6 @@ import {
   deleteVehicle,
   updateVehicleStatus,
 } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
 
 export default function AdminVehicles() {
   const { t } = useI18n();
@@ -19,15 +19,13 @@ export default function AdminVehicles() {
   const [vehicles, setVehicles] = useState([]);
 
   const [query, setQuery] = useState("");
-  const filtered = useMemo(() => {
-    const search = query.trim().toLowerCase();
-    return vehicles.filter((vehicle) =>
+  const search = query.trim().toLowerCase();
+  const filtered = vehicles.filter((vehicle) =>
       [vehicle.brand, vehicle.model, vehicle.year, vehicle.category, vehicle.status, t(vehicle.category), t(vehicle.status)]
         .join(" ")
         .toLowerCase()
         .includes(search)
-    );
-  }, [vehicles, query, t]);
+  );
   const pagination = usePagination(filtered, query);
 
   useEffect(() => {

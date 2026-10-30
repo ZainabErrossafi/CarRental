@@ -1,5 +1,5 @@
-import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useI18n } from "../../context/I18nContext";
+import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, KeyRound } from "lucide-react";

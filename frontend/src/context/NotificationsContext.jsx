@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { getNotifications } from "../services/adminApi";
 import { useAuth } from "./AuthContext";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { getNotifications } from "../services/adminApi";
 import { TOKEN_KEY } from "../services/api";
 
 const NotificationsContext = createContext(null);
@@ -9,17 +9,17 @@ export function NotificationsProvider({ children }) {
   const { user, loading } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const requestVersion = useRef(0);
-  const refreshNotifications = useCallback(async () => {
+  const refreshNotifications = async () => {
     if (loading || !user || !localStorage.getItem(TOKEN_KEY)) return;
     const version = ++requestVersion.current;
     const items = await getNotifications();
     if (version === requestVersion.current && localStorage.getItem(TOKEN_KEY)) setNotifications(items);
-  }, [user, loading]);
-  const updateNotifications = useCallback((update) => {
-    // Ignore requests started before a local read/delete action.
+  };
+  const updateNotifications = (update) => {
+
     requestVersion.current += 1;
     setNotifications(update);
-  }, []);
+  };
 
   useEffect(() => {
     if (loading || !user) {
@@ -42,13 +42,13 @@ export function NotificationsProvider({ children }) {
       window.removeEventListener("focus", refresh);
       document.removeEventListener("visibilitychange", refresh);
     };
-  }, [refreshNotifications, user, loading]);
+  }, [user, loading]);
 
-  return (
-    <NotificationsContext.Provider value={{ notifications, setNotifications: updateNotifications, refreshNotifications }}>
-      {children}
-    </NotificationsContext.Provider>
-  );
+  return <NotificationsContext.Provider value={{ notifications, setNotifications: updateNotifications, refreshNotifications }}>{children}</NotificationsContext.Provider>;
 }
 
-export const useNotifications = () => useContext(NotificationsContext);
+export function useNotifications() {
+  const value = useContext(NotificationsContext);
+  if (!value) throw new Error("useNotifications must be used within NotificationsProvider");
+  return value;
+}
