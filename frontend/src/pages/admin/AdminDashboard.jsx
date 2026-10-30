@@ -1,7 +1,7 @@
 import { useI18n } from "../../context/I18nContext";
 import { useConfirm } from "../../context/Confirmcontext";
-import DashboardAnalytics from "../../components/DashboardAnalytics.jsx";
-import Pagination from "../../components/Pagination.jsx";
+import DashboardAnalytics from "../../components/admin/dashboard/DashboardAnalytics.jsx";
+import Pagination from "../../components/admin/pagination/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useState } from "react";
 import { Search, Trash2, Pencil } from "lucide-react";

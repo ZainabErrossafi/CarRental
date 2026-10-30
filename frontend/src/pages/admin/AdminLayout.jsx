@@ -19,9 +19,8 @@ import {
   LogOut,
   Menu,
 } from "lucide-react";
-import GlobalSearch from "../../components/GlobalSearch.jsx";
+import GlobalSearch from "../../components/admin/search/GlobalSearch.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-
 
 const NAV_SECTIONS = [
   {
@@ -73,7 +72,6 @@ function AdminLayoutContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // ⌘K / Ctrl+K opens the global search from anywhere
   useEffect(() => {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -85,7 +83,6 @@ function AdminLayoutContent() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // Close the mobile drawer whenever the user navigates
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);

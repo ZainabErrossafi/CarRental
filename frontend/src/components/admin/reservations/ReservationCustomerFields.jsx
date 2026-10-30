@@ -1,5 +1,5 @@
 import { useI18n } from "../../../context/I18nContext";
-import SearchableSelect from "../../SearchableSelect";
+import SearchableSelect from "../forms/SearchableSelect";
 
 export default function ReservationCustomerFields({
   form,

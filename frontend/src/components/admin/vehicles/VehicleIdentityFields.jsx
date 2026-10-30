@@ -1,5 +1,5 @@
 import { useI18n } from "../../../context/I18nContext";
-import SearchableSelect from "../../SearchableSelect";
+import SearchableSelect from "../forms/SearchableSelect";
 
 export default function VehicleIdentityFields({ form, onChange, catalog }) {
   const { t } = useI18n();

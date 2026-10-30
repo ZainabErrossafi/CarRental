@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import { Tag } from "lucide-react";
-import { CATALOG_ICONS as ICONS } from "../../CatalogIcons.jsx";
+import { CATALOG_ICONS as ICONS } from "./CatalogIcons.jsx";
 
 export function IconBadge({ name }) {
   const Icon = ICONS[name] || Tag;

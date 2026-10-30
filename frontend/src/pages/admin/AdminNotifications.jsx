@@ -1,7 +1,7 @@
 import { useI18n } from "../../context/I18nContext";
 import { useNotifications } from "../../context/NotificationsContext";
 import { useConfirm } from "../../context/Confirmcontext";
-import Pagination from "../../components/Pagination.jsx";
+import Pagination from "../../components/admin/pagination/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +22,8 @@ import {
   markAllNotificationsAsRead,
 } from "../../services/adminApi";
 
-
 const TABS = ["All", "Unread", "Read"];
 
-// One icon + color tone per NotificationType in the data model.
 const TYPE_META = {
   reservation_created: { icon: CalendarCheck, tone: "blue", label: "New reservation" },
   reservation_confirmed: { icon: CalendarCheck, tone: "green", label: "Reservation confirmed" },

@@ -1,5 +1,5 @@
 import { useI18n } from "../../../context/I18nContext";
-import Pagination from "../../Pagination.jsx";
+import Pagination from "../pagination/Pagination.jsx";
 import { Pencil, Trash2, MapPin } from "lucide-react";
 
 export default function LocationsTable({

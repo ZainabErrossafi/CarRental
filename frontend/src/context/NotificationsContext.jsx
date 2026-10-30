@@ -16,7 +16,7 @@ export function NotificationsProvider({ children }) {
     if (version === requestVersion.current && localStorage.getItem(TOKEN_KEY)) setNotifications(items);
   };
   const updateNotifications = (update) => {
-    // Ignore requests started before a local read/delete action.
+
     requestVersion.current += 1;
     setNotifications(update);
   };

@@ -1,4 +1,4 @@
-// English UI strings are translation keys. Keep identifiers and saved content in their original language.
+
 export const LANGUAGES = [
   {
     "code": "en",

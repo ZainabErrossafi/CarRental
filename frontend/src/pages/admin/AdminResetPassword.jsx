@@ -13,7 +13,7 @@ export default function AdminResetPassword() {
   const { t } = useI18n();
   const email = useLocation().state?.email;
   const [d, setD] = useState(Array(N).fill(""));
-  const [step, setStep] = useState("code"); // code -> password -> done
+  const [step, setStep] = useState("code");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [error, setError] = useState("");

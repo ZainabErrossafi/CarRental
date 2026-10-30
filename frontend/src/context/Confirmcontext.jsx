@@ -6,11 +6,9 @@ const ConfirmContext = createContext(null);
 
 export function ConfirmProvider({ children }) {
   const { t } = useI18n();
-  const [dialog, setDialog] = useState(null); // { message, confirmLabel, cancelLabel, danger }
+  const [dialog, setDialog] = useState(null);
   const resolver = useRef(null);
 
-  // Returns a Promise<boolean> — true if the user clicked confirm, false otherwise.
-  // Drop-in replacement for `if (!confirm("...")) return;` → `if (!(await confirm("..."))) return;`
   const confirm = (message, options = {}) => {
     setDialog({
       message,

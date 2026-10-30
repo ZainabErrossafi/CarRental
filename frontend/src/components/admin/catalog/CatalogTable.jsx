@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import { Search, Pencil, Trash2 } from "lucide-react";
-import Pagination from "../../Pagination.jsx";
+import Pagination from "../pagination/Pagination.jsx";
 import { IconBadge, ActiveToggle } from "./CatalogItemControls.jsx";
 
 export default function CatalogTable({

@@ -23,7 +23,7 @@ export default function AdminLocations() {
   const [locations, setLocations] = useState([]);
   const [tab, setTab] = useState("All");
   const [query, setQuery] = useState("");
-  const [editing, setEditing] = useState(null); // null | "new" | location
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_LOCATION);
   const [saving, setSaving] = useState(false);
 

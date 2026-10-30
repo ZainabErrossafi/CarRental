@@ -2,7 +2,7 @@ import { useI18n } from "../../context/I18nContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createVehicle } from "../../services/adminApi";
-import VehicleForm, { EMPTY_VEHICLE } from "./VehicleForm";
+import VehicleForm, { EMPTY_VEHICLE } from "../../components/admin/vehicles/VehicleForm";
 
 export default function AdminVehicleAdd() {
   const { t } = useI18n();

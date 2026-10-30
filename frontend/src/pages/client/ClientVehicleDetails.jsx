@@ -2,7 +2,7 @@ import VehicleBooking from "../../components/client/VehicleBooking.jsx";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Users, Settings2, Fuel, Briefcase, Wind, Car, ShieldCheck, Gauge, CalendarDays, ArrowRight } from "lucide-react";
-import { CATALOG_ICONS } from "../../components/CatalogIcons.jsx";
+import { CATALOG_ICONS } from "../../components/admin/catalog/CatalogIcons.jsx";
 import { getClientVehicle } from "../../services/clientVehicles.js";
 
 export default function ClientVehicleDetails() {

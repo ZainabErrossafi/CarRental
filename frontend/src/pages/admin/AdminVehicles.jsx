@@ -1,6 +1,6 @@
 import { useI18n } from "../../context/I18nContext";
 import { useConfirm } from "../../context/Confirmcontext";
-import Pagination from "../../components/Pagination.jsx";
+import Pagination from "../../components/admin/pagination/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useState } from "react";
 import { Pencil, Trash2, Plus, Search } from "lucide-react";

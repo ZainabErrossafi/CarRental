@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import { X } from "lucide-react";
-import { CATALOG_ICONS as ICONS } from "../../CatalogIcons.jsx";
+import { CATALOG_ICONS as ICONS } from "./CatalogIcons.jsx";
 import { ICON_LABELS, CATEGORY_ICON_KEYS, slugify } from "./catalogConfig.js";
 
 export default function CatalogItemDialog({

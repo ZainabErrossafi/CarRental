@@ -26,7 +26,7 @@ export default function AdminVerifyEmail() {
   const isComplete = code.length === CODE_LENGTH;
 
   const handleChange = (index, value) => {
-    // Only keep the last digit typed, digits only.
+
     const digit = value.replace(/\D/g, "").slice(-1);
 
     const next = [...digits];

@@ -18,15 +18,13 @@ import {
   deleteCatalogItem,
 } from "../../services/adminApi";
 
-// The `icon` field on Category / Feature / Extra stores one of these keys.
-
 export default function AdminCatalog() {
   const { t } = useI18n();
   const confirm = useConfirm();
   const [catalog, setCatalog] = useState(null);
   const [tab, setTab] = useState("brands");
   const [query, setQuery] = useState("");
-  const [editing, setEditing] = useState(null); // null | "new" | item
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_FORMS.brands);
   const [slugTouched, setSlugTouched] = useState(false);
   const [saving, setSaving] = useState(false);

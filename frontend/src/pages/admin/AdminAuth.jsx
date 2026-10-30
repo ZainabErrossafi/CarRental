@@ -108,13 +108,11 @@ export default function AdminAuth({ initialMode = "login" }) {
   return (
     <div className="auth-page auth-page-full">
       <div className={`gcard ${view}`}>
-        {/* Icon rail */}
+
         <AuthNavigation view={view} switchView={switchView} />
 
-        {/* Photo hero */}
         <AuthHero image={HERO_IMAGE} />
 
-        {/* Form panel */}
         <div className="gcard-form">
           <div className="gcard-toolbar">
             <LanguageSwitcher />
@@ -142,7 +140,7 @@ export default function AdminAuth({ initialMode = "login" }) {
           )}
 
           <div className="gcard-forms">
-            {/* Formulaire de Connexion */}
+
             <SignInForm
               form={form}
               handleChange={handleChange}
@@ -153,7 +151,6 @@ export default function AdminAuth({ initialMode = "login" }) {
               location={location}
             />
 
-            {/* Formulaire d'Inscription */}
             <SignUpForm
               form={form}
               handleChange={handleChange}
