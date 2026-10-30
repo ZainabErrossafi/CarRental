@@ -4193,3 +4193,7 @@ gap: 0.5rem;
   outline: 2px solid var(--navy);
   outline-offset: 4px;
 }
+
+.auth-error {
+  color: #b42318;
+}
