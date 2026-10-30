@@ -22,7 +22,7 @@ const asUser = (user) => {
   if (!user) throw new Error("The server did not return a user profile.");
   return ({
   ...user,
-  // Prefer server metadata when available; otherwise use the current login method.
+
   canChangePassword: typeof user.has_usable_password === 'boolean'
     ? user.has_usable_password
     : readLoginMethod() !== 'google',

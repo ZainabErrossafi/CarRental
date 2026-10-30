@@ -1,10 +1,10 @@
+import { useAuth } from "../../context/AuthContext";
 import AccountSettings from "./AccountSettings.jsx";
 import ReservationsDropdown from "./ReservationsDropdown.jsx";
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { ShieldCheck, LogOut } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
 
 const links = [
   { to: "/", label: "Home" },
@@ -14,6 +14,7 @@ const links = [
 
 export default function ClientHeader({ overlay = false }) {
   const { user, loading, logout } = useAuth();
+  const signedIn = !loading && user;
   const [loggingOut, setLoggingOut] = useState(false);
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -94,7 +95,7 @@ export default function ClientHeader({ overlay = false }) {
         </NavLink>
 
         <div className="client-header-actions tw:relative tw:flex tw:items-center tw:gap-2 tw:ml-auto tw:lg:order-2 tw:lg:ml-0">
-          {!loading && user?.role === "admin" && (
+          {signedIn && user.role === "admin" && (
             <NavLink
               to="/admin"
               onClick={closeMenus}
@@ -123,9 +124,9 @@ export default function ClientHeader({ overlay = false }) {
               </NavLink>
             </>
           )}
-          {!loading && user && <ReservationsDropdown overlay={overlay} />}
-          {!loading && user && <AccountSettings overlay={overlay} />}
-          {!loading && user && (
+          {signedIn && <ReservationsDropdown overlay={overlay} />}
+          {signedIn && <AccountSettings overlay={overlay} />}
+          {signedIn && (
             <button
               type="button"
               onClick={handleLogout}
@@ -158,7 +159,7 @@ export default function ClientHeader({ overlay = false }) {
           className={`${mobileOpen ? "tw:block" : "tw:hidden"} tw:w-full tw:lg:absolute tw:lg:left-1/2 tw:lg:top-1/2 tw:lg:block tw:lg:w-auto tw:lg:-translate-x-1/2 tw:lg:-translate-y-1/2`}
         >
           <ul
-            className={`tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:rounded-2xl tw:p-0 tw:text-sm tw:font-semibold tw:lg:flex-row tw:lg:items-center ${overlay ? "tw:bg-transparent" : "tw:bg-transparent"}`}
+            className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:rounded-2xl tw:p-0 tw:text-sm tw:font-semibold tw:lg:flex-row tw:lg:items-center tw:bg-transparent"
           >
             {links.map(({ to, label }) => (
               <li key={to}>

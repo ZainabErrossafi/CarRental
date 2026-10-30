@@ -1,5 +1,5 @@
 import { ArrowUpRight, LockKeyhole } from "lucide-react";
-import { CATALOG_ICONS } from "../CatalogIcons.jsx";
+import { CATALOG_ICONS } from "../admin/catalog/CatalogIcons.jsx";
 import { Link } from "react-router-dom";
 
 export const rentalCategories = [

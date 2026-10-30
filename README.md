@@ -14,6 +14,12 @@ MAPS_API_KEY=
 
 VITE_API_URL=/api
 
+# Optional local Vite settings (in the root .env).
+# DEV_PORT: preferred development server port; omit to use Vite's default.
+# DEV_PROXY_TARGET: backend origin, including its port if needed.
+# Set DEV_PROXY_TARGET when running Vite locally with VITE_API_URL=/api.
+# Docker uses its existing reverse proxy and does not need these settings.
+
 
 GOOGLE_CLIENT_ID="your-client-id-from-google-console"
 GOOGLE_CLIENT_SECRET="your-client-secret-from-google-console"

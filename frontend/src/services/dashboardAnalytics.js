@@ -17,7 +17,7 @@ export function buildAnalytics(reservations, { start, end, status = 'all', vehic
   });
   const revenueOf = (row) => ['confirmed', 'completed'].includes(row.status) ? Math.max(0, Number(row.total_price) || 0) : 0;
   const days = new Map();
-  // Limit chart density to monthly buckets for long date ranges.
+
   const monthly = start && end && (new Date(end) - new Date(start)) / 86400000 > 92;
   if (start && end) {
     const cursor = new Date(`${start}T12:00:00`);
