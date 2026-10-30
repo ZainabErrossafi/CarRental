@@ -1,9 +1,11 @@
+import FaqsTable from "../../components/admin/faqs/FaqsTable.jsx";
+import FaqFormDialog from "../../components/admin/faqs/FaqFormDialog.jsx";
 import { useI18n } from "../../context/I18nContext";
 import { useConfirm } from "../../context/Confirmcontext";
-import Pagination from "../../components/Pagination.jsx";
+
 import usePagination from "../../hooks/usePagination.js";
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, ChevronUp, ChevronDown, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   getFaqs,
   createFaq,
@@ -22,7 +24,7 @@ export default function AdminFaqs() {
   const [faqs, setFaqs] = useState([]);
   const [tab, setTab] = useState("All");
   const [query, setQuery] = useState("");
-  const [editing, setEditing] = useState(null); 
+  const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_FAQ);
   const [saving, setSaving] = useState(false);
 
@@ -31,14 +33,14 @@ export default function AdminFaqs() {
   }, []);
 
   const filtered = faqs
-      .filter((f) => {
-        if (tab === "Active") return f.active;
-        if (tab === "Hidden") return !f.active;
-        return true;
-      })
-      .filter((f) =>
-        `${f.question} ${f.answer}`.toLowerCase().includes(query.toLowerCase())
-      );
+    .filter((f) => {
+      if (tab === "Active") return f.active;
+      if (tab === "Hidden") return !f.active;
+      return true;
+    })
+    .filter((f) =>
+      `${f.question} ${f.answer}`.toLowerCase().includes(query.toLowerCase()),
+    );
 
   const pagination = usePagination(filtered, JSON.stringify([tab, query]));
 
@@ -79,7 +81,13 @@ export default function AdminFaqs() {
   };
 
   const handleDelete = async (id) => {
-    if (!(await confirm("Are you sure you want to delete this FAQ?", { danger: true, confirmLabel: "Delete" }))) return;
+    if (
+      !(await confirm("Are you sure you want to delete this FAQ?", {
+        danger: true,
+        confirmLabel: "Delete",
+      }))
+    )
+      return;
     await deleteFaq(id);
     setFaqs((prev) => prev.filter((f) => f.id !== id));
   };
@@ -153,174 +161,28 @@ export default function AdminFaqs() {
         ))}
       </div>
 
-      <div className="table-card">
-        <div className="table-card-header">
-          {tab === "All" ? t("All FAQs") : t("{value0} FAQs", { value0: t(tab) })}
-          <span className="count-pill">{filtered.length}</span>
-
-          <div className="search-box users-search">
-            <input
-              placeholder={t("Search FAQs")}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th style={{ width: "90px" }}>{t("Order")}</th>
-              <th>{t("Question")}</th>
-              <th>{t("Answer")}</th>
-              <th>{t("Status")}</th>
-              <th>{t("Actions")}</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {pagination.pageItems.map((f) => {
-              const fullIndex = faqs.findIndex((x) => x.id === f.id);
-
-              return (
-                <tr key={f.id}>
-                  <td>
-                    <div className="order-cell">
-                      <span className="order-number">{f.order}</span>
-                      <div className="order-arrows">
-                        <button
-                          onClick={() => handleMove(f, -1)}
-                          disabled={fullIndex === 0}
-                          title={t("Move up")}
-                        >
-                          <ChevronUp size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleMove(f, 1)}
-                          disabled={fullIndex === faqs.length - 1}
-                          title={t("Move down")}
-                        >
-                          <ChevronDown size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="faq-question">{f.question}</td>
-
-                  <td className="faq-answer">{f.answer}</td>
-
-                  <td>
-                    <button
-                      className={`toggle ${f.active ? "on" : ""}`}
-                      onClick={() => handleToggleActive(f)}
-                      title={f.active ? t("Click to hide") : t("Click to publish")}
-                    >
-                      <span className="toggle-knob" />
-                    </button>
-                  </td>
-
-                  <td>
-                    <div className="row-actions">
-                      <button onClick={() => openEdit(f)} title={t("Edit FAQ")}>
-                        <Pencil size={15} />
-                      </button>
-                      <button onClick={() => handleDelete(f.id)} title={t("Delete FAQ")} className="danger">
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={5} className="table-empty">
-                  {t("No FAQs match this filter.")}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-        <Pagination {...pagination} />
-      </div>
+      <FaqsTable
+        tab={tab}
+        filtered={filtered}
+        query={query}
+        setQuery={setQuery}
+        pagination={pagination}
+        faqs={faqs}
+        handleMove={handleMove}
+        handleToggleActive={handleToggleActive}
+        openEdit={openEdit}
+        handleDelete={handleDelete}
+      />
 
       {editing && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div
-            className="modal-card modal-wide catalog-dialog"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <form onSubmit={handleSave}>
-              <div className="modal-header">
-                <div className="catalog-dialog-heading">
-                  <h3>{isNew ? t("Add FAQ") : t("Edit FAQ")}</h3>
-                  <p>{t("Answer the questions your customers ask most often.")}</p>
-                </div>
-                <button type="button" className="modal-close" onClick={closeModal} aria-label={t("Close")}>
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="modal-body catalog-dialog-body">
-                <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="faq_question">{t("Question")}</label>
-                  <input
-                    id="faq_question"
-                    type="text"
-                    placeholder={t("e.g. Can I extend my rental?")}
-                    value={form.question}
-                    onChange={(e) => setForm((p) => ({ ...p, question: e.target.value }))}
-                    autoFocus
-                    required
-                  />
-                </div>
-
-                <div className="form-field">
-                  <label className="catalog-field-label" htmlFor="faq_answer">{t("Answer")}</label>
-                  <textarea
-                    id="faq_answer"
-                    className="form-textarea"
-                    rows={5}
-                    placeholder={t("Write a clear, helpful answer...")}
-                    value={form.answer}
-                    onChange={(e) => setForm((p) => ({ ...p, answer: e.target.value }))}
-                    required
-                  />
-                  <span className="field-hint">{t("Keep it short and easy to scan.")}</span>
-                </div>
-
-                <label className="vehicle-featured-control">
-                  <span className="vehicle-featured-copy">
-                    <span className="vehicle-featured-title">{t("Published")}</span>
-                    <span className="field-hint" id="faq-active-hint">
-                      {t("Show this FAQ on the public site.")}
-                    </span>
-                  </span>
-                  <input
-                    className="vehicle-featured-input"
-                    type="checkbox"
-                    role="switch"
-                    aria-describedby="faq-active-hint"
-                    checked={!!form.active}
-                    onChange={(e) => setForm((p) => ({ ...p, active: e.target.checked }))}
-                  />
-                  <span className="vehicle-featured-switch" aria-hidden="true" />
-                </label>
-              </div>
-
-              <div className="modal-footer" style={{ gap: "0.6rem" }}>
-                <button type="button" className="btn btn-secondary" onClick={closeModal} disabled={saving}>
-                  {t("Cancel")}
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? t("Saving...") : isNew ? t("Add FAQ") : t("Save Changes")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <FaqFormDialog
+          closeModal={closeModal}
+          handleSave={handleSave}
+          isNew={isNew}
+          form={form}
+          setForm={setForm}
+          saving={saving}
+        />
       )}
     </div>
   );

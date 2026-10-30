@@ -1,13 +1,9 @@
+import AboutSettingsFields from "../../components/admin/settings/AboutSettingsFields.jsx";
+import SocialSettingsFields from "../../components/admin/settings/SocialSettingsFields.jsx";
+import CompanySettingsFields from "../../components/admin/settings/CompanySettingsFields.jsx";
 import { useI18n } from "../../context/I18nContext";
 import { useEffect, useRef, useState } from "react";
-import {
-  Facebook,
-  Instagram,
-  Twitter,
-  Linkedin,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getSiteSettings, updateSiteSettings } from "../../services/adminApi";
 
 const STEPS = ["Company & Social", "About Section"];
@@ -94,135 +90,37 @@ export default function AdminSiteSettings() {
       </div>
 
       <p className="local-editor-note">
-        {t("Company details appear in the website footer in this browser. Settings are stored locally and are not published to other visitors.")}
+        {t(
+          "Company details appear in the website footer in this browser. Settings are stored locally and are not published to other visitors.",
+        )}
       </p>
-      {error && <div role="alert" className="alert alert-error mb-4">{t(error)}</div>}
+      {error && (
+        <div role="alert" className="alert alert-error mb-4">
+          {t(error)}
+        </div>
+      )}
       {saved && (
-        <div className="alert alert-success mb-4">{t("✓ Settings saved in this browser.")}</div>
+        <div className="alert alert-success mb-4">
+          {t("✓ Settings saved in this browser.")}
+        </div>
       )}
 
       <form ref={formRef} onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
-
           {/* ================= STEP 1 ================= */}
           {step === 0 && (
             <>
               {/* Company Info */}
-              <div className="form-card vehicle-details-card">
-                <h3>{t("Company Information")}</h3>
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="email">{t("Email")}</label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={settings.email}
-                      onChange={(e) => handleChange("email", e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="phone">{t("Phone")}</label>
-                    <input
-                      id="phone"
-                      type="tel"
-                      value={settings.phone}
-                      onChange={(e) => handleChange("phone", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="whatsapp">{t("WhatsApp")}</label>
-                    <input
-                      id="whatsapp"
-                      type="tel"
-                      value={settings.whatsapp}
-                      onChange={(e) => handleChange("whatsapp", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field settings-address-field">
-                    <label htmlFor="address">{t("Address")}</label>
-                    <input
-                      id="address"
-                      type="text"
-                      value={settings.address}
-                      onChange={(e) => handleChange("address", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="city">{t("City")}</label>
-                    <input
-                      id="city"
-                      type="text"
-                      value={settings.city}
-                      onChange={(e) => handleChange("city", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="country">{t("Country")}</label>
-                    <input
-                      id="country"
-                      type="text"
-                      value={settings.country}
-                      onChange={(e) => handleChange("country", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
+              <CompanySettingsFields
+                settings={settings}
+                handleChange={handleChange}
+              />
 
               {/* Social Links */}
-              <div className="form-card vehicle-details-card settings-social-card">
-                <h3>{t("Social Links")}</h3>
-                <div className="form-grid">
-                  <div className="form-field">
-                    <label htmlFor="facebook"><Facebook size={13} /> {t("Facebook")}</label>
-                    <input
-                      id="facebook"
-                      type="url"
-                      placeholder={t("https://facebook.com/...")}
-                      value={settings.facebook}
-                      onChange={(e) => handleChange("facebook", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="instagram"><Instagram size={13} /> {t("Instagram")}</label>
-                    <input
-                      id="instagram"
-                      type="url"
-                      placeholder={t("https://instagram.com/...")}
-                      value={settings.instagram}
-                      onChange={(e) => handleChange("instagram", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="twitter"><Twitter size={13} /> {t("Twitter / X")}</label>
-                    <input
-                      id="twitter"
-                      type="url"
-                      placeholder={t("https://x.com/...")}
-                      value={settings.twitter}
-                      onChange={(e) => handleChange("twitter", e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="linkedin"><Linkedin size={13} /> {t("LinkedIn")}</label>
-                    <input
-                      id="linkedin"
-                      type="url"
-                      placeholder={t("https://linkedin.com/...")}
-                      value={settings.linkedin}
-                      onChange={(e) => handleChange("linkedin", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
+              <SocialSettingsFields
+                settings={settings}
+                handleChange={handleChange}
+              />
             </>
           )}
 
@@ -230,20 +128,10 @@ export default function AdminSiteSettings() {
           {step === 1 && (
             <>
               {/* About */}
-              <div className="form-card vehicle-details-card settings-about-card">
-                <h3>{t("About Section")}</h3>
-                <label className="settings-about-label" htmlFor="company-about">
-                  {t("About your company")}
-                </label>
-                <textarea
-                  id="company-about"
-                  className="vehicle-description-input"
-                  rows={5}
-                  placeholder={t("Tell customers about your company and rental service…")}
-                  value={settings.about_en}
-                  onChange={(e) => handleChange("about_en", e.target.value)}
-                />
-              </div>
+              <AboutSettingsFields
+                settings={settings}
+                handleChange={handleChange}
+              />
             </>
           )}
         </div>
@@ -251,7 +139,11 @@ export default function AdminSiteSettings() {
         {/* Actions */}
         <div className="form-actions step-actions">
           {step > 0 && (
-            <button type="button" className="btn btn-secondary" onClick={goBack}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={goBack}
+            >
               <ChevronLeft size={16} /> {t("Back")}
             </button>
           )}
