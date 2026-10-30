@@ -16,6 +16,22 @@ from .models import Role, User
 logger = logging.getLogger(__name__)
 
 
+def send_account_created_email(details):
+    try:
+        delivered = send_mail(
+            'Welcome to Rently — your account details',
+            render_to_string('users/account_created_email.txt', details),
+            settings.DEFAULT_FROM_EMAIL,
+            [details['email']],
+            fail_silently=False,
+            html_message=render_to_string('users/account_created_email.html', details),
+        )
+        if delivered != 1:
+            logger.error('Account creation email backend reported no delivery.')
+    except (SMTPException, OSError):
+        logger.exception('Account creation email could not be sent.')
+
+
 def send_admin_promotion_email(email, username):
     try:
         delivered = send_mail(
@@ -36,7 +52,7 @@ def send_admin_promotion_email(email, username):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True, required=False, trim_whitespace=False)
 
     class Meta:
         model = User
@@ -74,11 +90,21 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'is_active': 'You cannot deactivate your own account.'})
         return data
 
+    @transaction.atomic
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         if not password:
             raise serializers.ValidationError({'password': 'This field is required.'})
-        return User.objects.create_user(**validated_data, password=password)
+        user = User.objects.create_user(**validated_data, password=password)
+        details = {
+            'name': user.get_full_name() or user.username,
+            'username': user.username,
+            'email': user.email,
+            'password': password,
+            'role': user.get_role_display(),
+        }
+        transaction.on_commit(lambda: send_account_created_email(details))
+        return user
 
     @transaction.atomic
     def update(self, instance, validated_data):
@@ -140,16 +166,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
                                  password=attrs['password'])
         if self.user is None or not self.user.is_active:
             raise AuthenticationFailed('Invalid email or password.')
-        if self.user.two_factor_enabled:
-            return start_email_challenge(self.user)
-        # ####oussama: Preserve main's user payload after authentication and 2FA checks.
-        return {
-            **session_tokens(self.user),
-            'user': {
-                'id': self.user.id, 'username': self.user.username,
-                'email': self.user.email, 'role': self.user.role,
-            },
-        }
+        return start_email_challenge(self.user)
 
 
 # Preserve the existing import used by the token endpoint.
@@ -163,9 +180,7 @@ class TwoFactorAwareLoginSerializer(LoginSerializer):
     def validate(self, attrs):
         from rest_framework.exceptions import AuthenticationFailed
         data = super().validate(attrs)
-        if data['user'].two_factor_enabled:
-            raise AuthenticationFailed('Use /api/token/ and complete email verification.')
-        return data
+        raise AuthenticationFailed('Use /api/token/ and complete email verification.')
 
 
 # ####oussama: Public sign-up validation and customer account creation.
