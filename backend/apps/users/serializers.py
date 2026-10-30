@@ -1,9 +1,38 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import logging
+from smtplib import SMTPException
+
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db import transaction
+from django.template.loader import render_to_string
 # ####oussama: Convert sign-up password validation errors into API responses.
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from rest_framework import serializers
-from .models import User
+from .models import Role, User
+
+
+logger = logging.getLogger(__name__)
+
+
+def send_admin_promotion_email(email, username):
+    try:
+        delivered = send_mail(
+            'Your Rently account is now an admin',
+            f'Hello {username},\n\nYour Rently account has been changed to admin. '
+            'You can now sign in with your existing credentials to access the admin dashboard.',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+            html_message=render_to_string('users/admin_promotion_email.html', {
+                'username': username,
+            }),
+        )
+        if delivered != 1:
+            logger.error('Admin promotion email backend reported no delivery.')
+    except (SMTPException, OSError):
+        logger.exception('Admin promotion email could not be sent.')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -51,13 +80,19 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'password': 'This field is required.'})
         return User.objects.create_user(**validated_data, password=password)
 
+    @transaction.atomic
     def update(self, instance, validated_data):
+        instance = User.objects.select_for_update().get(pk=instance.pk)
+        previous_role = instance.role
         password = validated_data.pop('password', None)
         if password:
             instance.set_password(password)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+        if previous_role == Role.CLIENT and instance.role == Role.ADMIN:
+            email, username = instance.email, instance.username
+            transaction.on_commit(lambda: send_admin_promotion_email(email, username))
         return instance
 
 

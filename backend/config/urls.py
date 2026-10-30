@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from apps.users.serializers import AdminTokenObtainPairSerializer
+from apps.users.adapters import account_inactive_response
 from apps.users.views import SignupView, google_callback_redirect  # ####oussama: Sign-up view.
 from apps.users.views_2fa import EmailLoginView, TwoFactorToggleView, TwoFactorResendView, TwoFactorVerifyView
 from apps.users.password_reset import PasswordResetRequestView, PasswordResetVerifyView, PasswordResetConfirmView
@@ -27,6 +28,7 @@ urlpatterns = [
     path('api/auth/signup/', SignupView.as_view(), name='signup'),
     path('api/auth/', include('dj_rest_auth.urls')),
     # path('api/auth/google/', GoogleLoginView.as_view(), name='google_login'),
+    path('api/accounts/inactive/', account_inactive_response, name='account_inactive'),
     path('api/accounts/', include('allauth.urls')),
     path('api/token/', EmailLoginView.as_view(serializer_class=AdminTokenObtainPairSerializer), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

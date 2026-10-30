@@ -29,6 +29,20 @@ class PasswordResetTests(TestCase):
         return self.client.post(f'/api/auth/password-reset/{step}/',
                                 {'email': self.user.email, 'code': code, **extra}, format='json')
 
+    def test_request_rejects_unknown_email(self):
+        response = self.client.post('/api/auth/password-reset/request/',
+                                    {'email': 'missing@example.com'}, format='json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, {'detail': 'No account exists for this email.'})
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(PasswordResetChallenge.objects.exists())
+
+    def test_request_matches_email_case_insensitively(self):
+        response = self.client.post('/api/auth/password-reset/request/',
+                                    {'email': 'DRIVER@EXAMPLE.COM'}, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mail.outbox[-1].to, [self.user.email])
+
     def test_request_verify_confirm_and_single_use(self):
         code = self.start()
         self.assertEqual(mail.outbox[-1].to, [self.user.email])

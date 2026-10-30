@@ -1,7 +1,19 @@
 import random
 import re
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.account.adapter import DefaultAccountAdapter
+from django.http import JsonResponse
 from apps.users.models import User
+
+
+def account_inactive_response(request):
+    return JsonResponse({'detail': 'This account is inactive.'}, status=403)
+
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+    def respond_user_inactive(self, request, user):
+        return account_inactive_response(request)
+
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def populate_user(self, request, sociallogin, data):

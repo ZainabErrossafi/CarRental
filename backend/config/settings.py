@@ -197,6 +197,7 @@ REST_AUTH = {
     'JWT_AUTH_REFRESH_COOKIE': 'jwt-refresh-token',
 }
 
+ACCOUNT_ADAPTER = 'apps.users.adapters.CustomAccountAdapter'
 SOCIALACCOUNT_ADAPTER = 'apps.users.adapters.CustomSocialAccountAdapter'
 # إعدادات Google ديريكت من .env بلا ما تحتاج تعمر Admin
 SOCIALACCOUNT_PROVIDERS = {
