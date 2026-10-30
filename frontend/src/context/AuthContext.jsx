@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const loggedInUser = await loginApi(credentials);
-    setUser(loggedInUser);
+    if (!loggedInUser.two_factor_required) setUser(loggedInUser);
     return loggedInUser;
   };
 
