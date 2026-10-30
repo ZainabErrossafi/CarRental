@@ -71,6 +71,8 @@ class PasswordResetRequestView(PublicPasswordResetView):
         }
 
         with transaction.atomic():
+            if not User.objects.filter(email__iexact=email).exists():
+                return Response({'detail': 'No account exists for this email.'}, status=404)
             matches = list(User.objects.select_for_update().filter(
                 email__iexact=email, is_active=True, email_verified=True,
             ).order_by('pk')[:2])
