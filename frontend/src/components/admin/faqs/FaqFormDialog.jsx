@@ -8,6 +8,7 @@ export default function FaqFormDialog({
   form,
   setForm,
   saving,
+  saveError,
 }) {
   const { t } = useI18n();
   return (
@@ -33,6 +34,11 @@ export default function FaqFormDialog({
           </div>
 
           <div className="modal-body catalog-dialog-body">
+            {saveError && (
+              <div className="alert alert-error" role="alert" style={{ whiteSpace: "pre-line" }}>
+                {saveError}
+              </div>
+            )}
             <div className="form-field">
               <label className="catalog-field-label" htmlFor="faq_question">
                 {t("Question")}

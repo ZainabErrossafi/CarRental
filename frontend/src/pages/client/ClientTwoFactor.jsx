@@ -57,7 +57,7 @@ export default function ClientTwoFactor() {
     }
   };
   return (
-    <div className="auth-page">
+    <div className="auth-page client-two-factor">
       <div className="auth-card">
         <div className="auth-icon-circle"><ShieldCheck size={20} /></div>
         <h1 className="auth-title">Two-factor authentication</h1>

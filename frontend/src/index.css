@@ -1798,6 +1798,22 @@ th {
   box-shadow: 0 0 0 3px var(--orange-light);
 }
 
+@media (max-width: 480px) {
+  .client-two-factor .otp-inputs {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: 100%;
+    max-width: 408px;
+    gap: 8px;
+  }
+
+  .client-two-factor .otp-input {
+    width: 100%;
+    min-width: 0;
+    height: 56px;
+  }
+}
+
 .forgot-password-link {
   font-size: 0.82rem;
   color: #a64b00;
