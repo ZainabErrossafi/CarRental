@@ -2,14 +2,8 @@ from rest_framework import serializers
 from apps.brands.serializers import BrandSerializer
 from apps.categories.serializers import CategorySerializer
 from apps.features.serializers import FeatureSerializer
-from .models import Vehicle, VehicleImage
+from .models import Vehicle
 from apps.features.models import Feature
-
-
-class VehicleImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VehicleImage
-        fields = ["id", "image", "alt_text", "order", "created_at"]
 
 
 class VehicleListSerializer(serializers.ModelSerializer):
@@ -42,7 +36,6 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     features = FeatureSerializer(many=True, read_only=True)
-    gallery = VehicleImageSerializer(many=True, read_only=True)
 
     # Write-only ID fields for POST/PUT/PATCH requests
     brand_id = serializers.IntegerField(write_only=True)
@@ -62,7 +55,6 @@ class VehicleDetailSerializer(serializers.ModelSerializer):
             "home_location",
             "features",
             "feature_ids",
-            "gallery",
             "model",
             "year",
             "status",
