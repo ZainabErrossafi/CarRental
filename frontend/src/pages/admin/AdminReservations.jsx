@@ -140,6 +140,7 @@ export default function AdminReservations() {
       )}
 
       <ReservationsTable
+        handleEdit={(id) => navigate(`/admin/reservations/${id}/edit`)}
         pendingId={pendingId}
         tab={tab}
         filtered={filtered}

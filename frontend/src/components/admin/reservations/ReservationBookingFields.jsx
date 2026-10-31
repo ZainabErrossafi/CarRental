@@ -10,6 +10,7 @@ export default function ReservationBookingFields({
   handleChange,
   vehicles,
   locations,
+  isEditing = false,
   minimumTime,
   setMinimumTime,
 }) {
@@ -78,11 +79,11 @@ export default function ReservationBookingFields({
           <input
             id="pickup_date"
             type="datetime-local"
-            min={minimumTime}
+            min={isEditing ? undefined : minimumTime}
             onFocus={() => setMinimumTime(currentReservationTime())}
             value={form.pickup_date}
             onChange={(e) =>
-              handleChange("pickup_date", clampReservationTime(e.target.value))
+              handleChange("pickup_date", isEditing ? e.target.value : clampReservationTime(e.target.value))
             }
             required
           />
@@ -95,12 +96,12 @@ export default function ReservationBookingFields({
             type="datetime-local"
             disabled={!form.pickup_date}
             min={
-              form.pickup_date > minimumTime ? form.pickup_date : minimumTime
+              isEditing ? form.pickup_date : form.pickup_date > minimumTime ? form.pickup_date : minimumTime
             }
             onFocus={() => setMinimumTime(currentReservationTime())}
             value={form.return_date}
             onChange={(e) =>
-              handleChange("return_date", clampReservationTime(e.target.value))
+              handleChange("return_date", isEditing ? e.target.value : clampReservationTime(e.target.value))
             }
             required
           />

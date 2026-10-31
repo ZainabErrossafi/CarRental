@@ -6,13 +6,16 @@ import { currentReservationTime } from "../../utils/reservationTime";
 import { useI18n } from "../../context/I18nContext";
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   getVehicles,
   getLocations,
   getUsers,
   getExtras,
   createReservation,
+  getReservation,
+  getReservationExtras,
+  updateReservation,
 } from "../../services/adminApi";
 
 const EMPTY_RESERVATION = {
@@ -31,6 +34,11 @@ const EMPTY_RESERVATION = {
 export default function AdminReservationAdd() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditing = Boolean(id);
+  const [loading, setLoading] = useState(true);
+  const [original, setOriginal] = useState(null);
+  const [extrasChanged, setExtrasChanged] = useState(false);
   const [minimumTime, setMinimumTime] = useState(currentReservationTime);
 
   const [vehicles, setVehicles] = useState([]);
@@ -43,17 +51,53 @@ export default function AdminReservationAdd() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    Promise.all([getVehicles(), getLocations(), getUsers(), getExtras()])
-      .then(([vData, lData, uData, eData]) => {
-        setVehicles(vData.filter((v) => v.status === "available"));
+    let active = true;
+    setLoading(true);
+    setError(null);
+    setOriginal(null);
+    setForm(EMPTY_RESERVATION);
+    setExtrasChanged(false);
+    Promise.all([
+      getVehicles(), getLocations(), getUsers(), getExtras(),
+      isEditing ? getReservation(id) : null,
+      isEditing ? getReservationExtras(id) : [],
+    ])
+      .then(([vData, lData, uData, eData, reservation, reservationExtras]) => {
+        if (!active) return;
+        if (reservation && !["pending", "confirmed"].includes(reservation.status)) {
+          throw new Error("A cancelled or completed reservation cannot be modified.");
+        }
+        setVehicles(vData.filter((v) => v.status === "available" || v.id === reservation?.vehicle));
         setLocations(lData);
         setUsers(uData);
         setAvailableExtras(eData.filter((e) => e.active !== false));
+        if (reservation) {
+          const toLocal = (value) => {
+            const date = new Date(value);
+            return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+          };
+          const values = {
+            user_id: reservation.user ?? null,
+            vehicle_id: reservation.vehicle,
+            pickup_location_id: reservation.pickup_location,
+            dropoff_location_id: reservation.dropoff_location,
+            driver_name: reservation.driver_name,
+            phone: reservation.phone,
+            email: reservation.email,
+            pickup_date: toLocal(reservation.pickup_date),
+            return_date: toLocal(reservation.return_date),
+            extras: reservationExtras.map((item) => item.extra),
+          };
+          setForm(values);
+          setOriginal({ ...reservation, form: values });
+        }
       })
       .catch((err) => {
-        setError(err.message || "Could not load reservation options.");
-      });
-  }, []);
+        if (active) setError(err.message || "Could not load reservation options.");
+      })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [id, isEditing]);
 
   const handleChange = (field, value) => {
     setForm((prev) => ({
@@ -67,6 +111,7 @@ export default function AdminReservationAdd() {
   };
 
   const handleExtraToggle = (extraId) => {
+    setExtrasChanged(true);
     setForm((prev) => {
       const currentExtras = prev.extras;
       if (currentExtras.includes(extraId)) {
@@ -110,6 +155,7 @@ export default function AdminReservationAdd() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving || loading || (isEditing && !original)) return;
     setError(null);
 
     if (
@@ -140,11 +186,19 @@ export default function AdminReservationAdd() {
         total_price: estimatedTotal.toFixed(2),
       };
 
-      await createReservation(payload);
+      if (isEditing) {
+        if (!extrasChanged) delete payload.extras;
+        for (const field of ["pickup_date", "return_date"]) {
+          if (form[field] === original.form[field]) payload[field] = original[field];
+        }
+        await updateReservation(id, payload);
+      } else {
+        await createReservation(payload);
+      }
       navigate("/admin/reservations");
     } catch (err) {
       setError(
-        err.message || "Failed to create reservation. Please try again.",
+        err.message || "Failed to save reservation. Please try again.",
       );
       setSaving(false);
     }
@@ -160,16 +214,17 @@ export default function AdminReservationAdd() {
           >
             {t("← Back to Reservations")}
           </button>
-          <h1>{t("New Reservation")}</h1>
+          <h1>{t(isEditing ? "Edit Reservation" : "New Reservation")}</h1>
           <p className="subtitle">
-            {t("Book a vehicle on behalf of a client")}
+            {t(isEditing ? "Update reservation details" : "Book a vehicle on behalf of a client")}
           </p>
         </div>
       </div>
 
       {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
 
-      <form onSubmit={handleSubmit} className="vehicle-form">
+      {loading && <p role="status">{t("Loading...")}</p>}
+      {!loading && (!isEditing || original) && <form onSubmit={handleSubmit} className="vehicle-form">
         <div className="form-sections">
 
           <ReservationCustomerFields
@@ -183,6 +238,7 @@ export default function AdminReservationAdd() {
             handleChange={handleChange}
             vehicles={vehicles}
             locations={locations}
+            isEditing={isEditing}
             minimumTime={minimumTime}
             setMinimumTime={setMinimumTime}
           />
@@ -223,10 +279,10 @@ export default function AdminReservationAdd() {
             {t("Cancel")}
           </button>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? t("Creating...") : t("Create Reservation")}
+            {saving ? t(isEditing ? "Saving..." : "Creating...") : t(isEditing ? "Save Changes" : "Create Reservation")}
           </button>
         </div>
-      </form>
+      </form>}
     </div>
   );
 }
