@@ -13,7 +13,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
         return VehicleDetailSerializer
 
     def get_queryset(self):
-        queryset = Vehicle.objects.select_related("brand", "category", "home_location").prefetch_related("features", "gallery")
+        queryset = Vehicle.objects.select_related("brand", "category", "home_location").prefetch_related("features")
 
         # Query parameter filtering
         brand = self.request.query_params.get("brand")

@@ -97,18 +97,3 @@ class Vehicle(models.Model):
 
       return not reservations.exists()
 
-
-class VehicleImage(models.Model):
-    vehicle = models.ForeignKey(
-        Vehicle, on_delete=models.CASCADE, related_name="gallery"
-    )
-    image = models.ImageField(upload_to="vehicles/gallery/")
-    alt_text = models.CharField(max_length=255, blank=True)
-    order = models.PositiveSmallIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["order", "created_at"]
-
-    def __str__(self):
-        return f"Image for {self.vehicle.model} (Order: {self.order})"

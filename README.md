@@ -66,7 +66,7 @@ Browser / React
 | PendingSignup | Temporary registration before email confirmation | Separate from User; stores a password hash and OTP challenge |
 | PasswordChange | Password change requested from an authenticated session | OneToOne with User |
 | PasswordResetChallenge | Forgotten password recovery | OneToOne with User |
-| Vehicle | Vehicle specifications, status, and pricing | Brand, category, home location, features, gallery |
+| Vehicle | Vehicle specifications, status, and pricing | Brand, category, home location, features|
 | Brand / Category / Feature | Make, category, and equipment | Related to vehicles |
 | Location | Pickup or return location | Related to reservations and vehicles |
 | Extra | Optional service with a daily or fixed price | Through ReservationExtra |
