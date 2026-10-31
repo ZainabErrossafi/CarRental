@@ -102,6 +102,26 @@ export const createReservation = async (reservationData) => {
   return data;
 };
 
+export const getReservation = async (id) => {
+  const { data } = await api.get(`reservations/${id}/`);
+  return data;
+};
+
+export const getReservationExtras = async (id) =>
+  (await getList('reservation-extras/')).filter((item) => String(item.reservation) === String(id));
+
+export const updateReservation = async (id, reservationData) => {
+  const { user_id, vehicle_id, pickup_location_id, dropoff_location_id, total_price, ...fields } = reservationData;
+  const { data } = await api.patch(`reservations/${id}/`, {
+    ...fields,
+    user_id: user_id ? Number(user_id) : null,
+    vehicle: Number(vehicle_id),
+    pickup_location: Number(pickup_location_id),
+    dropoff_location: Number(dropoff_location_id),
+  });
+  return data;
+};
+
 export const updateReservationStatus = async (id, status) => {
   const action = { confirmed: 'confirm', cancelled: 'cancel', completed: 'complete' }[status];
   if (!action) throw new Error('Unsupported reservation status.');
