@@ -1,6 +1,6 @@
+import { useI18n } from "../../../context/I18nContext";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { useI18n } from '../context/I18nContext';
 
 export default function SearchableSelect({ id, value, onChange, options, placeholder, required = false, disablePortal = false }) {
   const { t } = useI18n();

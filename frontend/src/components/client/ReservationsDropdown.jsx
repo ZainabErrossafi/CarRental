@@ -1,7 +1,7 @@
+import { useAuth } from "../../context/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { TicketCheck, X, RefreshCw, CalendarDays } from "lucide-react";
-import { useAuth } from "../../context/AuthContext.jsx";
 import api, { getList } from "../../services/api.js";
 
 export default function ReservationsDropdown({ overlay }) {

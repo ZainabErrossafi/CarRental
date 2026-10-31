@@ -1,4 +1,4 @@
-// These editors save only in this browser; they do not publish to the backend.
+
 const CATALOG_KEY = 'rently_local_catalog';
 const SETTINGS_KEY = 'rently_local_settings';
 const emptyCatalog = () => ({ brands: [], categories: [], features: [], extras: [] });

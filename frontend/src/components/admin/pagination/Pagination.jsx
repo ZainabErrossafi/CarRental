@@ -1,4 +1,4 @@
-import { useI18n } from "../context/I18nContext";
+import { useI18n } from "../../../context/I18nContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Pagination({ page, pageCount, total, start, end, setPage }) {

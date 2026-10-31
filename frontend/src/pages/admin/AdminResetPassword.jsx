@@ -1,10 +1,10 @@
+import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { confirmPasswordReset, requestPasswordReset, verifyPasswordResetCode }
 from "../../services/Passwordresetapi";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-import { useI18n } from "../../context/I18nContext";
 
 const N = 6;
 const msg = (e) => e.response?.data?.detail || e.response?.data?.new_password?.[0] || "Something went wrong. Please try again.";
@@ -13,7 +13,7 @@ export default function AdminResetPassword() {
   const { t } = useI18n();
   const email = useLocation().state?.email;
   const [d, setD] = useState(Array(N).fill(""));
-  const [step, setStep] = useState("code"); // code -> password -> done
+  const [step, setStep] = useState("code");
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
   const [error, setError] = useState("");
@@ -49,7 +49,7 @@ export default function AdminResetPassword() {
   });
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-reset-page">
       <div className="auth-card">
         <div className="auth-language-switcher"><LanguageSwitcher /></div>
         {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
@@ -75,8 +75,14 @@ export default function AdminResetPassword() {
         {step === "password" && (<>
           <h1 className="auth-title">{t("Choose a new password")}</h1>
           <form onSubmit={save} className="auth-form">
-            <input type="password" placeholder={t("New password")} minLength={8} required value={pw} onChange={(e) => setPw(e.target.value)} />
-            <input type="password" placeholder={t("Confirm password")} minLength={8} required value={pw2} onChange={(e) => setPw2(e.target.value)} />
+            <div className="form-field">
+              <label htmlFor="new-password">{t("New password")}</label>
+              <input id="new-password" name="new-password" type="password" autoComplete="new-password" placeholder={t("New password")} minLength={8} required disabled={busy} value={pw} onChange={(e) => setPw(e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label htmlFor="confirm-password">{t("Confirm password")}</label>
+              <input id="confirm-password" name="confirm-password" type="password" autoComplete="new-password" placeholder={t("Confirm password")} minLength={8} required disabled={busy} value={pw2} onChange={(e) => setPw2(e.target.value)} />
+            </div>
             <button className="gcard-submit" disabled={busy}>{t(busy ? "Saving..." : "Change password")}</button>
           </form>
         </>)}

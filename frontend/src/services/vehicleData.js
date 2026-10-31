@@ -1,4 +1,4 @@
-// Keep the API's nested relations compatible with fleet, search and booking screens.
+
 export const vehicleFromApi = (vehicle) => ({
   ...vehicle,
   feature_ids: vehicle.features?.map((feature) => feature.id) ?? vehicle.feature_ids ?? [],
@@ -23,7 +23,7 @@ export const vehiclePayload = async (vehicle) => {
     const blob = await (await fetch(vehicle.main_image)).blob();
     const form = new FormData();
     Object.entries(payload).forEach(([key, value]) => {
-      // An empty multipart field is accepted as null for the mileage limit.
+
       if (Array.isArray(value)) {
         value.forEach((id) => form.append(key, id));
       } else {

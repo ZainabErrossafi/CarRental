@@ -1,10 +1,10 @@
+import { useAuth } from "../../context/AuthContext";
+import { useI18n } from "../../context/I18nContext";
 import { resendVerification } from "../../services/authApi";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 
 const CODE_LENGTH = 6;
 
@@ -26,7 +26,7 @@ export default function AdminVerifyEmail() {
   const isComplete = code.length === CODE_LENGTH;
 
   const handleChange = (index, value) => {
-    // Only keep the last digit typed, digits only.
+
     const digit = value.replace(/\D/g, "").slice(-1);
 
     const next = [...digits];

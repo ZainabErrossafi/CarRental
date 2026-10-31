@@ -1,19 +1,8 @@
 import VehicleBooking from "../../components/client/VehicleBooking.jsx";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  Users,
-  Settings2,
-  Fuel,
-  Briefcase,
-  Wind,
-  Car,
-  ShieldCheck,
-  Gauge,
-  CalendarDays,
-  ArrowRight,
-} from "lucide-react";
-import { CATALOG_ICONS } from "../../components/CatalogIcons.jsx";
+import { Users, Settings2, Fuel, Briefcase, Wind, Car, ShieldCheck, Gauge, CalendarDays, ArrowRight } from "lucide-react";
+import { CATALOG_ICONS } from "../../components/admin/catalog/CatalogIcons.jsx";
 import { getClientVehicle } from "../../services/clientVehicles.js";
 
 export default function ClientVehicleDetails() {
@@ -73,6 +62,12 @@ export default function ClientVehicleDetails() {
     [Briefcase, "Luggage", vehicle.luggage],
     [Wind, "Air conditioning", vehicle.air_conditioning ? "Included" : "Not included"],
   ];
+  const chips = [
+    [Fuel, vehicle.fuel],
+    [Settings2, vehicle.transmission],
+    [Car, `${vehicle.doors} doors`],
+    [Users, `${vehicle.seats} seats`],
+  ];
   const money = (value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(Number(value));
 
   return (
@@ -118,22 +113,9 @@ export default function ClientVehicleDetails() {
               {vehicle.name} {vehicle.year}
             </h1>
             <div className="vehicle-detail-heading-chips">
-              <span>
-                <Fuel size={13} aria-hidden="true" />
-                {vehicle.fuel}
-              </span>
-              <span>
-                <Settings2 size={13} aria-hidden="true" />
-                {vehicle.transmission}
-              </span>
-              <span>
-                <Car size={13} aria-hidden="true" />
-                {vehicle.doors} doors
-              </span>
-              <span>
-                <Users size={13} aria-hidden="true" />
-                {vehicle.seats} seats
-              </span>
+              {chips.map(([Icon, value], index) => (
+                <span key={index}><Icon size={13} aria-hidden="true" />{value}</span>
+              ))}
             </div>
             {vehicle.description && <p className="vehicle-detail-description">{vehicle.description}</p>}
           </section>

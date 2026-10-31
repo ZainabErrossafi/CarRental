@@ -63,6 +63,7 @@ export default function RentalSearch() {
   const [returnDate, setReturnDate] = useState("");
   const [departureTime, setDepartureTime] = useState("10:00");
   const [error, setError] = useState("");
+  const agenciesDisabled = locationsLoading || locationsError || !locations.length;
   const fieldClass =
     "tw:box-border tw:h-10 tw:w-full tw:min-w-0 tw:rounded-lg tw:border tw:border-solid tw:border-white/65 tw:bg-[#071b2e]/55 tw:backdrop-blur-sm tw:[color-scheme:dark] tw:px-2.5 tw:font-sans tw:text-[11px] tw:font-semibold tw:text-white tw:drop-shadow-sm tw:focus:outline-2 tw:focus:outline-[#ff8a3d]";
   const labelClass =
@@ -83,11 +84,13 @@ export default function RentalSearch() {
     fields.set("return_agency", `${returnLocation.name} · ${returnLocation.city}`);
     const departure = new Date(`${fields.get("departure_date")}T${fields.get("departure_time")}`);
     const returned = new Date(`${fields.get("return_date")}T${fields.get("return_time")}`);
-    if (departure <= new Date()) {
+    const departureIsPast = departure <= new Date();
+    const returnIsTooEarly = returned <= departure;
+    if (departureIsPast) {
       setError("La date et l’heure de départ doivent être dans le futur.");
       return;
     }
-    if (returned <= departure) {
+    if (returnIsTooEarly) {
       setError("Le retour doit être après le départ.");
       return;
     }
@@ -113,7 +116,7 @@ export default function RentalSearch() {
             label={label}
             locations={locations}
             loading={locationsLoading}
-            disabled={locationsLoading || locationsError || !locations.length}
+            disabled={agenciesDisabled}
             labelClass={labelClass}
             fieldClass={fieldClass}
           />
@@ -180,7 +183,7 @@ export default function RentalSearch() {
         </label>
         <button
           type="submit"
-          disabled={locationsLoading || locationsError || !locations.length}
+          disabled={agenciesDisabled}
           aria-label="Rechercher une voiture"
           title="Rechercher une voiture"
           className="tw:flex tw:w-10 tw:justify-self-end tw:h-10 tw:cursor-pointer tw:items-center tw:justify-center tw:gap-3 tw:rounded-lg tw:border tw:border-solid tw:border-white/50 tw:bg-[#071b2e]/65 tw:p-0 tw:font-sans tw:text-[11px] tw:font-bold tw:uppercase tw:tracking-widest tw:text-white tw:hover:bg-[#071b2e]/85 tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-[#ff8a3d] tw:sm:col-span-2 tw:xl:col-span-1"

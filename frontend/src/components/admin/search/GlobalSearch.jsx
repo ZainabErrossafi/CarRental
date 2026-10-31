@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useI18n } from "../../../context/I18nContext";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, CornerDownLeft } from "lucide-react";
 import {
@@ -9,16 +10,14 @@ import {
   getUsers,
   getFaqs,
   getNotifications,
-} from "../services/adminApi";
-import { useI18n } from "../context/I18nContext";
+} from "../../../services/adminApi";
 
 const norm = (s) =>
   String(s ?? "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, ""); // "Aéroport" matches "aeroport"
+    .replace(/[\u0300-\u036f]/g, "");
 
-// Build one flat, searchable list from every page's data.
 async function loadIndex() {
   const [vehicles, locations, catalog, reservations, users, faqs, notifs] =
     await Promise.allSettled([
@@ -69,7 +68,6 @@ export default function GlobalSearch({ open, onClose, pages }) {
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(0);
 
-  // (Re)load fresh data every time the palette opens
   useEffect(() => {
     if (!open) return;
     setQuery("");
@@ -86,7 +84,7 @@ export default function GlobalSearch({ open, onClose, pages }) {
     };
   }, [open]);
 
-  const results = useMemo(() => {
+  const calculateResults = () => {
     const words = norm(query).split(/\s+/).filter(Boolean);
     if (!words.length) return [];
 
@@ -96,17 +94,18 @@ export default function GlobalSearch({ open, onClose, pages }) {
 
     const dataHits = index.filter((i) => words.every((w) => i.haystack.includes(w))).slice(0, 30);
     return [...pageHits, ...dataHits];
-  }, [query, index, pages, t]);
+  };
+  const results = calculateResults();
 
-  // Group while keeping a single flat order for keyboard navigation
-  const groups = useMemo(() => {
+  const calculateGroups = () => {
     const map = new Map();
     results.forEach((r, i) => {
       if (!map.has(r.type)) map.set(r.type, []);
       map.get(r.type).push({ ...r, flatIndex: i });
     });
     return [...map.entries()];
-  }, [results]);
+  };
+  const groups = calculateGroups();
 
   useEffect(() => setActive(0), [query]);
 

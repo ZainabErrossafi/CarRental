@@ -1,6 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 
-// Show the user's local time with a fixed day:month:year and 24-hour clock.
 export function formatReservationDate(value) {
   if (!value) return '—';
   const date = new Date(value);
