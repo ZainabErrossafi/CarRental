@@ -19,14 +19,11 @@ const readTokens = () => {
 
 const normalize = (url = '') => url.replace(/^\/+/, '');
 
-// Login / signup / refresh endpoints: never send a (possibly stale) token to these.
 const isAuthEndpoint = (url) => {
   const path = normalize(url);
   return path.startsWith('token/') || path.startsWith('auth/');
 };
 
-// Public GET endpoints: send the token if we have one (so admins can see more),
-// but if the server rejects it with 401, retry once anonymously.
 const OPTIONAL_AUTH_PATHS = ['locations/'];
 const isOptionalAuth = (config) =>
   (config?.method || 'get').toLowerCase() === 'get' &&
@@ -54,7 +51,7 @@ api.interceptors.response.use(
     const refresh = readTokens()?.refresh;
 
     if (status === 401 && config && isOptionalAuth(config)) {
-      // Public endpoint rejected our token: retry once without it, and don't log the user out.
+
       if (!config._anon) {
         config._anon = true;
         config._skipAuth = true;
@@ -66,7 +63,7 @@ api.interceptors.response.use(
       try {
         if (!refreshRequest) {
           refreshRequest = api.post('token/refresh/', { refresh }).then(({ data }) => {
-            // A pending refresh must not restore a session after logout.
+
             if (readTokens()?.refresh !== refresh) throw new Error('Session ended. Please sign in again.');
             localStorage.setItem(TOKEN_KEY, JSON.stringify({ ...readTokens(), refresh, ...data }));
             return data.access;
@@ -94,7 +91,6 @@ api.interceptors.response.use(
   },
 );
 
-// Existing screens expect arrays; Django list endpoints return paginated objects.
 export const getList = async (path) => {
   const items = [];
   let next = path;
@@ -102,7 +98,7 @@ export const getList = async (path) => {
     const { data } = await api.get(next);
     if (Array.isArray(data)) return [...items, ...data];
     items.push(...data.results);
-    // Keep subsequent pages on the configured API origin, including through proxies.
+
     next = data.next ? `${path.split('?')[0]}${new URL(data.next, window.location.origin).search}` : null;
   }
   return items;

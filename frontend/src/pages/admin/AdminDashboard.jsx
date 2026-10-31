@@ -1,12 +1,12 @@
-import DashboardAnalytics from "../../components/DashboardAnalytics.jsx";
-import Pagination from "../../components/Pagination.jsx";
+import { useI18n } from "../../context/I18nContext";
+import { useConfirm } from "../../context/Confirmcontext";
+import DashboardAnalytics from "../../components/admin/dashboard/DashboardAnalytics.jsx";
+import Pagination from "../../components/admin/pagination/Pagination.jsx";
 import usePagination from "../../hooks/usePagination.js";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Trash2, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getVehicles, deleteVehicle } from "../../services/adminApi";
-import { useConfirm } from "../../context/Confirmcontext";
-import { useI18n } from "../../context/I18nContext";
 
 const dailyRate = (vehicle) => {
   const rate = Number(vehicle.dailyRate);
@@ -27,15 +27,13 @@ export default function AdminDashboard() {
     getVehicles().then(setVehicles);
   }, []);
 
-  const filtered = useMemo(() => {
-    return vehicles
+  const filtered = vehicles
       .filter((v) =>
         tableTab === "View all" ? true : v.status === tableTab.toLowerCase()
       )
       .filter((v) =>
         `${v.brand} ${v.model}`.toLowerCase().includes(query.toLowerCase())
       );
-  }, [vehicles, tableTab, query]);
 
   const pagination = usePagination(filtered, JSON.stringify([tableTab, query]));
 

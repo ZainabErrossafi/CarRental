@@ -1,17 +1,63 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+import logging
+from smtplib import SMTPException
+
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db import transaction
+from django.template.loader import render_to_string
 # ####oussama: Convert sign-up password validation errors into API responses.
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from rest_framework import serializers
-from .models import User
+from .models import Role, User
+
+
+logger = logging.getLogger(__name__)
+
+
+def send_account_created_email(details):
+    try:
+        delivered = send_mail(
+            'Welcome to Rently — your account details',
+            render_to_string('users/account_created_email.txt', details),
+            settings.DEFAULT_FROM_EMAIL,
+            [details['email']],
+            fail_silently=False,
+            html_message=render_to_string('users/account_created_email.html', details),
+        )
+        if delivered != 1:
+            logger.error('Account creation email backend reported no delivery.')
+    except (SMTPException, OSError):
+        logger.exception('Account creation email could not be sent.')
+
+
+def send_admin_promotion_email(email, username):
+    try:
+        delivered = send_mail(
+            'Your Rently account is now an admin',
+            f'Hello {username},\n\nYour Rently account has been changed to admin. '
+            'You can now sign in with your existing credentials to access the admin dashboard.',
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            fail_silently=False,
+            html_message=render_to_string('users/admin_promotion_email.html', {
+                'username': username,
+            }),
+        )
+        if delivered != 1:
+            logger.error('Admin promotion email backend reported no delivery.')
+    except (SMTPException, OSError):
+        logger.exception('Admin promotion email could not be sent.')
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True, required=False, trim_whitespace=False)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'password']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'password', 'two_factor_enabled']
+        read_only_fields = ['two_factor_enabled']
 
     def validate_email(self, value):
         value = value.strip().lower()
@@ -45,23 +91,39 @@ class UserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({'is_active': 'You cannot deactivate your own account.'})
         return data
 
+    @transaction.atomic
     def create(self, validated_data):
         password = validated_data.pop('password', None)
         if not password:
             raise serializers.ValidationError({'password': 'This field is required.'})
-        return User.objects.create_user(**validated_data, password=password)
+        user = User.objects.create_user(**validated_data, password=password)
+        details = {
+            'name': user.get_full_name() or user.username,
+            'username': user.username,
+            'email': user.email,
+            'password': password,
+            'role': user.get_role_display(),
+        }
+        transaction.on_commit(lambda: send_account_created_email(details))
+        return user
 
+    @transaction.atomic
     def update(self, instance, validated_data):
+        instance = User.objects.select_for_update().get(pk=instance.pk)
+        previous_role = instance.role
         password = validated_data.pop('password', None)
         if password:
             instance.set_password(password)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+        if previous_role == Role.CLIENT and instance.role == Role.ADMIN:
+            email, username = instance.email, instance.username
+            transaction.on_commit(lambda: send_admin_promotion_email(email, username))
         return instance
 
 
-# ####oussama: Merge username login and user response with email login and mandatory 2FA.
+# ####oussama: Merge username login and user response with email login and optional 2FA.
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     email = serializers.EmailField(write_only=True, required=False)
 
@@ -107,14 +169,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise AuthenticationFailed('Invalid email or password.')
         if self.user.two_factor_enabled:
             return start_email_challenge(self.user)
-        # ####oussama: Preserve main's user payload after authentication and 2FA checks.
-        return {
-            **session_tokens(self.user),
-            'user': {
-                'id': self.user.id, 'username': self.user.username,
-                'email': self.user.email, 'role': self.user.role,
-            },
-        }
+        return {**session_tokens(self.user), 'user': UserSerializer(self.user).data}
 
 
 # Preserve the existing import used by the token endpoint.
@@ -128,9 +183,7 @@ class TwoFactorAwareLoginSerializer(LoginSerializer):
     def validate(self, attrs):
         from rest_framework.exceptions import AuthenticationFailed
         data = super().validate(attrs)
-        if data['user'].two_factor_enabled:
-            raise AuthenticationFailed('Use /api/token/ and complete email verification.')
-        return data
+        raise AuthenticationFailed('Use /api/token/ and complete email verification.')
 
 
 # ####oussama: Public sign-up validation and customer account creation.

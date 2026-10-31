@@ -20,7 +20,6 @@ export default function usePagination(items, filterKey = "") {
   const [selection, setSelection] = useState({ filterKey, page: 1 });
   const pagination = paginate(items, selection.filterKey === filterKey ? selection.page : 1);
 
-  // Reset filters immediately and keep the page valid after deleting rows.
   if (selection.filterKey !== filterKey || selection.page !== pagination.page) {
     setSelection({ filterKey, page: pagination.page });
   }

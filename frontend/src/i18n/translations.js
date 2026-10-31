@@ -1,4 +1,4 @@
-// English UI strings are translation keys. Keep identifiers and saved content in their original language.
+
 export const LANGUAGES = [
   {
     "code": "en",
@@ -22,6 +22,13 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "Edit Reservation": "Modifier la réservation",
+    "Update reservation details": "Modifier les détails de la réservation",
+    "A cancelled or completed reservation cannot be modified.": "Une réservation annulée ou terminée ne peut pas être modifiée.",
+    "Failed to save reservation. Please try again.": "Impossible d’enregistrer la réservation. Veuillez réessayer.",
+    "Please enter your email address.": "Veuillez saisir votre adresse e-mail.",
+    "Please enter a valid email address.": "Veuillez saisir une adresse e-mail valide.",
+    "No active, verified account was found with this email.": "Aucun compte actif et vérifié n’a été trouvé avec cette adresse e-mail.",
     "Choose a new password": "Choisissez un nouveau mot de passe",
     "Enter and confirm your new password.": "Saisissez et confirmez votre nouveau mot de passe.",
     "New password": "Nouveau mot de passe",
@@ -417,6 +424,8 @@ export const translations = {
     "Phone": "Téléphone",
     "Photo & Description": "Photo et description",
     "Pickup Date": "Date de prise en charge",
+    "Pickup date and time": "Date et heure de prise en charge",
+    "Return date and time": "Date et heure de restitution",
     "Pickup Location": "Lieu de prise en charge",
     "Pickup reminder": "Rappel de prise en charge",
     "Pickup → Return": "Prise en charge → Restitution",
@@ -645,6 +654,13 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "Edit Reservation": "تعديل الحجز",
+    "Update reservation details": "تحديث تفاصيل الحجز",
+    "A cancelled or completed reservation cannot be modified.": "لا يمكن تعديل حجز ملغى أو مكتمل.",
+    "Failed to save reservation. Please try again.": "تعذر حفظ الحجز. يرجى المحاولة مرة أخرى.",
+    "Please enter your email address.": "يرجى إدخال بريدك الإلكتروني.",
+    "Please enter a valid email address.": "يرجى إدخال بريد إلكتروني صالح.",
+    "No active, verified account was found with this email.": "لم يتم العثور على حساب نشط ومؤكد بهذا البريد الإلكتروني.",
     "Choose a new password": "اختر كلمة مرور جديدة",
     "Enter and confirm your new password.": "أدخل كلمة المرور الجديدة وأكدها.",
     "New password": "كلمة المرور الجديدة",
@@ -1039,6 +1055,8 @@ export const translations = {
     "Phone": "الهاتف",
     "Photo & Description": "الصورة والوصف",
     "Pickup Date": "تاريخ الاستلام",
+    "Pickup date and time": "تاريخ ووقت الاستلام",
+    "Return date and time": "تاريخ ووقت الإرجاع",
     "Pickup Location": "موقع الاستلام",
     "Pickup reminder": "تذكير بالاستلام",
     "Pickup → Return": "الاستلام ← الإرجاع",

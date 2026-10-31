@@ -2,7 +2,7 @@ import { useI18n } from "../../context/I18nContext";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getVehicle, updateVehicle } from "../../services/adminApi";
-import VehicleForm from "./VehicleForm";
+import VehicleForm from "../../components/admin/vehicles/VehicleForm";
 
 export default function AdminVehicleEdit() {
   const { t } = useI18n();

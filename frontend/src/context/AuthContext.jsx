@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const loggedInUser = await loginApi(credentials);
-    setUser(loggedInUser);
+    if (!loggedInUser.two_factor_required) setUser(loggedInUser);
     return loggedInUser;
   };
 
@@ -62,15 +62,11 @@ export function AuthProvider({ children }) {
     return currentUser;
   };
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, googleLogin, signup, verifyEmail, logout, refreshUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, loading, login, googleLogin, signup, verifyEmail, logout, refreshUser }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
-  return ctx;
+  const value = useContext(AuthContext);
+  if (!value) throw new Error("useAuth must be used within AuthProvider");
+  return value;
 }

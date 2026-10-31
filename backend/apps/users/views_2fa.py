@@ -57,7 +57,7 @@ def pending_user(encoded):
             eligible = user.expires_at > timezone.now()
         else:
             eligible = (not user.email_verified and not user.is_active) if signup else (user.is_active and user.email_verified)
-        if (not eligible or (not registration and not user.two_factor_enabled) or
+        if (not eligible or (signup and not user.two_factor_enabled) or
                 not user.two_factor_challenge or
                 not constant_time_compare(user.two_factor_challenge, token['jti']) or
                 not constant_time_compare(credential_version(user), token.get('credential_version', '')) or
