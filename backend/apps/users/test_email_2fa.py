@@ -21,23 +21,40 @@ class EmailTwoFactorTests(TestCase):
             'email': self.user.email, 'password': 'StrongPassword123!',
         })
 
-    def test_login_requires_code_even_when_optional_flag_is_disabled(self):
+    def test_two_factor_is_disabled_by_default(self):
+        user = User.objects.create_user(username='default', email='default@example.com', password='StrongPassword123!')
+        self.assertFalse(user.two_factor_enabled)
+
+    def test_login_without_two_factor_returns_tokens_without_email(self):
         self.user.two_factor_enabled = False
         self.user.save()
-
         response = self.login()
-
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.data['two_factor_required'])
-        self.assertNotIn('access', response.data)
-        self.assertNotIn('refresh', response.data)
+        self.assertIn('access', response.data)
+        self.assertIn('refresh', response.data)
+        self.assertNotIn('two_factor_required', response.data)
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_user_can_enable_then_disable_login_two_factor(self):
+        self.client.force_authenticate(self.user)
+        for enabled in (False, True, False):
+            response = self.client.post('/api/auth/2fa/toggle/', {
+                'enabled': enabled, 'password': 'StrongPassword123!',
+            })
+            self.assertEqual(response.status_code, 200)
+            profile = self.client.get('/api/users/me/')
+            self.assertEqual(profile.data['two_factor_enabled'], enabled)
+            login = self.login()
+            self.assertEqual(login.status_code, 200)
+            self.assertEqual(login.data.get('two_factor_required', False), enabled)
+            self.assertEqual('access' in login.data, not enabled)
+
+    def test_profile_cannot_bypass_password_protected_toggle(self):
+        self.client.force_authenticate(self.user)
+        response = self.client.patch(f'/api/users/{self.user.pk}/', {'two_factor_enabled': False})
+        self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
-        verified = self.client.post('/api/auth/2fa/verify/', {
-            'ephemeral_token': response.data['ephemeral_token'],
-            'code': self.user.two_factor_code,
-        })
-        self.assertEqual(verified.status_code, 200)
-        self.assertIn('access', verified.data)
+        self.assertTrue(self.user.two_factor_enabled)
 
     def test_login_with_correct_code(self):
         login_response = self.login()
