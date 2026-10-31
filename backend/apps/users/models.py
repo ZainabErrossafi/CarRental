@@ -8,7 +8,11 @@ from django.utils.crypto import constant_time_compare
 from datetime import timedelta
 from smtplib import SMTPException
 import secrets
+import logging
 from rest_framework.exceptions import APIException
+
+
+logger = logging.getLogger(__name__)
 
 
 class VerificationEmailUnavailable(APIException):
@@ -46,8 +50,15 @@ class EmailCodeMixin:
                 html_message=html_message,
             )
             if delivered != 1:
+                logger.error("Verification email backend reported no delivery (backend=%s).",
+                             settings.EMAIL_BACKEND)
                 raise VerificationEmailUnavailable()
         except (SMTPException, OSError) as error:
+            logger.exception(
+                "Verification email delivery failed (host=%s, port=%s, TLS=%s, SSL=%s).",
+                settings.EMAIL_HOST, settings.EMAIL_PORT,
+                settings.EMAIL_USE_TLS, settings.EMAIL_USE_SSL,
+            )
             raise VerificationEmailUnavailable() from error
 
     def verify_email_code(self, code):
