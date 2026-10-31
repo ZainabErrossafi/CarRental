@@ -331,3 +331,4 @@ You can introduce the project like this: “The application has a React frontend
 - [Public API](docs/PUBLIC_API.md): curl examples and API key usage.
 - `docs/ARCHITECTURE.md` and `docs/DB_SCHEMA.md` are currently empty. Use this guide and the models instead.
 
+If an older comment or document conflicts with implementation, consult the current source code and tests. This README describes the current implementation and its limitations; it is not evidence that every flow has been tested end to end.
