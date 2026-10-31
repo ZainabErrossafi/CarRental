@@ -13,6 +13,25 @@ const localMinute = (date) => {
 };
 const nextMinute = () => localMinute(new Date(Math.floor(Date.now() / 60000) * 60000 + 60000));
 
+const tripFromSearch = (search) => {
+  const params = new URLSearchParams(search);
+  const readTime = (kind) => {
+    const value = `${params.get(`${kind}_date`)}T${params.get(`${kind}_time`)}`;
+    if (!/^\d{4}-\d{2}-\d{2}T([01]\d|2[0-3]):[0-5]\d$/.test(value)) return "";
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) && localMinute(date) === value && date > new Date() ? value : "";
+  };
+  const pickup = readTime("departure");
+  const returned = readTime("return");
+  const readAgency = (key) => /^\d+$/.test(params.get(key) || "") && Number(params.get(key)) > 0 ? params.get(key) : "";
+  return {
+    pickup,
+    returned: pickup && returned > pickup ? returned : "",
+    pickup_location: readAgency("pickup_location"),
+    dropoff_location: readAgency("dropoff_location"),
+  };
+};
+
 export default function VehicleBooking({ vehicle }) {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -41,15 +60,12 @@ export default function VehicleBooking({ vehicle }) {
       active = false;
     };
   }, []);
-  const [form, setForm] = useState({
-    pickup: "",
-    returned: "",
-    pickup_location: "",
-    dropoff_location: "",
+  const [form, setForm] = useState(() => ({
+    ...tripFromSearch(location.search),
     driver_name: "",
     email: "",
     phone: "",
-  });
+  }));
   const [error, setError] = useState("");
   const [unavailable, setUnavailable] = useState(false);
   const [locationError, setLocationError] = useState(false);
@@ -83,7 +99,15 @@ export default function VehicleBooking({ vehicle }) {
     setLocationError(false);
     getList("locations/")
       .then((items) => {
-        if (active) setLocations(items.filter((item) => item.active));
+        if (active) {
+          const agencies = items.filter((item) => item.active);
+          setLocations(agencies);
+          setForm((prev) => ({
+            ...prev,
+            pickup_location: agencies.some((item) => String(item.id) === prev.pickup_location) ? prev.pickup_location : "",
+            dropoff_location: agencies.some((item) => String(item.id) === prev.dropoff_location) ? prev.dropoff_location : "",
+          }));
+        }
       })
       .catch(() => {
         if (active) setLocationError(true);

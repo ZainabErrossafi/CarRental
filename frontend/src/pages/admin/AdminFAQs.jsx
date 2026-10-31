@@ -27,6 +27,7 @@ export default function AdminFaqs() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY_FAQ);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     getFaqs().then(setFaqs);
@@ -48,22 +49,27 @@ export default function AdminFaqs() {
   const isNew = editing === "new";
 
   const openNew = () => {
+    setSaveError("");
     setForm(EMPTY_FAQ);
     setEditing("new");
   };
 
   const openEdit = (faq) => {
+    setSaveError("");
     setForm({ question: faq.question, answer: faq.answer, active: faq.active });
     setEditing(faq);
   };
 
   const closeModal = () => {
+    setSaveError("");
     setEditing(null);
     setSaving(false);
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
+    if (saving) return;
+    setSaveError("");
     setSaving(true);
 
     try {
@@ -76,6 +82,7 @@ export default function AdminFaqs() {
       }
       closeModal();
     } catch (err) {
+      setSaveError(err.message || t("Could not save FAQ. Please try again."));
       setSaving(false);
     }
   };
@@ -180,6 +187,7 @@ export default function AdminFaqs() {
           form={form}
           setForm={setForm}
           saving={saving}
+          saveError={saveError}
         />
       )}
     </div>

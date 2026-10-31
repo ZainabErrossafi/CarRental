@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Users, Settings2, ArrowUpRight, Car } from "lucide-react";
 
 export default function VehicleCard({ vehicle }) {
+  const { search } = useLocation();
   const [failedImage, setFailedImage] = useState(null);
   const image = vehicle.main_image || vehicle.image;
   const brand = typeof vehicle.brand === "object" ? vehicle.brand.name : vehicle.brand;
@@ -11,7 +12,7 @@ export default function VehicleCard({ vehicle }) {
   const price = vehicle.pricePerDay ?? vehicle.dailyRate ?? vehicle.daily_rate;
   return (
     <Link
-      to={`/vehicles/${vehicle.id}`}
+      to={{ pathname: `/vehicles/${vehicle.id}`, search }}
       className="fleet-card fleet-card-clickable"
       aria-label={`View details for ${name}`}
     >
