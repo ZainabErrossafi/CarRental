@@ -49,7 +49,7 @@ export default function AdminResetPassword() {
   });
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-reset-page">
       <div className="auth-card">
         <div className="auth-language-switcher"><LanguageSwitcher /></div>
         {error && <div className="alert alert-error mb-4">⚠️ {t(error)}</div>}
@@ -75,8 +75,14 @@ export default function AdminResetPassword() {
         {step === "password" && (<>
           <h1 className="auth-title">{t("Choose a new password")}</h1>
           <form onSubmit={save} className="auth-form">
-            <input type="password" placeholder={t("New password")} minLength={8} required value={pw} onChange={(e) => setPw(e.target.value)} />
-            <input type="password" placeholder={t("Confirm password")} minLength={8} required value={pw2} onChange={(e) => setPw2(e.target.value)} />
+            <div className="form-field">
+              <label htmlFor="new-password">{t("New password")}</label>
+              <input id="new-password" name="new-password" type="password" autoComplete="new-password" placeholder={t("New password")} minLength={8} required disabled={busy} value={pw} onChange={(e) => setPw(e.target.value)} />
+            </div>
+            <div className="form-field">
+              <label htmlFor="confirm-password">{t("Confirm password")}</label>
+              <input id="confirm-password" name="confirm-password" type="password" autoComplete="new-password" placeholder={t("Confirm password")} minLength={8} required disabled={busy} value={pw2} onChange={(e) => setPw2(e.target.value)} />
+            </div>
             <button className="gcard-submit" disabled={busy}>{t(busy ? "Saving..." : "Change password")}</button>
           </form>
         </>)}
