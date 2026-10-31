@@ -59,6 +59,7 @@ export default function App() {
         <Route path="catalog" element={<AdminCatalog label="Catalog" />} />
         <Route path="reservations" element={<AdminReservations label="Reservations" />} />
         <Route path="reservations/new" element={<AdminReservationAdd />} />
+        <Route path="reservations/:id/edit" element={<AdminReservationAdd />} />
         <Route path="users" element={<AdminUsers label="Users & Roles" />} />
         <Route path="site-settings" element={<AdminSiteSettings label="Site Settings" />} />
         <Route path="faqs" element={<AdminFaqs label="FAQs" />} />

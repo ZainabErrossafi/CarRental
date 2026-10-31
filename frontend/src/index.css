@@ -1798,8 +1798,8 @@ th {
   box-shadow: 0 0 0 3px var(--orange-light);
 }
 
-@media (max-width: 480px) {
-  .client-two-factor .otp-inputs {
+@media (max-width: 560px) {
+  .otp-inputs {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     width: 100%;
@@ -1807,10 +1807,23 @@ th {
     gap: 8px;
   }
 
-  .client-two-factor .otp-input {
+  .otp-input {
     width: 100%;
     min-width: 0;
     height: 56px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .otp-inputs {
+    gap: 6px;
+  }
+
+  .otp-input {
+    height: 48px;
+    border-radius: 8px;
+    font-size: 1.25rem;
   }
 }
 
