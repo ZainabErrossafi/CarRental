@@ -1,6 +1,6 @@
 import AdminReports from "./pages/admin/AdminReports.jsx";
 import AdminTerms from "./pages/admin/AdminTerms.jsx";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import AdminVehicles from "./pages/admin/AdminVehicles.jsx";
@@ -25,6 +25,7 @@ import ClientVehicles from "./pages/client/ClientVehicles.jsx";
 import ClientVehicleDetails from "./pages/client/ClientVehicleDetails.jsx";
 import ClientFaqs from "./pages/client/ClientFaqs.jsx";
 import ClientTwoFactor from "./pages/client/ClientTwoFactor.jsx";
+import ClientNotFound from "./pages/client/ClientNotFound.jsx";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="faqs" element={<ClientFaqs />} />
         <Route path="vehicles" element={<ClientVehicles />} />
         <Route path="vehicles/:id" element={<ClientVehicleDetails />} />
+        <Route path="*" element={<ClientNotFound />} />
       </Route>
       <Route
         path="/admin"
@@ -64,7 +66,6 @@ export default function App() {
         <Route path="faqs" element={<AdminFaqs label="FAQs" />} />
         <Route path="notifications" element={<AdminNotifications label="Notifications" />} />
       </Route>
-      <Route path="*" element={<Navigate to="/admin" replace />} />
     </Routes>
   );
 }
