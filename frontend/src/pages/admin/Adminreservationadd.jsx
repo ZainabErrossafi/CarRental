@@ -103,7 +103,7 @@ export default function AdminReservationAdd() {
     setForm((prev) => ({
       ...prev,
       [field]: value,
-      ...(field === "pickup_date" &&
+      ...(!isEditing && field === "pickup_date" &&
       (!value || (prev.return_date && prev.return_date < value))
         ? { return_date: "" }
         : {}),
@@ -239,6 +239,7 @@ export default function AdminReservationAdd() {
             vehicles={vehicles}
             locations={locations}
             isEditing={isEditing}
+            originalPickupDate={original?.form.pickup_date}
             minimumTime={minimumTime}
             setMinimumTime={setMinimumTime}
           />
