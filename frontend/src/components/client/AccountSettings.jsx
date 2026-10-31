@@ -8,7 +8,7 @@ export default function AccountSettings({ overlay }) {
   const canChangePassword = user.canChangePassword !== false;
   const dialog = useRef(null);
   const [tab, setTab] = useState("profile");
-  const [profile, setProfile] = useState({ first_name: "", last_name: "", phone: "" });
+  const [profile, setProfile] = useState({ username: "", first_name: "", last_name: "", phone: "" });
   const [password, setPassword] = useState({ old: "", next: "", confirm: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -48,6 +48,7 @@ export default function AccountSettings({ overlay }) {
   const changePassword = (field, value) => setPassword({ ...password, [field]: value });
   const show = () => {
     setProfile({
+      username: user.username || "",
       first_name: user.first_name || "",
       last_name: user.last_name || "",
       phone: user.phone || "",
@@ -68,8 +69,8 @@ export default function AccountSettings({ overlay }) {
   const saveProfile = async (event) => {
     event.preventDefault();
     if (inFlight.current) return;
-    if (!profile.first_name.trim() || !profile.last_name.trim() || !profile.phone.trim()) {
-      setError("Please fill in your first name, last name and phone.");
+    if (!profile.username.trim() || !profile.first_name.trim() || !profile.last_name.trim() || !profile.phone.trim()) {
+      setError("Please fill in your username, first name, last name and phone.");
       return;
     }
     inFlight.current = true;
@@ -78,6 +79,7 @@ export default function AccountSettings({ overlay }) {
     setSuccess("");
     try {
       await api.patch(`users/${user.id}/`, {
+        username: profile.username.trim(),
         first_name: profile.first_name.trim(),
         last_name: profile.last_name.trim(),
         phone: profile.phone.trim(),
@@ -181,6 +183,18 @@ export default function AccountSettings({ overlay }) {
         {tab === "profile" && (
           <form onSubmit={saveProfile}>
             <fieldset disabled={busy}>
+              <label>
+                Username
+                <input
+                  required
+                  maxLength={150}
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  value={profile.username}
+                  onChange={(event) => changeProfile("username", event.target.value)}
+                />
+              </label>
               <div className="account-settings-names">
                 <label>
                   First name
