@@ -1,6 +1,6 @@
 import { useI18n } from "../../../context/I18nContext";
 import Pagination from "../pagination/Pagination.jsx";
-import { Check, X, CheckCheck, User, Phone, Mail } from "lucide-react";
+import { Pencil, Check, X, CheckCheck, User, Phone, Mail } from "lucide-react";
 import { formatReservationDate } from "../../../services/reservationInvoice";
 function EyeIcon(props) {
   return (
@@ -34,6 +34,7 @@ export default function ReservationsTable({
   pagination,
   durationDays,
   setViewing,
+  handleEdit,
   handleConfirm,
   handleCancel,
   handleComplete,
@@ -129,6 +130,17 @@ export default function ReservationsTable({
                   >
                     <EyeIcon size={15} />
                   </button>
+
+                  {["pending", "confirmed"].includes(r.status) && (
+                    <button
+                      disabled={pendingId != null}
+                      onClick={() => handleEdit(r.id)}
+                      title={t("Edit Reservation")}
+                      aria-label={t("Edit Reservation")}
+                    >
+                      <Pencil size={15} />
+                    </button>
+                  )}
 
                   {r.status === "pending" && (
                     <>
