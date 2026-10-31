@@ -1,6 +1,6 @@
 # Email OTP authentication
 
-The implementation is entirely in the backend. No frontend files are changed. Password login requires email confirmation for every account; access and refresh tokens are issued only after code verification.
+Login 2FA is optional and disabled by default. Users can enable or disable it in Account settings → 2FA by confirming their current password. Registration email verification remains required.
 
 ## Files
 
@@ -27,7 +27,7 @@ docker compose exec backend python manage.py migrate
 {"email": "user@example.com", "password": "your-password"}
 ```
 
-After valid credentials:
+After valid credentials for an account with 2FA enabled:
 
 ```json
 {
@@ -37,7 +37,7 @@ After valid credentials:
 }
 ```
 
-All password logins require this step, including existing accounts whose optional `two_factor_enabled` flag is false. Active client accounts and administrators use the same flow.
+Accounts with `two_factor_enabled=false` receive access and refresh tokens immediately after valid credentials, without an OTP email. Enabled accounts must verify their code before receiving session tokens. This applies to clients and administrators.
 
 ## Enable or disable
 
@@ -47,7 +47,7 @@ All password logins require this step, including existing accounts whose optiona
 {"enabled": true, "password": "your-current-password"}
 ```
 
-This legacy setting controls optional Google callback verification; it cannot disable verification for password login. Send `false` to disable that optional setting. The current password is required to prevent someone with only a stolen access token from changing this setting. Passwordless Google accounts must set a password through the existing password recovery process before using this endpoint. Changing the setting clears outstanding OTP challenges. Existing access/refresh tokens are not revoked by this operation.
+This setting controls verification for password login and the Google success callback. Send `false` to disable login 2FA. The current password is required to prevent someone with only a stolen access token from changing this setting. Passwordless Google accounts must set a password through the existing password recovery process before using this endpoint. Changing the setting clears outstanding OTP challenges. Existing access/refresh tokens are not revoked by this operation.
 
 ## Verify
 
@@ -73,7 +73,7 @@ Resending replaces the stored OTP without resetting the failed-attempt count or 
 
 The dj-rest-auth `/api/auth/login/` endpoint rejects password logins and directs them to `/api/token/` so it cannot bypass verification. The Google success callback returns the same pending challenge JSON for enabled accounts; it does not issue session tokens before OTP verification. Its existing redirect behavior is retained for accounts without 2FA.
 
-The current frontend login does not handle the pending challenge response. API clients must submit the ephemeral token and six-digit code to `/api/auth/2fa/verify/` to obtain session tokens. Google OAuth remains a separate login flow.
+The frontend sends enabled accounts to email code verification. API clients must submit the ephemeral token and six-digit code to `/api/auth/2fa/verify/` to obtain session tokens. Google OAuth remains a separate login flow.
 
 ## Email settings
 

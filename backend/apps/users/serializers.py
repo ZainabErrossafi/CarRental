@@ -56,7 +56,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'password']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'phone', 'role', 'is_active', 'password', 'two_factor_enabled']
+        read_only_fields = ['two_factor_enabled']
 
     def validate_email(self, value):
         value = value.strip().lower()
@@ -122,7 +123,7 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-# ####oussama: Merge username login and user response with email login and mandatory 2FA.
+# ####oussama: Merge username login and user response with email login and optional 2FA.
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     email = serializers.EmailField(write_only=True, required=False)
 
@@ -166,7 +167,9 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
                                  password=attrs['password'])
         if self.user is None or not self.user.is_active:
             raise AuthenticationFailed('Invalid email or password.')
-        return start_email_challenge(self.user)
+        if self.user.two_factor_enabled:
+            return start_email_challenge(self.user)
+        return {**session_tokens(self.user), 'user': UserSerializer(self.user).data}
 
 
 # Preserve the existing import used by the token endpoint.
