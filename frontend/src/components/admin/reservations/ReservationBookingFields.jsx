@@ -11,10 +11,17 @@ export default function ReservationBookingFields({
   vehicles,
   locations,
   isEditing = false,
+  originalPickupDate,
   minimumTime,
   setMinimumTime,
 }) {
   const { t } = useI18n();
+  const pickupMinimum = isEditing && originalPickupDate < minimumTime
+    ? originalPickupDate
+    : minimumTime;
+  const returnMinimum = form.pickup_date > pickupMinimum
+    ? form.pickup_date
+    : pickupMinimum;
   return (
     <div className="form-card vehicle-details-card">
       <div className="vehicle-identity-heading">
@@ -79,11 +86,14 @@ export default function ReservationBookingFields({
           <input
             id="pickup_date"
             type="datetime-local"
-            min={isEditing ? undefined : minimumTime}
+            min={pickupMinimum}
             onFocus={() => setMinimumTime(currentReservationTime())}
             value={form.pickup_date}
             onChange={(e) =>
-              handleChange("pickup_date", isEditing ? e.target.value : clampReservationTime(e.target.value))
+              handleChange(
+                "pickup_date",
+                isEditing ? e.target.value : clampReservationTime(e.target.value),
+              )
             }
             required
           />
@@ -95,13 +105,14 @@ export default function ReservationBookingFields({
             id="return_date"
             type="datetime-local"
             disabled={!form.pickup_date}
-            min={
-              isEditing ? form.pickup_date : form.pickup_date > minimumTime ? form.pickup_date : minimumTime
-            }
+            min={returnMinimum}
             onFocus={() => setMinimumTime(currentReservationTime())}
             value={form.return_date}
             onChange={(e) =>
-              handleChange("return_date", isEditing ? e.target.value : clampReservationTime(e.target.value))
+              handleChange(
+                "return_date",
+                isEditing ? e.target.value : clampReservationTime(e.target.value),
+              )
             }
             required
           />
