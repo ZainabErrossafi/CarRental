@@ -189,10 +189,11 @@ export default function AccountSettings({ overlay }) {
                   required
                   maxLength={150}
                   autoComplete="username"
+                  pattern="[A-Za-z_-]+"
                   autoCapitalize="none"
                   spellCheck={false}
                   value={profile.username}
-                  onChange={(event) => changeProfile("username", event.target.value)}
+                  onChange={(event) => changeProfile("username", event.target.value.replace(/[^A-Za-z_-]/g, ""))}
                 />
               </label>
               <div className="account-settings-names">
