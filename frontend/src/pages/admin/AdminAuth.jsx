@@ -8,7 +8,7 @@ import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 
-import heroCarImage from "../../assets/rently.png";
+import heroCarImage from "../../assets/home-hero-rently.png";
 
 const HERO_IMAGE = heroCarImage;
 
@@ -25,6 +25,9 @@ export default function AdminAuth({ initialMode = "login" }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
     name: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
     username: "",
     email: "",
     password: "",
@@ -86,6 +89,9 @@ export default function AdminAuth({ initialMode = "login" }) {
       } else {
         const result = await signup({
           name: form.name,
+          first_name: form.first_name,
+          last_name: form.last_name,
+          phone: form.phone,
           email: form.email,
           password: form.password,
         });

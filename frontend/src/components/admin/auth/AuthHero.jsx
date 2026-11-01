@@ -11,8 +11,8 @@ export default function AuthHero({ image }) {
 
       <div className="gcard-hero-inner">
         <div className="gcard-hero-content signin">
-          <h2>{t("Welcome back")}</h2>
-          <p>{t("Please enter your credentials")}</p>
+          <h2>{t("Your next journey starts here.")}</h2>
+          <p>{t("Discover Morocco at your own pace.")}</p>
           <Link to="/terms" className="gcard-hero-terms">
             {t("Terms & Conditions")}
             <ArrowUpRight size={14} />

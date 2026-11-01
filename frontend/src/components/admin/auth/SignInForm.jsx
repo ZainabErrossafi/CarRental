@@ -15,6 +15,11 @@ export default function SignInForm({
   const { t } = useI18n();
   return (
     <form className="signin" onSubmit={handleSubmit}>
+      <div className="signup-heading">
+        <span className="signup-eyebrow">RENTLY</span>
+        <h1>{t("Welcome back")}</h1>
+        <p>{t("Please enter your credentials")}</p>
+      </div>
       <div className="gfield">
         <label htmlFor="username">{t("Username")}</label>
         <div className="gfield-input">
@@ -36,6 +41,7 @@ export default function SignInForm({
         <div className="gfield-input">
           <input
             id="password"
+            autoComplete="current-password"
             type={showPassword ? "text" : "password"}
             placeholder={t("Enter your password")}
             value={form.password}
@@ -46,7 +52,8 @@ export default function SignInForm({
             type="button"
             className="gfield-icon-btn"
             onClick={() => setShowPassword((s) => !s)}
-            tabIndex={-1}
+            aria-label={t("Show password")}
+            aria-pressed={showPassword}
           >
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>

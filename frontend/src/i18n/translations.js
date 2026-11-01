@@ -22,6 +22,9 @@ export const LANGUAGES = [
 
 export const translations = {
   "fr": {
+    "Discover Morocco at your own pace.": "Découvrez le Maroc à votre rythme.",
+    "Create your account": "Créez votre compte",
+    "Your next journey starts here.": "Votre prochain voyage commence ici.",
     "Edit Reservation": "Modifier la réservation",
     "Update reservation details": "Modifier les détails de la réservation",
     "A cancelled or completed reservation cannot be modified.": "Une réservation annulée ou terminée ne peut pas être modifiée.",
@@ -654,6 +657,9 @@ export const translations = {
     "If you have questions about the platform or a rental, contact the rental team using the details provided with your booking. Ask for clarification before accepting conditions you do not understand.": "Pour toute question sur la plateforme ou une location, contactez l’équipe de location à l’aide des coordonnées fournies avec votre réservation. Demandez des précisions avant d’accepter des conditions que vous ne comprenez pas."
   },
   "ar": {
+    "Discover Morocco at your own pace.": "اكتشف المغرب على إيقاعك الخاص.",
+    "Create your account": "أنشئ حسابك",
+    "Your next journey starts here.": "رحلتك القادمة تبدأ هنا.",
     "Edit Reservation": "تعديل الحجز",
     "Update reservation details": "تحديث تفاصيل الحجز",
     "A cancelled or completed reservation cannot be modified.": "لا يمكن تعديل حجز ملغى أو مكتمل.",

@@ -87,11 +87,11 @@ const verificationToken = (email) => {
   return token;
 };
 
-export const signup = async ({ name, email, password }) => {
+export const signup = async ({ name, first_name, last_name, phone, email, password }) => {
   clearSession();
   sessionStorage.removeItem(VERIFICATION_KEY);
   sessionStorage.removeItem('rently_verification_email');
-  const { data } = await api.post('auth/signup/', { username: name.trim(), email: email.trim(), password });
+  const { data } = await api.post('auth/signup/', { username: name.trim(), first_name: first_name.trim(), last_name: last_name.trim(), phone: phone.trim(), email: email.trim(), password });
   if (!data.ephemeral_token || !data.email) {
     throw new Error('Signup did not return an email verification session.');
   }
