@@ -203,8 +203,9 @@ export default function AccountSettings({ overlay }) {
                     required
                     maxLength={150}
                     autoComplete="given-name"
+                    pattern="\p{L}+"
                     value={profile.first_name}
-                    onChange={(event) => changeProfile("first_name", event.target.value)}
+                    onChange={(event) => changeProfile("first_name", event.target.value.replace(/[^\p{L}]/gu, ""))}
                   />
                 </label>
                 <label>
@@ -213,8 +214,9 @@ export default function AccountSettings({ overlay }) {
                     required
                     maxLength={150}
                     autoComplete="family-name"
+                    pattern="\p{L}+"
                     value={profile.last_name}
-                    onChange={(event) => changeProfile("last_name", event.target.value)}
+                    onChange={(event) => changeProfile("last_name", event.target.value.replace(/[^\p{L}]/gu, ""))}
                   />
                 </label>
               </div>
