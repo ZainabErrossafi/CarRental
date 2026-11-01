@@ -227,10 +227,12 @@ export default function AccountSettings({ overlay }) {
                 <input
                   required
                   type="tel"
+                  placeholder="+212691033189"
+                  pattern="[+0-9]+"
                   maxLength={20}
                   autoComplete="tel"
                   value={profile.phone}
-                  onChange={(event) => changeProfile("phone", event.target.value)}
+                  onChange={(event) => changeProfile("phone", event.target.value.replace(/[^0-9+]/g, ""))}
                 />
               </label>
               <button className="account-settings-save" type="submit">
