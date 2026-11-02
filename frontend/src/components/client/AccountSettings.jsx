@@ -2,6 +2,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRef, useState } from "react";
 import { UserRound, X, LockKeyhole, Save, ShieldCheck } from "lucide-react";
 import api, { TOKEN_KEY } from "../../services/api.js";
+import { sanitizeName } from "../../utils/name";
 
 export default function AccountSettings({ overlay }) {
   const { user, refreshUser } = useAuth();
@@ -203,9 +204,8 @@ export default function AccountSettings({ overlay }) {
                     required
                     maxLength={150}
                     autoComplete="given-name"
-                    pattern="\p{L}+"
                     value={profile.first_name}
-                    onChange={(event) => changeProfile("first_name", event.target.value.replace(/[^\p{L}]/gu, ""))}
+                    onChange={(event) => changeProfile("first_name", sanitizeName(event.target.value))}
                   />
                 </label>
                 <label>
@@ -214,9 +214,8 @@ export default function AccountSettings({ overlay }) {
                     required
                     maxLength={150}
                     autoComplete="family-name"
-                    pattern="\p{L}+"
                     value={profile.last_name}
-                    onChange={(event) => changeProfile("last_name", event.target.value.replace(/[^\p{L}]/gu, ""))}
+                    onChange={(event) => changeProfile("last_name", sanitizeName(event.target.value))}
                   />
                 </label>
               </div>
