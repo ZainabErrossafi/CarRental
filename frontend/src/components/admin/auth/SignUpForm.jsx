@@ -1,3 +1,4 @@
+import { sanitizeName, sanitizeUsername } from "../../../utils/name";
 import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 import { Eye, EyeOff, User, Mail, Phone } from "lucide-react";
@@ -36,7 +37,7 @@ export default function SignUpForm({
             autoComplete="given-name"
             maxLength={150}
             value={form.first_name}
-            onChange={(e) => handleChange("first_name", e.target.value)}
+            onChange={(e) => handleChange("first_name", sanitizeName(e.target.value))}
             required
           />
           <User size={18} />
@@ -54,7 +55,7 @@ export default function SignUpForm({
             autoComplete="family-name"
             maxLength={150}
             value={form.last_name}
-            onChange={(e) => handleChange("last_name", e.target.value)}
+            onChange={(e) => handleChange("last_name", sanitizeName(e.target.value))}
             required
           />
           <User size={18} />
@@ -70,7 +71,7 @@ export default function SignUpForm({
             type="text"
             placeholder={t("myusername")}
             value={form.name}
-            onChange={(e) => handleChange("name", e.target.value)}
+            onChange={(e) => handleChange("name", sanitizeUsername(e.target.value))}
             required
           />
           <User size={18} />

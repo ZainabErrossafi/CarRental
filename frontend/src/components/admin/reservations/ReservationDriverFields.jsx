@@ -1,3 +1,4 @@
+import { sanitizeName } from "../../../utils/name";
 import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 
@@ -18,7 +19,7 @@ export default function ReservationDriverFields({ form, handleChange }) {
             id="driver_name"
             type="text"
             value={form.driver_name}
-            onChange={(e) => handleChange("driver_name", e.target.value)}
+            onChange={(e) => handleChange("driver_name", sanitizeName(e.target.value))}
             required
           />
         </div>
