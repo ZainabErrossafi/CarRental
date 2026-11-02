@@ -1,3 +1,4 @@
+import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 import { Eye, EyeOff, User, Mail, Phone } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
@@ -83,11 +84,12 @@ export default function SignUpForm({
             id="signup_phone"
             name="phone"
             type="tel"
+            pattern="[+]?[0-9]+"
             autoComplete="tel"
-            placeholder="+212 6 00 00 00 00"
+            placeholder="+212600000000"
             maxLength={20}
             value={form.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
+            onChange={(e) => handleChange("phone", sanitizePhone(e.target.value))}
             required
           />
           <Phone size={18} />
