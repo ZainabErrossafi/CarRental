@@ -121,7 +121,7 @@ class BrandAPITests(TestCase):
             username="admin",
             email="admin@test.com",
             password="password123",
-            is_staff=True
+            role="admin"
         )
 
         self.brand = Brand.objects.create(name="Toyota")
