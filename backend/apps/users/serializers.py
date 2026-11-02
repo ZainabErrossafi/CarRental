@@ -191,7 +191,7 @@ class SignupSerializer(UserSerializer):
     password = serializers.CharField(write_only=True, required=True, trim_whitespace=False)
 
     class Meta(UserSerializer.Meta):
-        fields = ['id', 'username', 'email', 'password']
+        fields = ['id', 'username', 'first_name', 'last_name', 'phone', 'email', 'password']
         extra_kwargs = {'email': {'required': True, 'allow_blank': False}}
 
     def validate_password(self, value):
@@ -202,6 +202,7 @@ class SignupSerializer(UserSerializer):
         try:
             django_validate_password(data['password'], user=User(
                 username=data.get('username', ''), email=data.get('email', ''),
+                first_name=data.get('first_name', ''), last_name=data.get('last_name', ''),
             ))
         except DjangoValidationError as error:
             raise serializers.ValidationError({'password': error.messages}) from error

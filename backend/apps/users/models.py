@@ -106,6 +106,9 @@ class User(EmailCodeMixin, AbstractUser):
 
 # ####oussama: Temporary registration data; never exposed as a user or allowed to authenticate.
 class PendingSignup(EmailCodeMixin, models.Model):
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    phone = models.CharField(max_length=20, blank=True)
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)

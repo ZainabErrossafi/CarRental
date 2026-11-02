@@ -58,6 +58,34 @@ class SignupTests(TestCase):
         self.assertIn('access', login.data)
         self.assertNotIn('two_factor_required', login.data)
 
+    def test_profile_details_survive_email_verification_and_login_resume(self):
+        self.payload.update(first_name='  Sara  ', last_name='  Alami  ', phone='  +212612345678  ')
+        pending, _ = self.start_signup()
+        expected = ('Sara', 'Alami', '+212612345678')
+        self.assertEqual((pending.first_name, pending.last_name, pending.phone), expected)
+        self.age_code(pending)
+        response = self.client.post('/api/token/', {
+            'email': pending.email, 'password': self.payload['password'],
+        }, format='json')
+        self.assertEqual(response.status_code, 200, response.data)
+        pending.refresh_from_db()
+        verified = self.verify(response.data['ephemeral_token'], pending.two_factor_code)
+        self.assertEqual(verified.status_code, 200, verified.data)
+        user = User.objects.get()
+        self.assertEqual((user.first_name, user.last_name, user.phone), expected)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {verified.data['access']}")
+        profile = self.client.get('/api/users/me/').data
+        self.assertEqual((profile['first_name'], profile['last_name'], profile['phone']), expected)
+
+    def test_profile_fields_enforce_model_length_limits(self):
+        for field, limit in [('first_name', 150), ('last_name', 150), ('phone', 20)]:
+            response = self.client.post('/api/auth/signup/', {
+                **self.payload, field: 'a' * (limit + 1),
+            }, format='json')
+            self.assertEqual(response.status_code, 400, response.data)
+            self.assertIn(field, response.data)
+        self.assertFalse(PendingSignup.objects.exists())
+
     def test_weak_or_missing_password_creates_nothing(self):
         for password in [None, '', '12345678', 'newdriver']:
             payload = {**self.payload}

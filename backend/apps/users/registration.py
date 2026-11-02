@@ -27,6 +27,8 @@ def start_registration(data):
             else:
                 pending = PendingSignup.objects.create(
                     username=data['username'], email=data['email'], password=make_password(data['password']),
+                    first_name=data.get('first_name', ''), last_name=data.get('last_name', ''),
+                    phone=data.get('phone', ''),
                     expires_at=timezone.now() + timedelta(minutes=10),
                 )
                 created = True
@@ -58,6 +60,7 @@ def complete_registration(pending):
                 raise serializers.ValidationError({'email': 'This email is already registered.'})
             user = User.objects.create(
                 username=pending.username, email=pending.email, password=pending.password,
+                first_name=pending.first_name, last_name=pending.last_name, phone=pending.phone,
                 is_active=True, email_verified=True, two_factor_enabled=False,
             )
             pending.delete()
