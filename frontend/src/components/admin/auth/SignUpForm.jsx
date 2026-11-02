@@ -1,3 +1,5 @@
+import { sanitizeName, sanitizeUsername } from "../../../utils/name";
+import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 import { Eye, EyeOff, User, Mail, Phone } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
@@ -35,7 +37,7 @@ export default function SignUpForm({
             autoComplete="given-name"
             maxLength={150}
             value={form.first_name}
-            onChange={(e) => handleChange("first_name", e.target.value)}
+            onChange={(e) => handleChange("first_name", sanitizeName(e.target.value))}
             required
           />
           <User size={18} />
@@ -53,7 +55,7 @@ export default function SignUpForm({
             autoComplete="family-name"
             maxLength={150}
             value={form.last_name}
-            onChange={(e) => handleChange("last_name", e.target.value)}
+            onChange={(e) => handleChange("last_name", sanitizeName(e.target.value))}
             required
           />
           <User size={18} />
@@ -69,7 +71,7 @@ export default function SignUpForm({
             type="text"
             placeholder={t("myusername")}
             value={form.name}
-            onChange={(e) => handleChange("name", e.target.value)}
+            onChange={(e) => handleChange("name", sanitizeUsername(e.target.value))}
             required
           />
           <User size={18} />
@@ -83,11 +85,12 @@ export default function SignUpForm({
             id="signup_phone"
             name="phone"
             type="tel"
+            pattern="[+]?[0-9]+"
             autoComplete="tel"
-            placeholder="+212 6 00 00 00 00"
+            placeholder="+212600000000"
             maxLength={20}
             value={form.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
+            onChange={(e) => handleChange("phone", sanitizePhone(e.target.value))}
             required
           />
           <Phone size={18} />

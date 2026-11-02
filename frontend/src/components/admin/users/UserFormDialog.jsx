@@ -1,3 +1,5 @@
+import { sanitizeName, sanitizeUsername } from "../../../utils/name";
+import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 import { X } from "lucide-react";
 
@@ -73,6 +75,7 @@ export default function UserFormDialog({
                   <input
                     id={`user-${name}`}
                     type={type}
+                    pattern={name === "phone" ? "[+]?[0-9]+" : undefined}
                     value={form[name]}
                     required={required}
                     maxLength={maxLength}
@@ -88,7 +91,13 @@ export default function UserFormDialog({
                     onChange={(event) =>
                       setForm((previous) => ({
                         ...previous,
-                        [name]: event.target.value,
+                        [name]: name === "phone"
+                          ? sanitizePhone(event.target.value)
+                          : name === "first_name" || name === "last_name"
+                            ? sanitizeName(event.target.value)
+                            : name === "username"
+                              ? sanitizeUsername(event.target.value)
+                              : event.target.value,
                       }))
                     }
                   />

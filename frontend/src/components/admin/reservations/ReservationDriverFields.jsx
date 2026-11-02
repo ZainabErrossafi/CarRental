@@ -1,3 +1,5 @@
+import { sanitizeName } from "../../../utils/name";
+import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 
 export default function ReservationDriverFields({ form, handleChange }) {
@@ -17,7 +19,7 @@ export default function ReservationDriverFields({ form, handleChange }) {
             id="driver_name"
             type="text"
             value={form.driver_name}
-            onChange={(e) => handleChange("driver_name", e.target.value)}
+            onChange={(e) => handleChange("driver_name", sanitizeName(e.target.value))}
             required
           />
         </div>
@@ -27,9 +29,10 @@ export default function ReservationDriverFields({ form, handleChange }) {
           <input
             id="phone"
             type="tel"
-            placeholder="+212 6 00 00 00 00"
+            pattern="[+]?[0-9]+"
+            placeholder="+212600000000"
             value={form.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
+            onChange={(e) => handleChange("phone", sanitizePhone(e.target.value))}
             required
           />
         </div>

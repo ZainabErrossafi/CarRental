@@ -1,3 +1,4 @@
+import { sanitizePhone } from "../../../utils/phone";
 import { useI18n } from "../../../context/I18nContext";
 
 export default function CompanySettingsFields({ settings, handleChange }) {
@@ -22,8 +23,9 @@ export default function CompanySettingsFields({ settings, handleChange }) {
           <input
             id="phone"
             type="tel"
+            pattern="[+]?[0-9]+"
             value={settings.phone}
-            onChange={(e) => handleChange("phone", e.target.value)}
+            onChange={(e) => handleChange("phone", sanitizePhone(e.target.value))}
           />
         </div>
 
@@ -32,8 +34,9 @@ export default function CompanySettingsFields({ settings, handleChange }) {
           <input
             id="whatsapp"
             type="tel"
+            pattern="[+]?[0-9]+"
             value={settings.whatsapp}
-            onChange={(e) => handleChange("whatsapp", e.target.value)}
+            onChange={(e) => handleChange("whatsapp", sanitizePhone(e.target.value))}
           />
         </div>
 
