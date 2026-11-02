@@ -91,7 +91,7 @@ export default function SignInForm({
         }}
       >
         <FcGoogle size={20} aria-hidden="true" />
-        {t("Sign in with Google")}
+        {t("Continue with Google")}
       </button>
     </form>
   );
