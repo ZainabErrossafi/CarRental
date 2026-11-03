@@ -4,6 +4,12 @@ import { UserRound, X, LockKeyhole, Save, ShieldCheck } from "lucide-react";
 import api, { TOKEN_KEY } from "../../services/api.js";
 import { sanitizeName } from "../../utils/name";
 
+const passwordFields = [
+  { name: "old", label: "Current password", autoComplete: "current-password" },
+  { name: "next", label: "New password", autoComplete: "new-password", minLength: 8 },
+  { name: "confirm", label: "Confirm new password", autoComplete: "new-password", minLength: 8 },
+];
+
 export default function AccountSettings({ overlay }) {
   const { user, refreshUser } = useAuth();
   const canChangePassword = user.canChangePassword !== false;
@@ -20,14 +26,28 @@ export default function AccountSettings({ overlay }) {
     if (typeof user.two_factor_enabled === "boolean") return user.two_factor_enabled;
     try { return localStorage.getItem(settingKey) === "true"; } catch { return false; }
   });
-  const toggleTwoFactor = async (event) => {
-    event.preventDefault();
+  const inFlight = useRef(false);
+
+  const runUpdate = async (action, successMessage, errorMessage) => {
     if (inFlight.current) return;
     inFlight.current = true;
     setBusy(true);
     setError("");
     setSuccess("");
     try {
+      await action();
+      setSuccess(successMessage);
+    } catch (err) {
+      setError(err.message || errorMessage);
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+    }
+  };
+
+  const toggleTwoFactor = (event) => {
+    event.preventDefault();
+    return runUpdate(async () => {
       const tokens = JSON.parse(localStorage.getItem(TOKEN_KEY) || "null");
       const { data } = await api.post("auth/2fa/toggle/", { enabled: !twoFactorEnabled, password: twoFactorPassword }, {
         headers: { Authorization: `Bearer ${tokens?.access}` },
@@ -36,15 +56,8 @@ export default function AccountSettings({ overlay }) {
       try { localStorage.setItem(settingKey, String(data.two_factor_enabled)); } catch { /* Optional display cache. */ }
       await refreshUser();
       setTwoFactorPassword("");
-      setSuccess("Two-factor authentication has been updated.");
-    } catch (err) {
-      setError(err.message || "Could not update two-factor authentication.");
-    } finally {
-      inFlight.current = false;
-      setBusy(false);
-    }
+    }, "Two-factor authentication has been updated.", "Could not update two-factor authentication.");
   };
-  const inFlight = useRef(false);
   const changeProfile = (field, value) => setProfile({ ...profile, [field]: value });
   const changePassword = (field, value) => setPassword({ ...password, [field]: value });
   const show = () => {
@@ -74,11 +87,7 @@ export default function AccountSettings({ overlay }) {
       setError("Please fill in your username, first name, last name and phone.");
       return;
     }
-    inFlight.current = true;
-    setBusy(true);
-    setError("");
-    setSuccess("");
-    try {
+    return runUpdate(async () => {
       await api.patch(`users/${user.id}/`, {
         username: profile.username.trim(),
         first_name: profile.first_name.trim(),
@@ -86,13 +95,7 @@ export default function AccountSettings({ overlay }) {
         phone: profile.phone.trim(),
       });
       await refreshUser();
-      setSuccess("Your information has been updated.");
-    } catch (err) {
-      setError(err.message || "Could not update your information.");
-    } finally {
-      inFlight.current = false;
-      setBusy(false);
-    }
+    }, "Your information has been updated.", "Could not update your information.");
   };
   const savePassword = async (event) => {
     event.preventDefault();
@@ -105,20 +108,10 @@ export default function AccountSettings({ overlay }) {
       setError("Choose a different password from your current one.");
       return;
     }
-    inFlight.current = true;
-    setBusy(true);
-    setError("");
-    setSuccess("");
-    try {
+    return runUpdate(async () => {
       await api.post("users/change-password/", { old_password: password.old, new_password: password.next });
       setPassword({ old: "", next: "", confirm: "" });
-      setSuccess("Your password has been changed.");
-    } catch (err) {
-      setError(err.message || "Could not change your password.");
-    } finally {
-      inFlight.current = false;
-      setBusy(false);
-    }
+    }, "Your password has been changed.", "Could not change your password.");
   };
   return (
     <>
@@ -247,39 +240,20 @@ export default function AccountSettings({ overlay }) {
         {tab === "password" && canChangePassword && (
           <form onSubmit={savePassword}>
             <fieldset disabled={busy}>
-              <label>
-                Current password
-                <input
-                  required
-                  type="password"
-                  autoComplete="current-password"
-                  value={password.old}
-                  onChange={(event) => changePassword("old", event.target.value)}
-                />
-              </label>
-              <label>
-                New password
-                <input
-                  required
-                  type="password"
-                  minLength={8}
-                  autoComplete="new-password"
-                  value={password.next}
-                  onChange={(event) => changePassword("next", event.target.value)}
-                />
-                <small>Use at least 8 characters and avoid common passwords.</small>
-              </label>
-              <label>
-                Confirm new password
-                <input
-                  required
-                  type="password"
-                  minLength={8}
-                  autoComplete="new-password"
-                  value={password.confirm}
-                  onChange={(event) => changePassword("confirm", event.target.value)}
-                />
-              </label>
+              {passwordFields.map(({ name, label, autoComplete, minLength }) => (
+                <label key={name}>
+                  {label}
+                  <input
+                    required
+                    type="password"
+                    minLength={minLength}
+                    autoComplete={autoComplete}
+                    value={password[name]}
+                    onChange={(event) => changePassword(name, event.target.value)}
+                  />
+                  {name === "next" && <small>Use at least 8 characters and avoid common passwords.</small>}
+                </label>
+              ))}
               <button className="account-settings-save" type="submit">
                 <LockKeyhole size={16} aria-hidden="true" />
                 {busy ? "Updating…" : "Change password"}

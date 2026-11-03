@@ -33,8 +33,8 @@ export const rentalCategories = [
 ];
 
 export default function CategoryCard({ category, index }) {
-  const Icon = CATALOG_ICONS[category.icon] || CATALOG_ICONS.car;
   const locked = category.active === false;
+  const Icon = locked ? LockKeyhole : CATALOG_ICONS[category.icon] || CATALOG_ICONS.car;
   const Wrapper = locked ? "article" : Link;
   return (
     <Wrapper
@@ -49,7 +49,7 @@ export default function CategoryCard({ category, index }) {
       >
         <span className="rental-category-number">0{index + 1}</span>
         <div className="rental-category-emblem" aria-hidden="true">
-          {locked ? <LockKeyhole size={42} strokeWidth={1.3} /> : <Icon size={42} strokeWidth={1.3} />}
+          <Icon size={42} strokeWidth={1.3} />
         </div>
         <span className="rental-category-label" aria-hidden="true">
           {category.label}
