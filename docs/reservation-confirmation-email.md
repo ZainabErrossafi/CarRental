@@ -31,5 +31,3 @@ Uses the existing `EMAIL_BACKEND`, SMTP and `DEFAULT_FROM_EMAIL` settings. The
 console backend prints the email to backend logs; real inbox delivery requires
 SMTP configuration. See [email configuration](signup-email-verification.md#real-email-delivery).
 No new migration is required for reservation emails.
-
-Tests: `python manage.py test apps.reservations.test_confirmation_email`

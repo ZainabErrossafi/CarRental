@@ -48,4 +48,4 @@ unverified users retain their existing verification flow; existing accounts are 
 - `POST /api/auth/2fa/resend/`: ephemeral_token; sends another code.
 - `POST /api/token/`: email, password; resumes pending sign-up or starts sign-in 2FA.
 
-Run `python manage.py migrate` and `python manage.py test apps.users` inside the backend.
+Run `python manage.py migrate` and `python manage.py check` inside the backend.

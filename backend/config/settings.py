@@ -72,7 +72,6 @@ INSTALLED_APPS = [
     'apps.locations',
     'apps.reservations',
     'apps.extras',
-    'apps.reviews',
     'apps.notifications',
     'apps.public_api',
 ]

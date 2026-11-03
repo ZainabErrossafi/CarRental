@@ -11,7 +11,6 @@ Login 2FA is optional and disabled by default. Users can enable or disable it in
 - `backend/config/urls.py`: API routes.
 - `backend/config/settings.py`: development console email backend and environment-based SMTP configuration.
 - `backend/apps/users/migrations/0004_email_two_factor.py`: database schema migration.
-- `backend/apps/users/test_email_2fa.py`: regression and security tests.
 
 ## Apply migration
 
@@ -92,9 +91,3 @@ DEFAULT_FROM_EMAIL=noreply@your-domain.example
 Email delivery failures return 503 without committing the new challenge through the API flow.
 
 The requested six-character database field stores the OTP itself. Protect database access and avoid exposing these fields through profile serializers or admin displays. OTP verification uses row locks in a transaction; production should retain PostgreSQL. Console email is only for development.
-
-## Test
-
-```sh
-docker compose exec backend python manage.py test apps.users
-```

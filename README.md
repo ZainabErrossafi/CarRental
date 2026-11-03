@@ -279,14 +279,12 @@ docker compose up -d --force-recreate --no-deps backend
 
 TLS on port 587 and implicit SSL on port 465 are common configurations. Use your provider's settings and do not enable both options. OTP delivery failures return 503 in transactional flows. Account creation and promotion messages run after commit and log delivery failures.
 
-## 15. Tests and presentation preparation
+## 15. Validation and presentation preparation
 
-Use the following commands to validate the application. Writing this README does not mean these tests have been run or passed during this documentation task.
+Use the following commands to check the application. These commands are not a confirmation that validation has passed.
 
 ```sh
 docker compose exec backend python manage.py check
-docker compose exec backend python manage.py test apps.users
-docker compose exec backend python manage.py test apps.reservations
 ```
 
 For the frontend, inside `frontend/`:
@@ -294,17 +292,6 @@ For the frontend, inside `frontend/`:
 ```sh
 npm run build
 ```
-
-| Test file | What to study |
-| --- | --- |
-| `users/test_signup.py` | Temporary registration and confirmation |
-| `users/test_email_2fa.py` | Pending tokens, OTP, attempts, and login |
-| `users/test_password_reset.py` | Password recovery |
-| `users/test_password_change.py` | Password change after verification |
-| `users/test_admin_promotion.py` | Role promotion emails |
-| `users/test_account_created_email.py` | Administrator-created account emails; currently a new local file |
-| `users/test_inactive_account.py` | Inactive accounts |
-| `reservations/test_confirmation_email.py` | Reservation emails and delivery failures |
 
 Prepare a demonstration: signup → retrieve code from logs or inbox → verify → view profile. Demonstrate password login through the API until the frontend OTP integration is completed. Also prepare a pending reservation, confirm it as an administrator, and show the resulting status, notification, and email.
 

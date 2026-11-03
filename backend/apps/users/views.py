@@ -13,11 +13,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import redirect
 from urllib.parse import urlencode
 
-#//////////////////////////////oussama
-from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
-from allauth.socialaccount.providers.oauth2.client import OAuth2Client
-from dj_rest_auth.registration.views import SocialLoginView
-
 def google_callback_redirect(request):
     user = request.user
     if not user.is_authenticated:
@@ -43,7 +38,6 @@ def google_callback_redirect(request):
     # The frontend consumes the fragment before requesting the user profile.
     # Fragments are not sent to the web server in the subsequent request.
     return redirect('/#' + urlencode({'access': access_token, 'refresh': refresh_token}))
-#////////////////////////////////////////////
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -118,7 +112,6 @@ class SignupView(CreateAPIView):
     throttle_classes = [TwoFactorThrottle]
 
     def create(self, request, *args, **kwargs):
-        from django.db import transaction
         from .two_factor import start_email_challenge  # ####oussama: No session before verification.
 
         # ####oussama: Resume an unfinished sign-up only when all original credentials match.

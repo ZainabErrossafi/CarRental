@@ -182,7 +182,7 @@ from dj_rest_auth.serializers import LoginSerializer
 class TwoFactorAwareLoginSerializer(LoginSerializer):
     def validate(self, attrs):
         from rest_framework.exceptions import AuthenticationFailed
-        data = super().validate(attrs)
+        super().validate(attrs)
         raise AuthenticationFailed('Use /api/token/ and complete email verification.')
 
 
