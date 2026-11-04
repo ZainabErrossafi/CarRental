@@ -1,6 +1,6 @@
 import { useAuth } from "../../context/AuthContext";
 import { useRef, useState } from "react";
-import { UserRound, X, LockKeyhole, Save, ShieldCheck } from "lucide-react";
+import { UserRound, X, LockKeyhole, Save, ShieldCheck, KeyRound, Copy, BookOpen } from "lucide-react";
 import api, { TOKEN_KEY } from "../../services/api.js";
 import { sanitizeName } from "../../utils/name";
 
@@ -17,6 +17,7 @@ export default function AccountSettings({ overlay }) {
   const [tab, setTab] = useState("profile");
   const [profile, setProfile] = useState({ username: "", first_name: "", last_name: "", phone: "" });
   const [password, setPassword] = useState({ old: "", next: "", confirm: "" });
+  const [apiKey, setApiKey] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -71,6 +72,7 @@ export default function AccountSettings({ overlay }) {
     setTwoFactorPassword("");
     setError("");
     setSuccess("");
+    setApiKey("");
     setTab("profile");
     dialog.current.showModal();
   };
@@ -79,6 +81,26 @@ export default function AccountSettings({ overlay }) {
     setTab(value);
     setError("");
     setSuccess("");
+  };
+  const generateApiKey = () => {
+    setError("");
+    setSuccess("");
+    try {
+      const bytes = crypto.getRandomValues(new Uint8Array(48));
+      setApiKey(btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""));
+    } catch {
+      setError("Could not generate a secure key. Please try again in a secure browser context.");
+    }
+  };
+  const copyApiKey = async () => {
+    setError("");
+    setSuccess("");
+    try {
+      await navigator.clipboard.writeText(apiKey);
+      setSuccess("API key copied.");
+    } catch {
+      setError("Could not copy the key. Select and copy it manually.");
+    }
   };
   const saveProfile = async (event) => {
     event.preventDefault();
@@ -131,11 +153,13 @@ export default function AccountSettings({ overlay }) {
         onCancel={(event) => {
           if (busy) event.preventDefault();
         }}
-        onClose={() => setPassword({ old: "", next: "", confirm: "" })}
+        onClose={() => {
+          setPassword({ old: "", next: "", confirm: "" });
+          setApiKey("");
+        }}
       >
         <header>
           <div>
-            <span>YOUR ACCOUNT</span>
             <h2 id="account-settings-title">Account settings</h2>
           </div>
           <button
@@ -155,7 +179,7 @@ export default function AccountSettings({ overlay }) {
             onClick={() => switchTab("profile")}
           >
             <UserRound size={15} aria-hidden="true" />
-            Personal information
+            Profile
           </button>
           {canChangePassword && (
             <button
@@ -173,7 +197,43 @@ export default function AccountSettings({ overlay }) {
             <ShieldCheck size={15} aria-hidden="true" />
             2FA
           </button>
+          <button type="button" disabled={busy} aria-pressed={tab === "public-api"}
+            onClick={() => switchTab("public-api")}>
+            <KeyRound size={15} aria-hidden="true" />
+            Public API
+          </button>
         </div>
+        {tab === "public-api" && (
+          <section className="account-settings-api" aria-label="Public API key generator">
+            <h3>Public API key generator</h3>
+            <a
+              className="account-settings-save account-settings-docs"
+              href={`${api.defaults.baseURL}public/v1/docs/`}
+              aria-label="API documentation (opens in a new tab)"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <BookOpen size={16} aria-hidden="true" />
+              API documentation ↗
+            </a>
+            <button className="account-settings-save" type="button" onClick={generateApiKey}>
+              <KeyRound size={16} aria-hidden="true" />
+              {apiKey ? "Generate another key" : "Generate API key"}
+            </button>
+            {apiKey && (
+              <>
+                <label>Generated key (not activated)
+                  <input readOnly value={apiKey} spellCheck={false} autoComplete="off" onFocus={(event) => event.target.select()} />
+                </label>
+                <button className="account-settings-save" type="button" onClick={copyApiKey}>
+                  <Copy size={16} aria-hidden="true" />
+                  Copy key
+                </button>
+                <small>Copy this key before closing settings. It is not saved in your browser.</small>
+              </>
+            )}
+          </section>
+        )}
         {tab === "profile" && (
           <form onSubmit={saveProfile}>
             <fieldset disabled={busy}>
@@ -266,16 +326,14 @@ export default function AccountSettings({ overlay }) {
         )}
         {tab === "two-factor" && <form onSubmit={toggleTwoFactor}>
           <fieldset disabled={busy || !canChangePassword}>
-            <div className="tw:rounded-xl tw:border tw:border-solid tw:border-[#e4e9ec] tw:bg-[#f7f9fa] tw:p-4">
-              <div className="tw:flex tw:items-center tw:gap-3">
-                <span className="tw:flex tw:size-10 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-xl tw:bg-[#ffead7] tw:text-[#975326]">
-                  <ShieldCheck size={22} aria-hidden="true" />
-                </span>
-                <h3 className="tw:m-0 tw:flex-1 tw:text-sm tw:font-bold tw:leading-snug">Two-factor authentication</h3>
-                <span className={`tw:rounded-full tw:px-2.5 tw:py-1 tw:text-[10px] tw:font-semibold ${twoFactorEnabled ? "tw:bg-[#e6f3ea] tw:text-[#39734c]" : "tw:bg-[#e9edf0] tw:text-[#657582]"}`}>
-                  {twoFactorEnabled ? "Enabled" : "Disabled"}
-                </span>
+            <div className="account-settings-security">
+              <div>
+                <h3>Two-factor authentication</h3>
+                <small>Verify your sign-in by email.</small>
               </div>
+              <span className={`account-settings-status${twoFactorEnabled ? " is-enabled" : ""}`}>
+                {twoFactorEnabled ? "Enabled" : "Disabled"}
+              </span>
             </div>
             {canChangePassword ? (
               <>

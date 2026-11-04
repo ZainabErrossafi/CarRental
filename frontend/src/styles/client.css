@@ -865,23 +865,26 @@
 .reservation-popover-list article > p.reservation-cancel-error { color: #b42318; font-size: 10px; white-space: pre-line; }
 
 .account-settings-trigger { background: transparent; cursor: pointer; }
-.account-settings-dialog { width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); box-sizing: border-box; padding: 26px; border: 1px solid #e1e6e9; border-radius: 18px; background: #fff; color: #173047; box-shadow: 0 24px 80px #071b2e30; font-family: "Plus Jakarta Sans", sans-serif; }
-.account-settings-dialog::backdrop { background: #071b2e70; backdrop-filter: blur(3px); }
+.account-settings-dialog { width: min(520px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); box-sizing: border-box; padding: 26px; border: 1px solid #e1e6e9; border-radius: 12px; background: #fff; color: #173047; box-shadow: 0 16px 48px #071b2e24; font-family: "Plus Jakarta Sans", sans-serif; }
+.account-settings-dialog::backdrop { background: #071b2e65; }
 .account-settings-dialog > header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .account-settings-dialog header span { font-size: 9px; letter-spacing: .15em; font-weight: 700; color: #975326; }
-.account-settings-dialog h2 { font-size: 23px; letter-spacing: -.035em; margin: 8px 0; }
-.account-settings-dialog header button { display: grid; place-items: center; padding: 7px; border: 0; background: #f4f7f8; color: #526575; border-radius: 8px; cursor: pointer; }
-.account-settings-tabs { display: flex; gap: 6px; padding: 5px; margin: 22px 0; background: #f4f7f8; border-radius: 10px; }
-.account-settings-tabs button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 7px; border: 0; border-radius: 7px; background: transparent; color: #71808a; font: inherit; font-size: 11px; cursor: pointer; }
-.account-settings-tabs button[aria-pressed="true"] { background: #fff; color: #173047; box-shadow: 0 2px 6px #071b2e09; }
+.account-settings-dialog h2 { font-size: 19px; font-weight: 600; letter-spacing: -.025em; margin: 0; }
+.account-settings-dialog header button { display: grid; place-items: center; padding: 7px; border: 1px solid #f2d9c2; background: #fff7ef; color: #975326; border-radius: 50%; cursor: pointer; }
+.account-settings-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; padding: 5px; margin: 22px 0; border: 1px solid #f0e5da; border-radius: 10px; background: #faf7f3; }
+.account-settings-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; padding: 11px 5px; border: 0; border-radius: 6px; background: transparent; color: #71808a; font: inherit; font-size: 12px; white-space: nowrap; cursor: pointer; transition: background .15s, color .15s; }
+.account-settings-tabs button[aria-pressed="true"] { background: #ffc58c; color: #173047; font-weight: 600; }
+.account-settings-tabs button:hover:not([aria-pressed="true"]) { background: #fff0e2; color: #975326; }
+.account-settings-tabs button svg { flex-shrink: 0; }
+.account-settings-tabs:has(> button:nth-child(3):last-child) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .account-settings-dialog fieldset { display: grid; gap: 17px; padding: 0; margin: 0; border: 0; min-width: 0; }
-.account-settings-dialog label { display: grid; gap: 8px; font-size: 11px; font-weight: 700; min-width: 0; }
+.account-settings-dialog label { display: grid; gap: 7px; font-size: 12px; font-weight: 500; min-width: 0; }
 .account-settings-names { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .account-settings-dialog input { width: 100%; min-width: 0; box-sizing: border-box; padding: 11px 12px; border: 1px solid #dfe6ea; border-radius: 8px; background: #fff; color: #173047; font: inherit; font-weight: 400; }
 .account-settings-dialog input[type="tel"]::placeholder { color: #9aa6af; opacity: 1; font-style: italic; }
 .account-settings-dialog input[readonly] { background: #f4f7f8; color: #7c8992; }
 .account-settings-dialog small { color: #7c8992; font-size: 10px; font-weight: 400; line-height: 1.6; }
-.account-settings-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; padding: 12px; border: 0; border-radius: 9px; background: #ffc58c; color: #173047; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.account-settings-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; padding: 12px; border: 0; border-radius: 7px; background: #ffc58c; color: #173047; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
 .account-settings-dialog button:disabled { opacity: .5; cursor: wait; }
 .account-settings-error, .account-settings-success { padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.6; white-space: pre-line; }
 .account-settings-error { color: #b42318; background: #fff1f0; }
@@ -1006,4 +1009,22 @@ select.compact-dropdown-trigger { display: block; width: 100%; font: inherit; fo
   .vehicle-booking-estimate h2 { margin-bottom: 8px; }
   .vehicle-booking-button { padding: 11px; }
   .vehicle-booking-note { margin: 9px 0 0; font-size: 10px; line-height: 1.45; }
+}
+
+.account-settings-api { display: grid; gap: 14px; }
+.account-settings-api h3 { margin: 0; font-size: 15px; }
+.account-settings-api p { margin: 0; font-size: 12px; line-height: 1.7; color: #526575; }
+.account-settings-api input { font-family: monospace; }
+
+.account-settings-docs { text-decoration: none; background: #fff0e2; color: #975326; border: 1px solid #f2d9c2; }
+.account-settings-docs:focus-visible { outline: 2px solid #b97d50; outline-offset: 2px; }
+
+.account-settings-security { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid #e1e6e9; }
+.account-settings-security h3 { margin: 0 0 5px; font-size: 14px; font-weight: 600; }
+.account-settings-status { padding: 5px 9px; border-radius: 5px; background: #f1f3f5; color: #657582; font-size: 11px; }
+.account-settings-status.is-enabled { background: #edf7ef; color: #39734c; }
+@media (max-width: 480px) {
+  .account-settings-tabs { gap: 4px; }
+  .account-settings-tabs button { font-size: 11px; gap: 4px; }
+  .account-settings-tabs button { flex-direction: column; gap: 6px; }
 }
