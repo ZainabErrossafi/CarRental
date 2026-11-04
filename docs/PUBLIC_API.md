@@ -4,16 +4,28 @@ The API-key-protected public API is available under `/api/public/v1/`.
 
 - Human-readable documentation: `/api/public/v1/docs/`
 - OpenAPI JSON: `/api/public/v1/openapi.json`
-- Send the server's `PUBLIC_API_KEY` in the `X-API-Key` request header.
-- Default rate limit: 60 requests per minute per API key. Set `PUBLIC_API_RATE_LIMIT` to a DRF rate string such as `120/hour` to change it.
+- Send your personal API key in the `X-API-Key` header.
+- Default rate limit: 60 requests per minute per user, preserved across key rotation. Configure `PUBLIC_API_RATE_LIMIT` to change it.
+- All active users can read the shared catalog. Only users with the `admin` role can create, update or delete vehicles. This is a shared catalog, without agency isolation.
 
-The API key belongs in the ignored root `.env` file. Generate a strong random key with:
+## Manage your key
+
+After logging in, use your account JWT access token (not an API key):
 
 ```sh
-python -c "import secrets; print(secrets.token_urlsafe(48))"
+# Generate a key, or rotate it (immediately invalidating the previous key).
+curl -X POST -H "Authorization: Bearer $ACCESS_TOKEN" https://your-domain.example/api/users/api-key/
+# Read metadata only; the original key cannot be recovered.
+curl -H "Authorization: Bearer $ACCESS_TOKEN" https://your-domain.example/api/users/api-key/
+# Revoke your key immediately.
+curl -X DELETE -H "Authorization: Bearer $ACCESS_TOKEN" https://your-domain.example/api/users/api-key/
 ```
 
-Do not commit the key or put it in frontend/browser code. The public API exposes read-only brands, categories, active locations, and active FAQs. Vehicle records support `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`. Vehicle writes require valid database IDs for brand and category.
+POST returns HTTP 201 with `key`, `prefix`, `is_active`, `created_at`, `expires_at`, and `is_expired`. Save `key` immediately: it is returned only once. GET returns the same metadata without `key` (404 if no key exists). DELETE returns 204. Each user has one key, valid for one year; rotating a key starts a new year. Only its SHA-256 hash is stored. Disabled or deleted users cannot authenticate with their keys.
+
+Apply the database migration with `python manage.py migrate` before using these endpoints.
+
+Keep keys in a trusted server or API client, never in browser code or source control. Vehicle writes require existing brand and category IDs.
 
 ## Endpoints
 
@@ -155,6 +167,7 @@ Successful deletion returns HTTP `204` with an empty body. A successful create r
 ### Common errors
 
 - `401`: API key missing or incorrect.
+- `403`: an admin role is required for vehicle writes.
 - `400`: invalid JSON or a database ID such as `brand_id` does not exist.
 - `404`: requested vehicle ID does not exist.
 - `429`: the API key exceeded its rate limit; wait before retrying.

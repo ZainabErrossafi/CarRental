@@ -35,7 +35,7 @@ Follow these stages in order. After each stage, you should be able to answer its
 | 7 | Reservations and pricing | `reservations/serializers.py`, `reservations/models.py`, `reservations/views.py`, `reservations/emails.py` | How are reservations priced and confirmed? |
 | 8 | Frontend/backend integration | `services/api.js`, `services/authApi.js`, `context/AuthContext.jsx` | How are requests, sessions, and errors handled? |
 | 9 | Pages and components | `App.jsx`, `pages/`, `components/` | What are the roles of a page, service, context, and hook? |
-| 10 | Integration and validation | `apps/public_api/`, `test_*.py` files, documentation | How do you use the API and verify its behavior? |
+| 10 | API integration | `apps/public_api/`, documentation | How do you authenticate and use the API? |
 
 Paths starting with `users/` or `reservations/` refer to `backend/apps/`. Frontend services, contexts, and pages are under `frontend/src/`.
 
@@ -205,12 +205,12 @@ Read [models.py](backend/apps/reservations/models.py), [serializers.py](backend/
 
 ## 12. Public API
 
-An additional API under `/api/public/v1/` requires the server's `PUBLIC_API_KEY` in the `X-API-Key` header.
+An additional API under `/api/public/v1/` requires a personal API key in the `X-API-Key` header. Each user manages their key at `/api/users/api-key/` using their account JWT: POST generates or rotates it, GET returns metadata, and DELETE revokes it. Keys are shown only once and expire after one year.
 
-- Vehicles: read, create, update, and delete.
+- Vehicles: all active users can read; only users with the `admin` role can create, update, and delete.
 - Brands/categories/locations/FAQs: read.
 - Vehicle pagination, search, filtering, and ordering.
-- Default rate limit: `60/minute`, configurable through `PUBLIC_API_RATE_LIMIT`.
+- Default rate limit: `60/minute` per user, configurable through `PUBLIC_API_RATE_LIMIT`.
 - Documentation: `/api/public/v1/docs/`; OpenAPI: `/api/public/v1/openapi.json`.
 - Keep the key on a server or trusted client; never embed it in React code.
 
@@ -234,7 +234,6 @@ MAPS_API_KEY=
 VITE_API_URL=/api
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-PUBLIC_API_KEY=
 PUBLIC_API_RATE_LIMIT=60/minute
 ```
 

@@ -84,6 +84,12 @@ OPENAPI_SCHEMA = {
 }
 
 
+for path in ('/vehicles/', '/vehicles/{id}/'):
+    for method, operation in OPENAPI_SCHEMA['paths'][path].items():
+        if method != 'get':
+            operation['responses']['403'] = {'description': 'Admin account required'}
+
+
 def openapi_schema(request):
     return JsonResponse(OPENAPI_SCHEMA)
 
@@ -98,10 +104,10 @@ body{margin:0;background:#fdfaf5;color:#021731;font:15px/1.65 Arial,sans-serif}m
 </style></head><body><main>
 <div class="brand">Rently<span>.</span></div><h1>Public API documentation</h1>
 <p>Version 1.0.0 · JSON REST API · Base URL <code>/api/public/v1/</code></p>
-<div class="panel"><strong>Authentication</strong><p>Send your API key on every API request in the <code>X-API-Key</code> header. The API key is configured by the server owner as the <code>PUBLIC_API_KEY</code> environment variable. Do not put the key in public browser code or commit it to source control.</p>
+<div class="panel"><strong>Authentication</strong><p>Send your API key on every API request in the <code>X-API-Key</code> header. Generate or rotate your personal key with <code>POST /api/users/api-key/</code> using your account Bearer token. GET returns metadata; DELETE revokes it. Keys expire after one year and are shown only once. Vehicle writes require an admin account. Do not put the key in public browser code or commit it to source control.</p>
 <pre>curl -H 'X-API-Key: YOUR_API_KEY' \\
   https://your-domain.example/api/public/v1/vehicles/</pre>
-<strong>Rate limit:</strong> 60 requests per minute per API key by default. Configure <code>PUBLIC_API_RATE_LIMIT</code> to change it. Requests over the limit return HTTP 429.
+<strong>Rate limit:</strong> 60 requests per minute per user by default. Configure <code>PUBLIC_API_RATE_LIMIT</code> to change it. Requests over the limit return HTTP 429.
 </div>
 <h2>Endpoints</h2><table><thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead><tbody>
 <tr><td class="method">GET</td><td><code>/vehicles/</code></td><td>List vehicles; supports pagination, filters, search, and ordering.</td></tr>
@@ -127,7 +133,7 @@ body{margin:0;background:#fdfaf5;color:#021731;font:15px/1.65 Arial,sans-serif}m
   "deposit": "2000.00"
 }</pre>
 <p>Vehicle list responses are paginated. Common query parameters include <code>brand</code>, <code>category</code>, <code>status</code>, <code>fuel</code>, <code>transmission</code>, <code>search</code>, <code>ordering</code>, and <code>page</code>.</p>
-<p>Responses: <code>401</code> missing/invalid key, <code>400</code> invalid input, <code>404</code> missing record, <code>429</code> rate limit exceeded.</p>
+<p>Responses: <code>401</code> missing/invalid key, <code>403</code> admin access required for writes, <code>400</code> invalid input, <code>404</code> missing record, <code>429</code> rate limit exceeded.</p>
 <p>Machine-readable OpenAPI specification: <a class="link" href="/api/public/v1/openapi.json">/api/public/v1/openapi.json</a></p>
 </main></body></html>''',
         content_type='text/html; charset=utf-8',

@@ -53,7 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['retrieve', 'update', 'partial_update']:
             return [IsAdminOrOwner()]
-        elif self.action in ['me', 'change_password', 'confirm_password']:
+        elif self.action in ['me', 'change_password', 'confirm_password', 'api_key']:
             return [IsAuthenticated()]
         else:
             return [IsAdmin()]
@@ -62,6 +62,31 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get', 'post', 'delete'], url_path='api-key')
+    def api_key(self, request):
+        from apps.public_api.models import PublicAPIKey
+        from django.utils import timezone
+
+        headers = {'Cache-Control': 'no-store'}
+        if request.method == 'DELETE':
+            PublicAPIKey.objects.filter(user=request.user).update(is_active=False)
+            return Response(status=204, headers=headers)
+        if request.method == 'POST':
+            key, raw_key = PublicAPIKey.issue(request.user)
+        else:
+            key = PublicAPIKey.objects.filter(user=request.user).first()
+            raw_key = None
+        if key is None:
+            return Response({'detail': 'No API key. Use POST to generate one.'}, status=404, headers=headers)
+        data = {
+            'prefix': key.prefix, 'is_active': key.is_active,
+            'created_at': key.created_at, 'expires_at': key.expires_at,
+            'is_expired': key.expires_at <= timezone.now(),
+        }
+        if raw_key is not None:
+            data['key'] = raw_key
+        return Response(data, status=201 if raw_key else 200, headers=headers)
 
     @action(detail=False, methods=['post'], url_path='change-password')
     def change_password(self, request):

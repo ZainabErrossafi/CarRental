@@ -1,7 +1,6 @@
 import django_filters
 
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from apps.brands.models import Brand
@@ -13,6 +12,7 @@ from apps.faqs.serializers import FAQSerializer
 from apps.locations.models import Location
 from apps.locations.serializers import LocationSerializer
 from apps.vehicles.models import Vehicle
+from .permissions import PublicAPIReadOrAdmin
 from .authentication import PublicAPIKeyAuthentication
 from .serializers import PublicVehicleSerializer
 from .throttling import PublicAPIKeyThrottle
@@ -29,7 +29,7 @@ class PublicVehicleFilter(django_filters.FilterSet):
 
 class PublicAPIBaseViewSet:
     authentication_classes = [PublicAPIKeyAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [PublicAPIReadOrAdmin]
     throttle_classes = [PublicAPIKeyThrottle]
 
 
