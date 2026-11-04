@@ -1028,3 +1028,14 @@ select.compact-dropdown-trigger { display: block; width: 100%; font: inherit; fo
   .account-settings-tabs button { font-size: 11px; gap: 4px; }
   .account-settings-tabs button { flex-direction: column; gap: 6px; }
 }
+
+.account-settings-api-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.account-settings-api-link { display: inline-flex; align-items: center; gap: 6px; color: #975326; font-size: 11px; text-decoration: none; }
+.account-settings-api-link:hover { text-decoration: underline; }
+.account-settings-api-link:focus-visible { outline: 2px solid #b97d50; outline-offset: 3px; }
+.account-settings-api-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.account-settings-api .account-settings-save { margin: 0; padding: 10px 14px; }
+.account-settings-api-actions .account-settings-docs { background: transparent; border-color: transparent; }
+.account-settings-api-copy { display: flex; align-items: center; gap: 8px; }
+.account-settings-api-copy input { flex: 1; width: 0; }
+.account-settings-api-copy button { flex-shrink: 0; }

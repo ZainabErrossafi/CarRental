@@ -18,6 +18,8 @@ export default function AccountSettings({ overlay }) {
   const [profile, setProfile] = useState({ username: "", first_name: "", last_name: "", phone: "" });
   const [password, setPassword] = useState({ old: "", next: "", confirm: "" });
   const [apiKey, setApiKey] = useState("");
+  const [apiKeyInfo, setApiKeyInfo] = useState(null);
+  const [apiKeyLoaded, setApiKeyLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -73,6 +75,8 @@ export default function AccountSettings({ overlay }) {
     setError("");
     setSuccess("");
     setApiKey("");
+    setApiKeyInfo(null);
+    setApiKeyLoaded(false);
     setTab("profile");
     dialog.current.showModal();
   };
@@ -81,17 +85,30 @@ export default function AccountSettings({ overlay }) {
     setTab(value);
     setError("");
     setSuccess("");
+    if (value === "public-api") loadApiKey();
   };
-  const generateApiKey = () => {
-    setError("");
-    setSuccess("");
+  const loadApiKey = () => runUpdate(async () => {
+    setApiKeyLoaded(false);
     try {
-      const bytes = crypto.getRandomValues(new Uint8Array(48));
-      setApiKey(btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""));
-    } catch {
-      setError("Could not generate a secure key. Please try again in a secure browser context.");
+      const { data } = await api.get("users/api-key/");
+      setApiKeyInfo(data);
+    } catch (err) {
+      if (err.response?.status !== 404) throw err;
+      setApiKeyInfo(null);
     }
-  };
+    setApiKeyLoaded(true);
+  }, "", "Could not load API key status.");
+  const generateApiKey = () => runUpdate(async () => {
+    const { data } = await api.post("users/api-key/");
+    const { key, ...metadata } = data;
+    setApiKey(key);
+    setApiKeyInfo(metadata);
+  }, "API key generated. Copy it now; it will only be shown once.", "Could not generate API key.");
+  const revokeApiKey = () => runUpdate(async () => {
+    await api.delete("users/api-key/");
+    setApiKey("");
+    setApiKeyInfo((current) => ({ ...current, is_active: false }));
+  }, "API key revoked.", "Could not revoke API key.");
   const copyApiKey = async () => {
     setError("");
     setSuccess("");
@@ -205,30 +222,51 @@ export default function AccountSettings({ overlay }) {
         </div>
         {tab === "public-api" && (
           <section className="account-settings-api" aria-label="Public API key generator">
-            <h3>Public API key generator</h3>
+            <div className="account-settings-api-heading">
+            <h3>Public API</h3>
             <a
-              className="account-settings-save account-settings-docs"
+              className="account-settings-api-link"
               href={`${api.defaults.baseURL}public/v1/docs/`}
               aria-label="API documentation (opens in a new tab)"
               target="_blank"
               rel="noopener noreferrer"
             >
               <BookOpen size={16} aria-hidden="true" />
-              API documentation ↗
+              Documentation ↗
             </a>
-            <button className="account-settings-save" type="button" onClick={generateApiKey}>
+            </div>
+            {busy && !apiKeyLoaded && <p role="status">Loading API key status…</p>}
+            {!busy && !apiKeyLoaded && (
+              <button className="account-settings-save" type="button" onClick={loadApiKey}>Retry loading status</button>
+            )}
+            {apiKeyLoaded && (
+              <p role="status">
+                {apiKeyInfo
+                  ? `Key ${apiKeyInfo.prefix}… · ${!apiKeyInfo.is_active ? "Revoked" : apiKeyInfo.is_expired ? "Expired" : "Active"} · Expires ${new Date(apiKeyInfo.expires_at).toLocaleDateString()}`
+                  : "You do not have an API key yet."}
+              </p>
+            )}
+            <div className="account-settings-api-actions">
+            <button className="account-settings-save" type="button" disabled={busy || !apiKeyLoaded} onClick={generateApiKey}>
               <KeyRound size={16} aria-hidden="true" />
-              {apiKey ? "Generate another key" : "Generate API key"}
+              {busy && apiKeyLoaded ? "Updating…" : apiKeyInfo?.is_active ? "Replace key" : "Generate key"}
             </button>
+            {apiKeyLoaded && apiKeyInfo?.is_active && (
+              <button className="account-settings-save account-settings-docs" type="button" disabled={busy} onClick={revokeApiKey}>
+                Revoke key
+              </button>
+            )}
+            </div>
             {apiKey && (
               <>
-                <label>Generated key (not activated)
-                  <input readOnly value={apiKey} spellCheck={false} autoComplete="off" onFocus={(event) => event.target.select()} />
-                </label>
-                <button className="account-settings-save" type="button" onClick={copyApiKey}>
+                <label htmlFor="account-api-key">Your API key</label>
+                <div className="account-settings-api-copy">
+                  <input id="account-api-key" aria-label="Your API key" readOnly value={apiKey} spellCheck={false} autoComplete="off" onFocus={(event) => event.target.select()} />
+                <button className="account-settings-save" type="button" disabled={busy} onClick={copyApiKey}>
                   <Copy size={16} aria-hidden="true" />
-                  Copy key
+                  Copy
                 </button>
+                </div>
                 <small>Copy this key before closing settings. It is not saved in your browser.</small>
               </>
             )}
