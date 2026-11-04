@@ -1,3 +1,4 @@
+import PasswordRequirement from "../../components/admin/auth/PasswordRequirement.jsx";
 import { useI18n } from "../../context/I18nContext";
 import { useRef, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
@@ -20,6 +21,17 @@ export default function AdminResetPassword() {
   const [busy, setBusy] = useState(false);
   const refs = useRef([]);
   const code = d.join("");
+  const passwordChecks = {
+    length: pw.length >= 8,
+    uppercase: /[A-Z]/.test(pw),
+    lowercase: /[a-z]/.test(pw),
+    number: /[0-9]/.test(pw),
+    special: /[!@#$%^&*(),.?":{}|<>_\-+=]/.test(pw),
+    noSpaces: !/\s/.test(pw),
+    maxLength: pw.length <= 64,
+    match: pw.length > 0 && pw === pw2,
+  };
+  const isPasswordValid = Object.values(passwordChecks).every(Boolean);
 
   if (!email) return <Navigate to="/forgot-password" replace />;
 
@@ -44,6 +56,7 @@ export default function AdminResetPassword() {
   const resend = run(async () => { await requestPasswordReset(email); clear(); });
   const save = run(async () => {
     if (pw !== pw2) throw { response: { data: { detail: "Passwords do not match." } } };
+    if (!isPasswordValid) throw { response: { data: { detail: "Please meet all password requirements." } } };
     try { await confirmPasswordReset({ email, code, newPassword: pw }); setStep("done"); }
     catch (err) { if (err.response?.data?.detail) { setStep("code"); clear(); } throw err; }
   });
@@ -77,13 +90,20 @@ export default function AdminResetPassword() {
           <form onSubmit={save} className="auth-form">
             <div className="form-field">
               <label htmlFor="new-password">{t("New password")}</label>
-              <input id="new-password" name="new-password" type="password" autoComplete="new-password" placeholder={t("New password")} minLength={8} required disabled={busy} value={pw} onChange={(e) => setPw(e.target.value)} />
+              <input id="new-password" name="new-password" type="password" autoComplete="new-password" placeholder={t("New password")} minLength={8} maxLength={64} required disabled={busy} value={pw} onChange={(e) => setPw(e.target.value)} />
             </div>
             <div className="form-field">
               <label htmlFor="confirm-password">{t("Confirm password")}</label>
-              <input id="confirm-password" name="confirm-password" type="password" autoComplete="new-password" placeholder={t("Confirm password")} minLength={8} required disabled={busy} value={pw2} onChange={(e) => setPw2(e.target.value)} />
+              <input id="confirm-password" name="confirm-password" type="password" autoComplete="new-password" placeholder={t("Confirm password")} minLength={8} maxLength={64} required disabled={busy} value={pw2} onChange={(e) => setPw2(e.target.value)} />
             </div>
-            <button className="gcard-submit" disabled={busy}>{t(busy ? "Saving..." : "Change password")}</button>
+            <div className="password-requirements" aria-live="polite">
+              {[
+                [passwordChecks.length, "At least 8 characters"],
+                [passwordChecks.uppercase && passwordChecks.lowercase, "Uppercase and lowercase letters"],
+                [passwordChecks.number && passwordChecks.special, "One number and one special character"],
+              ].map(([met, label]) => <PasswordRequirement key={label} met={met} label={t(label)} />)}
+            </div>
+            <button className="gcard-submit" disabled={busy || !isPasswordValid}>{t(busy ? "Saving..." : "Change password")}</button>
           </form>
         </>)}
 
