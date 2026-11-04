@@ -232,9 +232,6 @@ REST_FRAMEWORK = {
     },
 }
 
-# The dedicated public API stays disabled until a deployment supplies a secret key.
-PUBLIC_API_KEY = os.getenv('PUBLIC_API_KEY', '')
-PUBLIC_API_RATE_LIMIT = os.getenv('PUBLIC_API_RATE_LIMIT', '60/minute')
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 

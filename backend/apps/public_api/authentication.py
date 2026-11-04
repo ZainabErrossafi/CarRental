@@ -1,31 +1,24 @@
-import hmac
-
-from django.conf import settings
+from django.utils import timezone
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 
-
-class PublicAPIPrincipal:
-    """Non-user identity representing a valid server-to-server API key."""
-
-    is_authenticated = True
-    is_anonymous = False
-    is_active = True
+from .models import PublicAPIKey
 
 
 class PublicAPIKeyAuthentication(BaseAuthentication):
     keyword = 'ApiKey'
 
     def authenticate(self, request):
-        expected_key = getattr(settings, 'PUBLIC_API_KEY', '')
         provided_key = request.META.get('HTTP_X_API_KEY', '')
-
-        if not expected_key:
-            raise AuthenticationFailed('The public API is not configured.')
-        if not provided_key or not hmac.compare_digest(provided_key, expected_key):
+        if not provided_key or len(provided_key) > 256:
             raise AuthenticationFailed('A valid X-API-Key header is required.')
-
-        return PublicAPIPrincipal(), None
+        key = PublicAPIKey.objects.select_related('user').filter(
+            key_hash=PublicAPIKey.digest(provided_key), is_active=True,
+            expires_at__gt=timezone.now(), user__is_active=True,
+        ).first()
+        if key is None:
+            raise AuthenticationFailed('A valid X-API-Key header is required.')
+        return key.user, key
 
     def authenticate_header(self, request):
         return self.keyword
