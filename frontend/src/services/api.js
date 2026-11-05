@@ -50,15 +50,7 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const refresh = readTokens()?.refresh;
 
-    if (status === 401 && config && isOptionalAuth(config)) {
-
-      if (!config._anon) {
-        config._anon = true;
-        config._skipAuth = true;
-        delete config.headers.Authorization;
-        return api(config);
-      }
-    } else if (status === 401 && config && !isAuthEndpoint(config.url) && !config._retry && refresh) {
+    if (status === 401 && config && !isAuthEndpoint(config.url) && !config._retry && refresh && !config._skipAuth) {
       config._retry = true;
       try {
         if (!refreshRequest) {
@@ -75,6 +67,11 @@ api.interceptors.response.use(
         clearSession();
         throw refreshError;
       }
+    } else if (status === 401 && config && isOptionalAuth(config) && !refresh && !config._anon) {
+      config._anon = true;
+      config._skipAuth = true;
+      delete config.headers.Authorization;
+      return api(config);
     } else if (status === 401 && config && !isAuthEndpoint(config.url)) {
       clearSession();
     }
