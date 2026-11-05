@@ -1,11 +1,12 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+from .permissions import IsAdminOrReadOnly
 from .models import Vehicle
 from .serializers import VehicleDetailSerializer, VehicleListSerializer
 
 
 class VehicleViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_serializer_class(self):
         if self.action == "list":
