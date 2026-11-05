@@ -3940,7 +3940,6 @@ gap: 0.5rem;
 .reports-bar-icon { color: var(--muted); display: flex; }
 .reports-dataset-bar label { display: grid; gap: 5px; flex: 1; font-size: 14px; }
 .reports-dataset-bar label span { font-size: 12px; color: var(--muted); }
-.reports-dataset-bar select { min-width: 200px; padding: 12px 15px; border: 1px solid var(--border); background: var(--off-white); border-radius: 9px; color: var(--navy); font: inherit; font-size: 14px; }
 .reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
 .reports-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 28px; display: flex; flex-direction: column; }
 .reports-card-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
@@ -3961,7 +3960,7 @@ gap: 0.5rem;
 .reports-format input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .reports-radio { position: absolute; inset-inline-end: 14px; top: 18px; width: 15px; height: 15px; border: 1px solid #d8d0cb; border-radius: 50%; }
 .selected .reports-radio { border: 4px solid var(--orange); background: white; }
-.reports-format:focus-within, .reports-page button:focus-visible, .reports-page select:focus-visible, .reports-guide summary:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+.reports-format:focus-within, .reports-page button:focus-visible, .reports-guide summary:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .reports-export-summary { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 12px; margin-bottom: 22px; }
 .reports-export-summary svg { color: #38916b; }
 .reports-primary, .reports-secondary { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 46px; width: 100%; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .15s; }
@@ -3996,7 +3995,7 @@ gap: 0.5rem;
 .reports-errors { margin-top: 12px; max-height: 300px; overflow: auto; border: 1px solid var(--border); border-radius: 10px; background: white; }
 .reports-errors pre { white-space: pre-wrap; font-size: 12px; }
 @media (max-width: 900px) { .reports-grid { grid-template-columns: 1fr; } }
-@media (max-width: 540px) { .reports-heading { align-items: flex-start; } .reports-heading-badge { display: none; } .reports-heading h1 { font-size: 25px; } .reports-dataset-bar { flex-wrap: wrap; padding: 16px; } .reports-dataset-bar select { width: 100%; } .reports-card { padding: 22px; } .reports-import-meta { flex-wrap: wrap; } }
+@media (max-width: 540px) { .reports-heading { align-items: flex-start; } .reports-heading-badge { display: none; } .reports-heading h1 { font-size: 25px; } .reports-dataset-bar { flex-wrap: wrap; padding: 16px; } .reports-card { padding: 22px; } .reports-import-meta { flex-wrap: wrap; } }
 
 .searchable-select .MuiOutlinedInput-root {
   min-height: 46px;

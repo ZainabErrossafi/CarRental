@@ -2,12 +2,12 @@ import { useI18n } from "../../context/I18nContext";
 import UploadProgress from "../../components/admin/forms/UploadProgress";
 import { useRef, useState } from 'react';
 import { Download, Upload, FileSpreadsheet, FileJson, Database, CheckCircle2, ArrowRight, FileUp, Info, X } from 'lucide-react';
-import { getVehicles, getLocations, getReservations, getUsers, getReviews, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
+import { getVehicles, getLocations, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
 import { serializeReport, parseReport, prepareImport } from '../../services/reportFiles';
 
-const LOADERS = { vehicles: getVehicles, locations: getLocations, reservations: getReservations, users: getUsers, reviews: getReviews };
+const LOADERS = { vehicles: getVehicles, locations: getLocations };
 const WRITERS = { vehicles: { create: createVehicle, update: updateVehicle }, locations: { create: createLocation, update: updateLocation } };
-const DATASETS = ['vehicles', 'locations', 'reservations', 'users', 'reviews'];
+const DATASETS = ['vehicles', 'locations'];
 
 export default function AdminReports() {
   const { t } = useI18n();
@@ -103,8 +103,13 @@ export default function AdminReports() {
       </div>
       <div className="reports-dataset-bar">
         <div className="reports-bar-icon"><Database size={20} /></div>
-        <label htmlFor="report-dataset"><strong>{t('Choose your dataset')}</strong><span>{t('Select the records you want to work with.')}</span></label>
-        <select id="report-dataset" value={dataset} disabled={busy} onChange={(e) => { setDataset(e.target.value); setFile(null); reset(); }}>
+        <label id="report-dataset-label" htmlFor="report-dataset"><strong>{t('Choose your dataset')}</strong><span>{t('Select the records you want to work with.')}</span></label>
+        <select
+          id="report-dataset"
+          value={dataset}
+          disabled={busy}
+          onChange={(e) => { setDataset(e.target.value); setFile(null); reset(); }}
+        >
           {DATASETS.map((name) => <option key={name} value={name}>{t(name.charAt(0).toUpperCase() + name.slice(1))}</option>)}
         </select>
       </div>
