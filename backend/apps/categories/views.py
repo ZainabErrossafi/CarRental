@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from apps.brands.permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly
 from .models import Category
 from .serializers import CategorySerializer
 
