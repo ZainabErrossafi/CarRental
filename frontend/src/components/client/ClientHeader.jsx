@@ -35,6 +35,7 @@ export default function ClientHeader({ overlay = false }) {
   }, [pathname]);
 
   useEffect(() => {
+    if (!mobileOpen) return;
     const closeOutside = (event) => {
       if (!headerRef.current?.contains(event.target)) {
         setMobileOpen(false);
@@ -158,9 +159,7 @@ export default function ClientHeader({ overlay = false }) {
           id="client-navigation"
           className={`${mobileOpen ? "tw:block" : "tw:hidden"} tw:w-full tw:lg:absolute tw:lg:left-1/2 tw:lg:top-1/2 tw:lg:block tw:lg:w-auto tw:lg:-translate-x-1/2 tw:lg:-translate-y-1/2`}
         >
-          <ul
-            className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:rounded-2xl tw:p-0 tw:text-sm tw:font-semibold tw:lg:flex-row tw:lg:items-center tw:bg-transparent"
-          >
+          <ul className="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-2 tw:rounded-2xl tw:p-0 tw:text-sm tw:font-semibold tw:lg:flex-row tw:lg:items-center tw:bg-transparent">
             {links.map(({ to, label }) => (
               <li key={to}>
                 <NavLink

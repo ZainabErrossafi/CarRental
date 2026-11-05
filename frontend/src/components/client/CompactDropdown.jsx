@@ -16,9 +16,7 @@ export default function CompactDropdown({
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
       >
-        {!options.some((option) => String(option.value) === String(value)) && (
-          <option value="">{placeholder}</option>
-        )}
+        {!options.some((option) => String(option.value) === String(value)) && <option value="">{placeholder}</option>}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}

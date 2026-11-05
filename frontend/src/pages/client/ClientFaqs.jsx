@@ -38,7 +38,10 @@ export default function ClientFaqs() {
         <div className="client-faqs-list">
           {faqs.map((faq) => (
             <details key={faq.id}>
-              <summary><span>{faq.question}</span><span className="client-faqs-toggle" aria-hidden="true" /></summary>
+              <summary>
+                <span>{faq.question}</span>
+                <span className="client-faqs-toggle" aria-hidden="true" />
+              </summary>
               <p>{faq.answer}</p>
             </details>
           ))}

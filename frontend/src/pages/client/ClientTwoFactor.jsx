@@ -32,7 +32,8 @@ export default function ClientTwoFactor() {
       await verifyEmail({ email, code });
       const from = location.state?.from;
       const target = /^\/vehicles\/[^/]+$/.test(from?.pathname || "")
-        ? from.pathname + (from.search || "") + (from.hash || "") : "/";
+        ? from.pathname + (from.search || "") + (from.hash || "")
+        : "/";
       navigate(target, { replace: true });
     } catch (err) {
       setError(err.message || "Verification failed. Please try again.");
@@ -59,38 +60,67 @@ export default function ClientTwoFactor() {
   return (
     <div className="auth-page client-two-factor">
       <div className="auth-card">
-        <div className="auth-icon-circle"><ShieldCheck size={20} /></div>
+        <div className="auth-icon-circle">
+          <ShieldCheck size={20} />
+        </div>
         <h1 className="auth-title">Two-factor authentication</h1>
-        <p className="auth-subtitle">Enter the six-digit code sent to <strong>{email || "your email"}</strong>.</p>
+        <p className="auth-subtitle">
+          Enter the six-digit code sent to <strong>{email || "your email"}</strong>.
+        </p>
         {!email && <p role="alert">Your verification session has expired. Please sign in again.</p>}
-        {error && <p className="alert alert-error mb-4" role="alert">{error}</p>}
+        {error && (
+          <p className="alert alert-error mb-4" role="alert">
+            {error}
+          </p>
+        )}
         {notice && <p role="status">{notice}</p>}
         <form className="auth-form" onSubmit={submit} style={{ alignItems: "center" }}>
-          <div className="otp-inputs" onPaste={(event) => {
-            const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-            if (!pasted) return;
-            event.preventDefault();
-            setDigits(Array.from({ length: 6 }, (_, index) => pasted[index] || ""));
-            setError("");
-            inputs.current[pasted.length - 1]?.focus();
-          }}>
+          <div
+            className="otp-inputs"
+            onPaste={(event) => {
+              const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+              if (!pasted) return;
+              event.preventDefault();
+              setDigits(Array.from({ length: 6 }, (_, index) => pasted[index] || ""));
+              setError("");
+              inputs.current[pasted.length - 1]?.focus();
+            }}
+          >
             {digits.map((digit, index) => (
-              <input key={index} ref={(input) => { inputs.current[index] = input; }} className="otp-input"
-                aria-label={`Code digit ${index + 1}`} inputMode="numeric" maxLength={1}
-                autoComplete={index === 0 ? "one-time-code" : "off"} value={digit} disabled={busy || !email}
+              <input
+                key={index}
+                ref={(input) => {
+                  inputs.current[index] = input;
+                }}
+                className="otp-input"
+                aria-label={`Code digit ${index + 1}`}
+                inputMode="numeric"
+                maxLength={1}
+                autoComplete={index === 0 ? "one-time-code" : "off"}
+                value={digit}
+                disabled={busy || !email}
                 onChange={(event) => change(index, event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Backspace" && !digit) inputs.current[index - 1]?.focus();
-                }} />
+                }}
+              />
             ))}
           </div>
           <button className="gcard-submit" disabled={busy || !email || code.length !== 6}>
             {busy ? "Verifying…" : "Verify code"}
           </button>
         </form>
-        <p className="auth-footer">Didn't receive the email? <button type="button" className="auth-link"
-          disabled={busy || !email} onClick={resend}>Click to resend</button></p>
-        <p className="auth-footer"><Link to="/login" className="auth-link">Back to log in</Link></p>
+        <p className="auth-footer">
+          Didn't receive the email?{" "}
+          <button type="button" className="auth-link" disabled={busy || !email} onClick={resend}>
+            Click to resend
+          </button>
+        </p>
+        <p className="auth-footer">
+          <Link to="/login" className="auth-link">
+            Back to log in
+          </Link>
+        </p>
       </div>
     </div>
   );

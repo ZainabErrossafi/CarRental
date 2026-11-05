@@ -40,9 +40,7 @@ export default function ClientFooter({ home = false }) {
     };
   }, []);
   const company = settings.company_name?.trim() || "Rently";
-  const address = [settings.address, settings.city, settings.country]
-    .filter((part) => part?.trim())
-    .join(", ");
+  const address = [settings.address, settings.city, settings.country].filter((part) => part?.trim()).join(", ");
   const phone = settings.phone?.replace(/[^\d+]/g, "");
   const whatsapp = settings.whatsapp?.replace(/\D/g, "");
   const socials = socialNetworks.filter(([key]) => webLink(settings[key]));
@@ -58,10 +56,7 @@ export default function ClientFooter({ home = false }) {
             </span>
             {company}
           </Link>
-          <p>
-            {settings.about_en?.trim() ||
-              "Rently."}
-          </p>
+          <p>{settings.about_en?.trim() || "Rently."}</p>
         </div>
         <nav aria-label="Footer navigation">
           <h2>Liens rapides</h2>
@@ -105,13 +100,7 @@ export default function ClientFooter({ home = false }) {
           {socials.length > 0 && (
             <div className="client-footer-socials" aria-label="Social media">
               {socials.map(([key, label, Icon]) => (
-                <a
-                  key={key}
-                  href={webLink(settings[key])}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                >
+                <a key={key} href={webLink(settings[key])} target="_blank" rel="noopener noreferrer" aria-label={label}>
                   <Icon size={18} aria-hidden="true" />
                 </a>
               ))}

@@ -24,9 +24,7 @@ export default function ClientVehicleDetails() {
       .catch((err) => {
         if (active)
           setError(
-            err.response?.status === 404
-              ? "Vehicle not found"
-              : "Could not load this vehicle. Please try again later.",
+            err.response?.status === 404 ? "Vehicle not found" : "Could not load this vehicle. Please try again later.",
           );
       })
       .finally(() => {
@@ -87,8 +85,7 @@ export default function ClientVehicleDetails() {
               <img src={selected} alt={vehicle.name} />
             ) : (
               <div className="vehicle-detail-no-photo">
-                <Car size={76} strokeWidth={1} aria-hidden="true" />
-                <span>Photos coming soon</span>
+                <span>Photo coming soon</span>
               </div>
             )}
             <span className="vehicle-detail-category">{vehicle.category}</span>
@@ -114,7 +111,10 @@ export default function ClientVehicleDetails() {
             </h1>
             <div className="vehicle-detail-heading-chips">
               {chips.map(([Icon, value], index) => (
-                <span key={index}><Icon size={13} aria-hidden="true" />{value}</span>
+                <span key={index}>
+                  <Icon size={13} aria-hidden="true" />
+                  {value}
+                </span>
               ))}
             </div>
             {vehicle.description && <p className="vehicle-detail-description">{vehicle.description}</p>}

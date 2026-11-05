@@ -1,47 +1,27 @@
+import ReservationItem from "./ReservationItem.jsx";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { TicketCheck, X, RefreshCw, CalendarDays } from "lucide-react";
-import api, { getList } from "../../services/api.js";
+import { TicketCheck, X, RefreshCw } from "lucide-react";
+import { getList } from "../../services/api.js";
 
 export default function ReservationsDropdown({ overlay }) {
   const { user } = useAuth();
+  const userId = user?.id;
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
-  const [confirmCancel, setConfirmCancel] = useState(null);
-  const [cancelling, setCancelling] = useState(null);
-  const [cancelError, setCancelError] = useState(null);
-  const cancelInFlight = useRef(false);
-  const cancelReservation = async (item) => {
-    if (cancelInFlight.current) return;
-    cancelInFlight.current = true;
-    setCancelling(item.id);
-    setCancelError(null);
-    try {
-      const { data } = await api.post(`reservations/${item.id}/cancel/`);
-      setItems((previous) =>
-        previous.map((booking) => (booking.id === item.id ? { ...booking, ...data } : booking)),
-      );
-      setConfirmCancel(null);
-    } catch (err) {
-      setCancelError({
-        id: item.id,
-        message: err.message || "Could not cancel this reservation. Please try again.",
-      });
-    } finally {
-      setCancelling(null);
-      cancelInFlight.current = false;
-    }
+  const updateReservation = (updated) => {
+    setItems((previous) => previous.map((item) => (item.id === updated.id ? { ...item, ...updated } : item)));
   };
   const root = useRef(null);
   const trigger = useRef(null);
   const { pathname } = useLocation();
   useEffect(() => {
     setOpen(false);
-  }, [pathname, user?.id]);
+  }, [pathname, userId]);
   useEffect(() => {
     const outside = (event) => {
       if (!root.current?.contains(event.target)) setOpen(false);
@@ -67,13 +47,13 @@ export default function ReservationsDropdown({ overlay }) {
     };
   }, []);
   useEffect(() => {
-    if (!open || !user) return;
+    if (!open || !userId) return;
     let active = true;
     setLoading(true);
     setError("");
-    getList(`reservations/?user=${encodeURIComponent(user.id)}`)
+    getList(`reservations/?user=${encodeURIComponent(userId)}`)
       .then((data) => {
-        if (active) setItems(data.filter((item) => String(item.user) === String(user.id)));
+        if (active) setItems(data.filter((item) => String(item.user) === String(userId)));
       })
       .catch(() => {
         if (active) setError("Could not load your reservations.");
@@ -84,9 +64,7 @@ export default function ReservationsDropdown({ overlay }) {
     return () => {
       active = false;
     };
-  }, [open, user, retry]);
-  const date = (value) =>
-    new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(value));
+  }, [open, userId, retry]);
   return (
     <div className="reservation-popover-root" ref={root}>
       <button
@@ -108,11 +86,7 @@ export default function ReservationsDropdown({ overlay }) {
               <strong>My reservations</strong>
               <span>Your bookings at a glance</span>
             </div>
-            <button
-              type="button"
-              aria-label="Refresh reservations"
-              onClick={() => setRetry((value) => value + 1)}
-            >
+            <button type="button" aria-label="Refresh reservations" onClick={() => setRetry((value) => value + 1)}>
               <RefreshCw size={15} aria-hidden="true" />
             </button>
             <button
@@ -145,69 +119,12 @@ export default function ReservationsDropdown({ overlay }) {
               </div>
             ) : (
               items.map((item) => (
-                <article key={item.id}>
-                  <div className="reservation-popover-row">
-                    <small>{item.reference}</small>
-                    <span className={`reservation-status status-${item.status}`}>{item.status}</span>
-                  </div>
-                  <Link to={`/vehicles/${item.vehicle}`} onClick={() => setOpen(false)}>
-                    {item.vehicle_name}
-                  </Link>
-                  <p>
-                    <CalendarDays size={13} aria-hidden="true" />
-                    {date(item.pickup_date)} → {date(item.return_date)}
-                  </p>
-                  <div className="reservation-popover-row">
-                    <span>{item.pickup_location_name}</span>
-                    <strong>{Number(item.total_price).toLocaleString()} MAD</strong>
-                  </div>
-                  {["pending", "confirmed"].includes(item.status) && (
-                    <div className="reservation-cancel-actions">
-                      {confirmCancel === item.id ? (
-                        <>
-                          <p>Cancel this reservation?</p>
-                          <div>
-                            <button
-                              type="button"
-                              disabled={cancelling !== null}
-                              onClick={() => {
-                                setConfirmCancel(null);
-                                setCancelError(null);
-                              }}
-                            >
-                              Keep booking
-                            </button>
-                            <button
-                              className="reservation-cancel-confirm"
-                              type="button"
-                              disabled={cancelling !== null}
-                              onClick={() => cancelReservation(item)}
-                            >
-                              {cancelling === item.id ? "Cancelling…" : "Yes, cancel"}
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <button
-                          className="reservation-cancel-trigger"
-                          type="button"
-                          disabled={cancelling !== null}
-                          onClick={() => {
-                            setConfirmCancel(item.id);
-                            setCancelError(null);
-                          }}
-                        >
-                          Cancel reservation
-                        </button>
-                      )}
-                    </div>
-                  )}
-                  {cancelError?.id === item.id && (
-                    <p className="reservation-cancel-error" role="alert">
-                      {cancelError.message}
-                    </p>
-                  )}
-                </article>
+                <ReservationItem
+                  key={item.id}
+                  item={item}
+                  onClose={() => setOpen(false)}
+                  onUpdated={updateReservation}
+                />
               ))
             )}
           </div>

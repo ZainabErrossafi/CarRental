@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { Users, Settings2, ArrowUpRight, Car } from "lucide-react";
+import { Users, Settings2, ArrowUpRight } from "lucide-react";
 
 export default function VehicleCard({ vehicle }) {
   const { search } = useLocation();
@@ -26,14 +26,12 @@ export default function VehicleCard({ vehicle }) {
           />
         ) : (
           <div className="fleet-card-placeholder">
-            <Car size={56} strokeWidth={1.2} aria-hidden="true" />
             <span>Photo coming soon</span>
           </div>
         )}
         {category && <span className="fleet-card-category">{category}</span>}
       </div>
       <div className="fleet-card-body">
-        <p className="fleet-card-brand">{brand || name.split(" ")[0]}</p>
         <h3>{name}</h3>
         <div className="fleet-card-specs">
           <span>

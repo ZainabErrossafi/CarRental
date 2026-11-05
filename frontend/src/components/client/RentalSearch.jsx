@@ -1,3 +1,4 @@
+import { localToday, localTime } from "../../utils/bookingDates.js";
 import { useEffect, useState } from "react";
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -21,16 +22,6 @@ function AgencyDropdown({ name, label, locations, disabled, loading, labelClass,
     </label>
   );
 }
-
-const localToday = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-};
-
-const localTime = () => {
-  const now = new Date();
-  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-};
 
 export default function RentalSearch() {
   const navigate = useNavigate();
