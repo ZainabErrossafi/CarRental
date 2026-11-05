@@ -63,7 +63,6 @@ export default function VehicleBooking({ vehicle }) {
   const [form, setForm] = useState(() => ({
     ...tripFromSearch(location.search),
     driver_name: "",
-    email: "",
     phone: "",
   }));
   const [error, setError] = useState("");
@@ -93,7 +92,6 @@ export default function VehicleBooking({ vehicle }) {
     setForm((prev) => ({
       ...prev,
       driver_name: prev.driver_name || user.name || "",
-      email: user.email || "",
       phone: prev.phone || user.phone || "",
     }));
     setLocationError(false);
