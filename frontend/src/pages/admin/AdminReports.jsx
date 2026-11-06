@@ -2,7 +2,7 @@ import { useI18n } from "../../context/I18nContext";
 import UploadProgress from "../../components/admin/forms/UploadProgress";
 import { useRef, useState } from 'react';
 import { Download, Upload, FileSpreadsheet, FileJson, Database, CheckCircle2, ArrowRight, FileUp, Info, X } from 'lucide-react';
-import { getVehicles, getLocations, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
+import { getVehicles, getLocations, getCatalog, createVehicle, updateVehicle, createLocation, updateLocation } from '../../services/adminApi';
 import { serializeReport, parseReport, prepareImport } from '../../services/reportFiles';
 
 const LOADERS = { vehicles: getVehicles, locations: getLocations };
@@ -54,7 +54,8 @@ export default function AdminReports() {
     try {
       if (isPreview) {
         const records = parseReport(await file.text(), file.name, dataset, t);
-        const plan = prepareImport(dataset, records, await LOADERS[dataset](), t);
+        const [existing, catalog] = await Promise.all([LOADERS[dataset](), dataset === 'vehicles' ? getCatalog() : Promise.resolve({})]);
+        const plan = prepareImport(dataset, records, existing, t, catalog);
         if (plan.errors.length) { setErrors(plan.errors); setPreview(null); setMessage(t('Fix the listed rows before importing.')); }
         else { setPreview(plan); setMessage(t('File checked. The server validates each record when saved.')); }
       } else {

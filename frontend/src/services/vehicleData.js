@@ -17,7 +17,9 @@ export const vehiclePayload = async (vehicle) => {
     'min_driver_age', 'min_license_years', 'description_en', 'description_fr', 'description_ar'];
   const payload = Object.fromEntries(fields.filter((key) => vehicle[key] !== undefined)
     .map((key) => [key, vehicle[key]]));
-  payload.daily_rate = vehicle.dailyRate;
+  if (vehicle.dailyRate !== undefined || vehicle.daily_rate !== undefined) {
+    payload.daily_rate = vehicle.dailyRate ?? vehicle.daily_rate;
+  }
   payload.daily_mileage_limit = vehicle.daily_mileage_limit === '' ? null : vehicle.daily_mileage_limit;
   if (vehicle.main_image?.startsWith('data:')) {
     const blob = await (await fetch(vehicle.main_image)).blob();
