@@ -7,11 +7,6 @@ class NotificationType(models.TextChoices):
     RESERVATION_CONFIRMED = 'reservation_confirmed', 'Reservation confirmed'
     RESERVATION_CREATED = 'reservation_created', 'Reservation created'
     RESERVATION_CANCELLED = 'reservation_cancelled', 'Reservation cancelled'
-    PICKUP_REMINDER = 'pickup_reminder', 'Pickup reminder'
-    RETURN_REMINDER = 'return_reminder', 'Return reminder'
-    PAYMENT_RECEIVED = 'payment_received', 'Payment received'
-    REVIEW_REQUEST = 'review_request', 'Review request'
-
 
 class Notification(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')

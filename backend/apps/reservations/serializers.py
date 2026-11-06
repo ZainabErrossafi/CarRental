@@ -68,7 +68,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
         if pickup_date and return_date and pickup_date >= return_date:
             raise serializers.ValidationError("The return date must be after the pickup date.")
-        if self.instance is None and pickup_date and pickup_date < timezone.now():
+        if pickup_date and pickup_date < timezone.now():
             raise serializers.ValidationError("The pickup date cannot be in the past.")
 
         vehicle = data.get('vehicle', getattr(self.instance, 'vehicle', None))
