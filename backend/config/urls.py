@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -15,7 +14,6 @@ urlpatterns = [
     # Health & Admin
     path('api/health/', lambda request: JsonResponse({'status': 'ok'})),
     path('api/public/v1/', include('apps.public_api.urls')),
-    path('admin/', admin.site.urls),
 
     # Authentication & OAuth
     path('api/auth/2fa/toggle/', TwoFactorToggleView.as_view(), name='two_factor_toggle'),
@@ -45,6 +43,7 @@ urlpatterns = [
     path('api/features/', include('apps.features.urls')),
     path('api/extras/', include('apps.extras.urls')),
     path('api/vehicles/', include('apps.vehicles.urls')),
+    # path('api-auth/', include('rest_framework.urls')),
 
 ]
 
