@@ -1972,6 +1972,10 @@
       font-size: 16px !important;
     }
 
+  }
+
+  /* Match the mobile button whenever the search fields use a stacked grid. */
+  @media (width < 1280px) {
     .client-rental-search-grid > button {
       grid-column: 1 / -1 !important;
       width: 100% !important;
@@ -2755,9 +2759,21 @@
     gap: 20px;
   }
 
+}
+
+@media (max-width: 1100px) {
+  .fleet-layout-horizontal .fleet-price-filter,
   .fleet-layout-horizontal .fleet-clear-filters {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .fleet-layout-horizontal .fleet-clear-filters {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
     margin: 0;
-    justify-self: start;
+    justify-content: center;
   }
 }
 
