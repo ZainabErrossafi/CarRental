@@ -55,10 +55,10 @@ export function parseReport(text, filename, dataset, t = (key, values = {}) => k
 
 const writable = {
   locations: ['name', 'name_fr', 'name_ar', 'city', 'country', 'active'],
-  vehicles: ['brand', 'category', 'home_location', 'features', 'model', 'year', 'status', 'is_featured', 'transmission', 'fuel', 'seats', 'doors', 'luggage', 'air_conditioning', 'daily_rate', 'deposit', 'daily_mileage_limit', 'min_driver_age', 'min_license_years', 'description_en', 'description_fr', 'description_ar'],
+  vehicles: ['brand_id', 'category_id', 'feature_ids', 'brand', 'category', 'home_location', 'features', 'model', 'year', 'status', 'is_featured', 'transmission', 'fuel', 'seats', 'doors', 'luggage', 'air_conditioning', 'daily_rate', 'deposit', 'daily_mileage_limit', 'min_driver_age', 'min_license_years', 'description_en', 'description_fr', 'description_ar'],
 };
-const required = { locations: ['name', 'city', 'country'], vehicles: ['brand', 'category', 'model', 'year', 'transmission', 'fuel', 'seats', 'doors', 'daily_rate'] };
-export function prepareImport(dataset, records, existing, t = (key, values = {}) => key.replace(/\{(\w+)\}/g, (match, name) => values[name] ?? match)) {
+const required = { locations: ['name', 'city', 'country'], vehicles: ['brand_id', 'category_id', 'model', 'year', 'transmission', 'fuel', 'seats', 'doors', 'daily_rate'] };
+export function prepareImport(dataset, records, existing, t = (key, values = {}) => key.replace(/\{(\w+)\}/g, (match, name) => values[name] ?? match), catalog = {}) {
   const errors = [], operations = [], seen = new Set();
   records.forEach((row, index) => {
     const issues = [];
@@ -73,6 +73,20 @@ export function prepareImport(dataset, records, existing, t = (key, values = {})
         else fields[key] = /^(true|1)$/i.test(value);
       }
       if (['home_location', 'daily_mileage_limit'].includes(key) && value === '') fields[key] = null;
+    }
+    if (dataset === 'vehicles') {
+      for (const key of ['brand', 'category']) {
+        if (!fields[`${key}_id`] && fields[key]) {
+          const value = fields[key];
+          const options = catalog[key === 'brand' ? 'brands' : 'categories'] ?? [];
+          const matches = options.filter((item) => typeof value === 'object'
+            ? String(item.id) === String(value.id)
+            : item.name.trim().toLowerCase() === String(value).trim().toLowerCase());
+          if (matches.length === 1) fields[`${key}_id`] = matches[0].id;
+          else issues.push(`${key}: unknown or ambiguous name "${typeof value === 'object' ? value.name : value}". Use an existing ${key}_id.`);
+        }
+        delete fields[key];
+      }
     }
     if (!id) required[dataset].forEach((key) => { if (fields[key] == null || fields[key] === '') issues.push(t('{field} is required.', { field: key })); });
     if (!Object.keys(fields).length) issues.push(t('No supported fields found.'));
