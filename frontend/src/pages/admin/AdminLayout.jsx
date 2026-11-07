@@ -11,10 +11,8 @@ import {
   Tag,
   CalendarCheck,
   Users,
-  Settings,
   HelpCircle,
   Bell,
-  BarChart2,
   Search,
   LogOut,
   Menu,
@@ -25,8 +23,7 @@ import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 const NAV_SECTIONS = [
   {
     label: "Overview",
-    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
-      { to: "/admin/reports", label: "Reports & Data", icon: BarChart2 }],
+    items: [{ to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true }],
   },
   {
     label: "Fleet",
@@ -49,7 +46,6 @@ const NAV_SECTIONS = [
   {
     label: "Content",
     items: [
-      { to: "/admin/site-settings", label: "Site Settings", icon: Settings },
       { to: "/admin/faqs", label: "FAQs", icon: HelpCircle },
       { to: "/admin/notifications", label: "Notifications", icon: Bell },
     ],
