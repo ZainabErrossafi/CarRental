@@ -1,4 +1,3 @@
-import AdminReports from "./pages/admin/AdminReports.jsx";
 import AdminTerms from "./pages/admin/AdminTerms.jsx";
 import { Routes, Route } from "react-router-dom";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
@@ -16,7 +15,6 @@ import AdminResetPassword from "./pages/admin/AdminResetPassword.jsx";
 import AdminVerifyEmail from "./pages/admin/AdminVerifyEmail.jsx";
 import ProtectedRoute from "./components/admin/auth/ProtectedRoute.jsx";
 import AdminUsers from "./pages/admin/AdminUsers.jsx";
-import AdminSiteSettings from "./pages/admin/AdminSiteSettings.jsx";
 import AdminFaqs from "./pages/admin/AdminFAQs.jsx";
 import AdminNotifications from "./pages/admin/AdminNotifications.jsx";
 import ClientLayout from "./pages/client/ClientLayout.jsx";
@@ -53,7 +51,6 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboard />} />
-        <Route path="reports" element={<AdminReports />} />
         <Route path="vehicles" element={<AdminVehicles />} />
         <Route path="vehicles/:id/edit" element={<AdminVehicleEdit />} />
         <Route path="vehicles/new" element={<AdminVehicleAdd />} />
@@ -63,7 +60,6 @@ export default function App() {
         <Route path="reservations/new" element={<AdminReservationAdd />} />
         <Route path="reservations/:id/edit" element={<AdminReservationAdd />} />
         <Route path="users" element={<AdminUsers label="Users & Roles" />} />
-        <Route path="site-settings" element={<AdminSiteSettings label="Site Settings" />} />
         <Route path="faqs" element={<AdminFaqs label="FAQs" />} />
         <Route path="notifications" element={<AdminNotifications label="Notifications" />} />
       </Route>

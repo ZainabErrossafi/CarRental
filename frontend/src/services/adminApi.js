@@ -83,7 +83,6 @@ export const deleteCatalogItem = async (kind, id) => {
   await api.delete(catalogPath(kind, id));
   window.dispatchEvent(new Event("rently:catalog-updated"));
 };
-export { getSiteSettings, updateSiteSettings } from './localAdminData';
 export const getExtras = async () => getList('extras/');
 
 export const getReservations = async () => {
