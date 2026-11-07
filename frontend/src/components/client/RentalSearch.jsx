@@ -94,7 +94,7 @@ export default function RentalSearch() {
       onSubmit={submit}
       onChange={() => setError("")}
       aria-label="Rechercher une voiture"
-      className="client-rental-search client-hero-copy tw:mx-auto tw:mt-7 tw:box-border tw:w-full tw:max-w-[1040px] tw:bg-transparent tw:p-0 tw:text-white"
+      className="client-rental-search client-hero-copy tw:mx-auto tw:mt-7 tw:box-border tw:w-full tw:max-w-260 tw:bg-transparent tw:p-0 tw:text-white"
     >
       <div className="client-rental-search-grid tw:grid tw:grid-cols-1 tw:items-end tw:gap-2 tw:sm:grid-cols-2 tw:xl:grid-cols-[minmax(145px,1.3fr)_minmax(145px,1.3fr)_minmax(130px,1fr)_minmax(112px,0.9fr)_minmax(130px,1fr)_minmax(112px,0.9fr)_40px]">
         {[

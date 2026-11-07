@@ -54,7 +54,6 @@ export default function AccountTwoFactor({ onBusy }) {
         try {
           localStorage.setItem(settingKey, String(data.two_factor_enabled));
         } catch {
-          /* Optional display cache. */
         }
         await refreshUser();
         setTwoFactorPassword("");
